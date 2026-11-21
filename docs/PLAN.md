@@ -31,7 +31,7 @@
 | D2  | 語言                | **只做繁體中文**(其他語言之後再說)           |
 | D3  | 購買方式            | **保留預訂制**;未來會串接物流,讓用戶直接下單 |
 | D4  | 聯絡信箱            | **weider@0061qwen.cc.cd**(暫定)              |
-| D5  | 新 GitHub repo 名稱 | **drink3cup**                                |
+| D5  | 新 GitHub repo 名稱 | **mycafe**                                   |
 
 ## 仍待擁有者提供
 
@@ -82,17 +82,17 @@
 
 ### E 階段 — 上線(需擁有者)
 
-| ID  | 標籤  | 步驟                                                                                                                                                                                                                                                                | 狀態 | 負責人 |
-| --- | ----- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---- | ------ |
-| S17 | 👤    | 建立**全新空白 Private** GitHub repo `drink3cup`(不要勾 README/.gitignore/授權檔)。若要讓 Claude 代為推送:建立 **Fine-grained token,Repository access 只選 drink3cup**,權限 Contents: Read and write,效期 7 天,用完撤銷。**不要用能存取原專案的 token**(違反鐵則 2) | ⬜   |        |
-| S18 | 👤/🤖 | 推送:`git remote add origin https://github.com/shineday999/drink3cup.git` → `git push -u origin main`(Claude 沙盒無 GitHub 憑證,擁有者在本機執行即可)                                                                                                               | ⬜   |        |
-| S19 | 👤    | Cloudflare 建立新 D1 `mycafe`、R2 `mycafe-images`、2 個 KV;ID 填入 `wrangler.jsonc`                                                                                                                                                                                 | ⬜   |        |
-| S20 | 👤    | 套用 migrations:`npx wrangler d1 migrations apply mycafe --remote`,再匯入種子                                                                                                                                                                                       | ⬜   |        |
-| S21 | 👤    | Cloudflare Pages 建立新專案 `mycafe` 連接新 repo;GitHub secrets 設定**新的**受限權限 API Token                                                                                                                                                                      | ⬜   |        |
-| S22 | 👤    | Pages → 自訂網域 → 新增 `mycafe.de5.net`(自動建立 CNAME → `mycafe.pages.dev`)                                                                                                                                                                                       | ⬜   |        |
-| S23 | 👤    | 建立管理員帳號與金鑰(管理密碼、JWT secret、Resend key),全部用新值                                                                                                                                                                                                   | ⬜   |        |
-| S25 | 🤖    | 【未來】物流串接與直接下單(取代預訂制):先調查物流商 API、金流、運費規則,另開計畫                                                                                                                                                                                    | ⬜   |        |
-| S24 | 🤖/👤 | 手機/桌面最終 QA:表單、後台登入、Email                                                                                                                                                                                                                              | ⬜   |        |
+| ID  | 標籤  | 步驟                                                                                                                                                                                                                                                          | 狀態 | 負責人 |
+| --- | ----- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---- | ------ |
+| S17 | 👤    | 建立**全新空白 Private** GitHub repo `mycafe`(不要勾 README/.gitignore/授權檔)。若要讓 Claude 代為推送:建立 **Fine-grained token,Repository access 只選 mycafe**,權限 Contents: Read and write,效期 7 天,用完撤銷。**不要用能存取原專案的 token**(違反鐵則 2) | ⬜   |        |
+| S18 | 👤/🤖 | 推送:`git remote add origin https://github.com/shineday999/mycafe.git` → `git push -u origin main`(Claude 沙盒無 GitHub 憑證,擁有者在本機執行即可)                                                                                                            | ⬜   |        |
+| S19 | 👤    | Cloudflare 建立新 D1 `mycafe`、R2 `mycafe-images`、2 個 KV;ID 填入 `wrangler.jsonc`                                                                                                                                                                           | ⬜   |        |
+| S20 | 👤    | 套用 migrations:`npx wrangler d1 migrations apply mycafe --remote`,再匯入種子                                                                                                                                                                                 | ⬜   |        |
+| S21 | 👤    | Cloudflare Pages 建立新專案 `mycafe` 連接新 repo;GitHub secrets 設定**新的**受限權限 API Token                                                                                                                                                                | ⬜   |        |
+| S22 | 👤    | Pages → 自訂網域 → 新增 `mycafe.de5.net`(自動建立 CNAME → `mycafe.pages.dev`)                                                                                                                                                                                 | ⬜   |        |
+| S23 | 👤    | 建立管理員帳號與金鑰(管理密碼、JWT secret、Resend key),全部用新值                                                                                                                                                                                             | ⬜   |        |
+| S25 | 🤖    | 【未來】物流串接與直接下單(取代預訂制):先調查物流商 API、金流、運費規則,另開計畫                                                                                                                                                                              | ⬜   |        |
+| S24 | 🤖/👤 | 手機/桌面最終 QA:表單、後台登入、Email                                                                                                                                                                                                                        | ⬜   |        |
 
 ## 紀錄
 
