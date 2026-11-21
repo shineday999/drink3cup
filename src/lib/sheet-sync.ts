@@ -69,7 +69,7 @@ export function parseCsv(input: string): string[][] {
 
 const normHeader = (s: string) => s.replace(/\s+/g, " ").trim();
 
-/** 依 slug 找出那一列；空白格子略過（不會蓋掉後台現有內容）。 */
+/** 依 slug 找出那一列；空白格子略過（不會蓋掉後臺現有內容）。 */
 export function findProductRow(rows: string[][], slug: string): SheetLookup {
   const header = rows[0];
   if (!header) return { ok: false, error: "empty" };
@@ -100,6 +100,6 @@ export function findProductRow(rows: string[][], slug: string): SheetLookup {
   return { ok: true, fills, filled, missing };
 }
 
-// 維護用的 Google 試算表（放在 Drive「龍蝦廣場」資料夾）；後台的「打开表格」連結用
+// 維護用的 Google 試算表（放在 Drive「龍蝦廣場」資料夾）；後臺的「開啟表格」連結用
 export const PRODUCT_SHEET_EDIT_URL =
   "https://docs.google.com/spreadsheets/d/1_TdcQ2Ymd5c0wzuodz-gOjSYoWvtDE4wBC_bnGbgRqI/edit";

@@ -30,10 +30,10 @@ export const POST: APIRoute = async (ctx) => {
   const slug = String(form.get("slug") ?? "");
   const status = String(form.get("status") ?? "");
 
-  if (!isCategory(category)) return fail("分类不正确");
+  if (!isCategory(category)) return fail("分類不正確");
   if (!["draft", "active", "archived"].includes(status))
-    return fail("状态不正确");
-  if (!slug || !/^[a-z0-9-]+$/.test(slug)) return fail("编号格式不正确");
+    return fail("狀態不正確");
+  if (!slug || !/^[a-z0-9-]+$/.test(slug)) return fail("編號格式不正確");
 
   const existing = await db
     .prepare("SELECT status FROM products WHERE id = ?")
@@ -45,13 +45,13 @@ export const POST: APIRoute = async (ctx) => {
     .prepare("SELECT id FROM products WHERE slug = ? AND id <> ?")
     .bind(slug, id)
     .first();
-  if (dup) return fail("这个编号已被其他商品使用");
+  if (dup) return fail("這個編號已被其他商品使用");
 
-  // 改成「上架」前先檢查資料齊不齊（與前台實際讀取的資料一致）
+  // 改成「上架」前先檢查資料齊不齊（與前臺實際讀取的資料一致）
   if (status === "active" && existing.status !== "active") {
     const missing = await checkReadiness(db, id);
     if (missing.length > 0) {
-      return fail(`还不能上架，缺少：${missing.join("、")}`);
+      return fail(`還不能上架，缺少：${missing.join("、")}`);
     }
   }
 

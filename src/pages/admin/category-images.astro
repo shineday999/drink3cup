@@ -11,7 +11,7 @@ import {
   type SiteCategory,
 } from "../../lib/categories";
 
-// /admin/category-images — 首頁「手作路线」分類卡片：標題、簡介、圖片、排序；可新增 / 刪除分類。
+// /admin/category-images — 首頁「手作路線」分類卡片：標題、簡介、圖片、排序；可新增 / 刪除分類。
 // 沒上傳圖片的 jewelry / incense 使用靜態預設圖。
 const t = createT(zhHansMessages as Record<string, unknown>);
 
@@ -55,7 +55,7 @@ const label = (c: SiteCategory) =>
 
 <AdminLayout title={t("admin.category_images.title")} active="category_images">
   <p class="mb-3 text-sm text-text-secondary">
-    首页「手作路线」的分类卡片：可改各语言标题与简介、换图片、调整顺序，也可以新增或删除分类。语言栏留空时，首页会使用默认文字。
+    首頁「手作路線」的分類卡片：可改各語言標題與簡介、換圖片、調整順序，也可以新增或刪除分類。語言欄留空時，首頁會使用預設文字。
   </p>
 
   {
@@ -101,7 +101,7 @@ const label = (c: SiteCategory) =>
                   ? t("admin.category_images.current_custom")
                   : src
                     ? t("admin.category_images.current_default")
-                    : "未设置图片"}
+                    : "未設定圖片"}
               </p>
             </div>
             <div class="flex-1 space-y-3 min-w-0">
@@ -117,14 +117,14 @@ const label = (c: SiteCategory) =>
                   data-ci-delete={c.code}
                   class="shrink-0 text-xs text-error underline underline-offset-2 hover:opacity-80"
                 >
-                  删除分类
+                  刪除分類
                 </button>
               </div>
 
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 {locales.map((l) => (
                   <label class="block text-xs text-text-muted">
-                    标题 · {localeNames[l]}
+                    標題 · {localeNames[l]}
                     <input
                       type="text"
                       maxlength="60"
@@ -139,12 +139,12 @@ const label = (c: SiteCategory) =>
 
               <details open>
                 <summary class="cursor-pointer text-xs text-forest-700">
-                  简介（显示在首页卡片上，可选）
+                  簡介（顯示在首頁卡片上，可選）
                 </summary>
                 <div class="grid grid-cols-1 gap-2 mt-2">
                   {locales.map((l) => (
                     <label class="block text-xs text-text-muted">
-                      简介 · {localeNames[l]}
+                      簡介 · {localeNames[l]}
                       <input
                         type="text"
                         maxlength="200"
@@ -159,7 +159,7 @@ const label = (c: SiteCategory) =>
               </details>
 
               <label class="inline-block text-xs text-text-muted">
-                排序（数字小的在前）
+                排序（數字小的在前）
                 <input
                   type="number"
                   data-ci-sort={c.code}
@@ -195,10 +195,10 @@ const label = (c: SiteCategory) =>
     <section
       class="bg-bg-card border border-dashed border-text-muted/40 rounded-card p-4 space-y-3"
     >
-      <h3 class="font-serif text-lg">新增分类</h3>
+      <h3 class="font-serif text-lg">新增分類</h3>
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
         <label class="block text-xs text-text-muted">
-          代码（小写英文、数字、连字符，如 bracelet）
+          程式碼（小寫英文、數字、連字元，如 bracelet）
           <input
             id="ci-new-code"
             type="text"
@@ -207,7 +207,7 @@ const label = (c: SiteCategory) =>
           />
         </label>
         <label class="block text-xs text-text-muted">
-          标题 · 简体中文
+          標題 · 簡體中文
           <input
             id="ci-new-title"
             type="text"
@@ -217,7 +217,7 @@ const label = (c: SiteCategory) =>
         </label>
       </div>
       <label class="block text-xs text-text-muted">
-        简介 · 简体中文（可选，显示在首页卡片上）
+        簡介 · 簡體中文（可選，顯示在首頁卡片上）
         <input
           id="ci-new-desc"
           type="text"
@@ -226,8 +226,8 @@ const label = (c: SiteCategory) =>
         />
       </label>
       <p class="text-xs text-text-muted">
-        代码就是商品的分类代码（首页卡片会链接到
-        /products?cat=代码）。建立后再补其他语言标题与图片。
+        程式碼就是商品的分類程式碼（首頁卡片會連結到
+        /products?cat=程式碼）。建立後再補其他語言標題與圖片。
       </p>
       <button
         type="button"
@@ -456,7 +456,7 @@ const label = (c: SiteCategory) =>
         if (delBtn) {
           var code = delBtn.getAttribute("data-ci-delete");
           if (
-            !window.confirm("确定删除分类「" + code + "」？图片也会一起删除。")
+            !window.confirm("確定刪除分類「" + code + "」？圖片也會一起刪除。")
           )
             return;
           api({ action: "delete", code: code })

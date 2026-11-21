@@ -109,7 +109,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
   context.locals.locale = locale;
   context.locals.messages = messages;
 
-  // Wave 28.7: 載入 D1 site_settings（30 秒快取，後台存檔時會立刻失效）。
+  // Wave 28.7: 載入 D1 site_settings（30 秒快取，後臺存檔時會立刻失效）。
   // 匯率表（D1 exchange_rates，60 秒快取）：formatPrice 依它換算各語言顯示價格。
   // 兩者互不相依，快取過期時一起查，只付一趟 D1 往返的時間。
   const [siteSettings] = await Promise.all([

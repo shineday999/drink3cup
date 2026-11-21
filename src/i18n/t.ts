@@ -45,7 +45,7 @@ export function createT(messages: Messages): Translator {
  * to the raw D1 value rather than showing the dot-notation key).
  *
  * Example: tEnum(t, 'status', 'pending') -> t('admin.value.status.pending')
- *          if defined -> '待确认'; else fallback -> 'pending'.
+ *          if defined -> '待確認'; else fallback -> 'pending'.
  */
 export function tEnum(t: Translator, kind: string, value: string): string {
   if (!value) return value;

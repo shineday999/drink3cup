@@ -78,7 +78,7 @@ const th =
     rel="noopener noreferrer"
     class="text-sm text-text-secondary hover:underline">商品描述表格 ↗</a
   >
-  <nav class="mb-3 flex gap-2 overflow-x-auto pb-1" aria-label="商品状态筛选">
+  <nav class="mb-3 flex gap-2 overflow-x-auto pb-1" aria-label="商品狀態篩選">
     {
       chips.map((c) => (
         <a
@@ -108,7 +108,7 @@ const th =
           <th class={th}>{t("admin.products_list.col_image")}</th>
           <th class={th}>{t("admin.products_list.col_name")}</th>
           <th class={th}>{t("admin.products_list.col_category")}</th>
-          <th class={th}>售价</th>
+          <th class={th}>售價</th>
           <th class={th}>{t("admin.products_list.col_status")}</th>
           <th class={`${th} text-right`}>
             {t("admin.products_list.col_actions")}
@@ -191,7 +191,7 @@ const th =
                   method="POST"
                   action={`/api/admin/products/${p.id}`}
                   class="ml-3 inline"
-                  onsubmit="return confirm('确定删除该商品？此操作无法撤销。')"
+                  onsubmit="return confirm('確定刪除該商品？此操作無法撤銷。')"
                 >
                   <input type="hidden" name="_action" value="delete" />
                   <button

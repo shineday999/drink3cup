@@ -74,7 +74,7 @@ const [siteImgRes, siteCatRes, featuredRes, bannerRes] = await Promise.all([
     : null,
 ]);
 
-// 後台「分類圖片」：沒上傳（或資料表還不存在）時沿用靜態預設圖
+// 後臺「分類圖片」：沒上傳（或資料表還不存在）時沿用靜態預設圖
 const catImages = {
   jewelry: {
     src: "/images/banners/cat-jewelry.jpg",
@@ -97,7 +97,7 @@ for (const r of siteImgRes?.results ?? []) {
   }
 }
 
-// 分類卡片：由後台「分類圖片」管理（site_categories）；沒有資料時用預設的 jewelry / incense
+// 分類卡片：由後臺「分類圖片」管理（site_categories）；沒有資料時用預設的 jewelry / incense
 interface HomeCategory {
   code: string;
   zhTitle: string;
@@ -169,7 +169,7 @@ const homeCategories: HomeCategory[] = homeCatRows.map((c) => {
   return {
     code: c.code,
     zhTitle: c.titles["zh-Hant"] ?? "",
-    // 後台有設定名稱時，名稱只顯示後台的；沒設定才退回舊的導覽名稱
+    // 後臺有設定名稱時，名稱只顯示後臺的；沒設定才退回舊的導覽名稱
     kicker: c.titles[locale] || c.titles["zh-Hant"] ? "" : legacyT(lk?.kicker),
     title,
     desc: c.descs[locale] || legacyT(lk?.desc) || c.descs["zh-Hant"] || "",
@@ -179,7 +179,7 @@ const homeCategories: HomeCategory[] = homeCatRows.map((c) => {
   };
 });
 
-// 「找一件」卡片：跟著分類走，名稱讀後台「分类图片」的標題。
+// 「找一件」卡片：跟著分類走，名稱讀後臺「分類圖片」的標題。
 // 只有 jewelry / incense 有測驗；自訂分類的卡片連到該分類的商品列表。
 interface QuizCard {
   href: string;

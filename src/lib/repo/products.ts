@@ -1,5 +1,5 @@
-// 後台產品 repository（步驟 1.3 讀取、1.4 寫入、1.5 變體與價格）
-// - 所有函式第一個參數都是 D1Database，方便測試時換成假的；頁面與 API 用 getDB() 傳入
+// 後臺產品 repository（步驟 1.3 讀取、1.4 寫入、1.5 變體與價格）
+// - 所有函式第一個引數都是 D1Database，方便測試時換成假的；頁面與 API 用 getDB() 傳入
 // - 不在這裡 import ../db 的執行期內容（它依賴 cloudflare:workers，測試環境載不到），只 import type
 import type { Product, ProductTranslation } from "../db";
 import {
@@ -53,7 +53,7 @@ function mapConstraintError(e: unknown): never {
 
 /**
  * product_variants.price_base 仍是 NOT NULL，要等 6.5 移除欄位前都得寫入。
- * 取 TWD（新台幣）價格（沒有就取第一個幣別）換成「元」字串，例如 92000 → "920.00"。
+ * 取 TWD（新臺幣）價格（沒有就取第一個幣別）換成「元」字串，例如 92000 → "920.00"。
  */
 export function derivePriceBase(prices: Record<string, number>): string {
   const cents = prices.TWD ?? Object.values(prices)[0];
@@ -478,7 +478,7 @@ export async function setProductStatus(
   await updateProduct(db, id, { status });
 }
 
-/** 直接刪除商品；翻譯、變體、價格、評論由外鍵 ON DELETE CASCADE 一併刪除。 */
+/** 直接刪除商品；翻譯、變體、價格、評論由外部索引鍵 ON DELETE CASCADE 一併刪除。 */
 export async function deleteProduct(
   db: D1Database,
   id: string,
@@ -585,7 +585,7 @@ export async function setVariantPrices(
   ]);
 }
 
-/** 商品至少要留一個變體，刪最後一個會丟 last_variant。價格由外鍵一併刪除。 */
+/** 商品至少要留一個變體，刪最後一個會丟 last_variant。價格由外部索引鍵一併刪除。 */
 export async function deleteVariant(
   db: D1Database,
   productId: string,

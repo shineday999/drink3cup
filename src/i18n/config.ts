@@ -1,4 +1,4 @@
-// 目前只做繁體中文。未來要加語言:在此加入代碼、補 loader 與 messages/<code>.json。
+// 目前只做繁體中文。未來要加語言:在此加入程式碼、補 loader 與 messages/<code>.json。
 export const locales = ["zh-Hant"] as const;
 export type Locale = (typeof locales)[number];
 export const defaultLocale: Locale = "zh-Hant";

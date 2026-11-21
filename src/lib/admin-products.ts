@@ -1,4 +1,4 @@
-// 後台商品共用邏輯：自動編號、價格換算、標籤預設、圖片處理、新增與上架檢查
+// 後臺商品共用邏輯：自動編號、價格換算、標籤預設、圖片處理、新增與上架檢查
 // 注意：這裡不 import "./db"（它會載入 cloudflare:workers），方便在 Node 內單元測試。
 import { JEWELRY_STEPS, INCENSE_STEPS, TEA_STEPS, type QuizStep } from "./quiz";
 import type { QuizKind } from "./category-kind";
@@ -11,7 +11,7 @@ export function isCategory(v: string): v is Category {
   return (CATEGORIES as readonly string[]).includes(v);
 }
 
-/** 後台「分类图片」可以新增分類；新增商品時可選的分類 = 那裡的分類代碼（沒傳就只認內建兩個）。 */
+/** 後臺「分類圖片」可以新增分類；新增商品時可選的分類 = 那裡的分類程式碼（沒傳就只認內建兩個）。 */
 function isAllowedCategory(v: string, validCodes?: readonly string[]): boolean {
   return (validCodes ?? CATEGORIES).includes(v);
 }
@@ -21,7 +21,7 @@ export const SUBCATEGORIES: Record<Category, readonly string[]> = {
   incense: ["stick", "balm", "oil"],
 };
 
-// ---------- 標籤預設（來源：測驗各題的答案值，「为我推荐」靠它們比對） ----------
+// ---------- 標籤預設（來源：測驗各題的答案值，「為我推薦」靠它們比對） ----------
 export interface TagGroup {
   id: string;
   titleKey: string;
@@ -73,7 +73,7 @@ export function buildTags(
 }
 
 // ---------- 自動編號 ----------
-/** 台灣時間（UTC+8）的 YYYYMMDD */
+/** 臺灣時間（UTC+8）的 YYYYMMDD */
 export function todayStamp(now: number = Date.now()): string {
   const d = new Date(now + 8 * 3600 * 1000);
   const y = d.getUTCFullYear();
@@ -105,7 +105,7 @@ export async function uniqueSlug(
       .first();
     if (!hit) return candidate;
   }
-  throw new Error("编号冲突过多，请稍后重试");
+  throw new Error("編號衝突過多，請稍後重試");
 }
 
 export async function uniqueSku(db: D1Database, slug: string): Promise<string> {
@@ -117,7 +117,7 @@ export async function uniqueSku(db: D1Database, slug: string): Promise<string> {
       .first();
     if (!hit) return sku;
   }
-  throw new Error("规格编号冲突过多，请稍后重试");
+  throw new Error("規格編號衝突過多，請稍後重試");
 }
 
 export function newId(prefix: string): string {
@@ -125,8 +125,8 @@ export function newId(prefix: string): string {
 }
 
 // ---------- 價格 ----------
-// 售價以新台幣（TWD）記錄：product_prices 的 TWD 列，amount 單位為分。
-// 各語言前台再依匯率表（exchange_rates）換算成當地貨幣顯示。
+// 售價以新臺幣（TWD）記錄：product_prices 的 TWD 列，amount 單位為分。
+// 各語言前臺再依匯率表（exchange_rates）換算成當地貨幣顯示。
 export const PRICE_CURRENCY = "TWD";
 
 export function parsePrice(raw: string): number | null {
@@ -156,12 +156,12 @@ export function pickImages(form: FormData, field = "images"): File[] {
 }
 
 export function checkImages(files: File[]): string | null {
-  if (files.length > MAX_IMAGES) return `最多上传 ${MAX_IMAGES} 张图片`;
+  if (files.length > MAX_IMAGES) return `最多上傳 ${MAX_IMAGES} 張圖片`;
   for (const f of files) {
     if (!IMAGE_EXT[f.type]) {
-      return `不支持的图片格式：${f.name}（仅支持 JPG / PNG / WebP / GIF）`;
+      return `不支援的圖片格式：${f.name}（僅支援 JPG / PNG / WebP / GIF）`;
     }
-    if (f.size > MAX_IMAGE_BYTES) return `图片过大：${f.name}（单张上限 5MB）`;
+    if (f.size > MAX_IMAGE_BYTES) return `圖片過大：${f.name}（單張上限 5MB）`;
   }
   return null;
 }
@@ -252,32 +252,32 @@ export function validateNewProduct(
 ): string[] {
   const errors: string[] = [];
   if (!isAllowedCategory(v.category, validCodes)) {
-    errors.push("请选择分类");
+    errors.push("請選擇分類");
   } else if (
     v.subcategory &&
     !(isCategory(v.category) ? SUBCATEGORIES[v.category] : []).includes(
       v.subcategory,
     )
   ) {
-    errors.push("子分类与分类不符");
+    errors.push("子分類與分類不符");
   }
-  if (!v.name_zh) errors.push("请填写中文名称");
+  if (!v.name_zh) errors.push("請填寫中文名稱");
   if (!v.name_en) {
     errors.push("請填寫英文名稱（用來自動產生商品網址與編號）");
   } else if (!slugifyEnglish(v.name_en)) {
     errors.push("英文名稱需要包含英文字母或數字（用來自動產生商品網址與編號）");
   }
-  if (!v.desc_zh) errors.push("请填写中文描述");
+  if (!v.desc_zh) errors.push("請填寫中文描述");
   if (parsePrice(v.price) === null)
-    errors.push("请填写大于 0 的售价（新台幣）");
+    errors.push("請填寫大於 0 的售價（新臺幣）");
   const stock = Number(v.stock);
   if (!Number.isInteger(stock) || stock < 0 || stock > 99999) {
-    errors.push("库存需为 0 以上的整数");
+    errors.push("庫存需為 0 以上的整數");
   }
   if (v.weight) {
     const w = Number(v.weight);
     if (!Number.isFinite(w) || w < 0 || w > 1_000_000) {
-      errors.push("重量需为 0 以上的数字（克）");
+      errors.push("重量需為 0 以上的數字（克）");
     }
   }
   const imgErr = checkImages(files);
@@ -290,7 +290,7 @@ export interface CreateResult {
   slug: string;
   sku: string;
   status: "draft" | "active";
-  /** 想上架但還缺的項目（空陣列表示沒問題） */
+  /** 想上架但還缺的專案（空陣列表示沒問題） */
   blocked: string[];
 }
 
@@ -303,8 +303,8 @@ export async function createProduct(
   validCodes?: readonly string[],
   kinds?: Record<string, QuizKind | null>,
 ): Promise<CreateResult> {
-  if (!isAllowedCategory(v.category, validCodes)) throw new Error("分类不正确");
-  if (files.length > 0 && !r2) throw new Error("R2 未绑定，无法上传图片");
+  if (!isAllowedCategory(v.category, validCodes)) throw new Error("分類不正確");
+  if (files.length > 0 && !r2) throw new Error("R2 未繫結，無法上傳圖片");
 
   const now = Math.floor(Date.now() / 1000);
   const id = newId("prod");
@@ -328,7 +328,7 @@ export async function createProduct(
   const tags = kind ? buildTags(kind, v.tags) : "";
 
   const blocked: string[] = [];
-  if (urls.length === 0) blocked.push("至少 1 张图片");
+  if (urls.length === 0) blocked.push("至少 1 張圖片");
   const status: "draft" | "active" =
     intent === "publish" && blocked.length === 0 ? "active" : "draft";
 
@@ -383,7 +383,7 @@ export async function createProduct(
 }
 
 // ---------- 上架檢查 ----------
-/** 回傳還缺哪些項目；空陣列＝可以上架。判斷標準與前台實際讀取的資料一致。 */
+/** 回傳還缺哪些專案；空陣列＝可以上架。判斷標準與前臺實際讀取的資料一致。 */
 export async function checkReadiness(
   db: D1Database,
   productId: string,
@@ -396,7 +396,7 @@ export async function checkReadiness(
     )
     .bind(productId)
     .first<{ name: string; description: string }>();
-  if (!tr?.name?.trim()) missing.push("中文名称");
+  if (!tr?.name?.trim()) missing.push("中文名稱");
   if (!tr?.description?.trim()) missing.push("中文描述");
 
   const variant = await db
@@ -407,7 +407,7 @@ export async function checkReadiness(
     .first<{ id: string; image_urls: string }>();
 
   if (!variant) {
-    missing.push("规格（售价、库存、图片）");
+    missing.push("規格（售價、庫存、圖片）");
     return missing;
   }
 
@@ -417,7 +417,7 @@ export async function checkReadiness(
     )
     .bind(variant.id)
     .first<{ amount: number }>();
-  if (!price || price.amount <= 0) missing.push("售价");
+  if (!price || price.amount <= 0) missing.push("售價");
 
   let imgs: unknown = [];
   try {
@@ -425,7 +425,7 @@ export async function checkReadiness(
   } catch {
     imgs = [];
   }
-  if (!Array.isArray(imgs) || imgs.length === 0) missing.push("至少 1 张图片");
+  if (!Array.isArray(imgs) || imgs.length === 0) missing.push("至少 1 張圖片");
 
   return missing;
 }

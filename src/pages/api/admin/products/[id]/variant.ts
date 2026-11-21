@@ -13,7 +13,7 @@ import {
   uploadImages,
 } from "../../../../../lib/admin-products";
 
-// 儲存商品的規格：售價（新台幣，單位分）、庫存、重量、圖片。
+// 儲存商品的規格：售價（新臺幣，單位分）、庫存、重量、圖片。
 // 還沒有規格的舊商品（只有封面圖）也從這裡補齊。
 export const POST: APIRoute = async (ctx) => {
   if (!ctx.locals.admin) return new Response("Unauthorized", { status: 401 });
@@ -42,15 +42,15 @@ export const POST: APIRoute = async (ctx) => {
   const price = parsePrice(String(form.get("price") ?? ""));
   const stock = Number(String(form.get("stock") ?? ""));
   const weightRaw = String(form.get("weight") ?? "").trim();
-  if (price === null) return fail("请填写大于 0 的售价（新台幣）");
+  if (price === null) return fail("請填寫大於 0 的售價（新臺幣）");
   if (!Number.isInteger(stock) || stock < 0 || stock > 99999) {
-    return fail("库存需为 0 以上的整数");
+    return fail("庫存需為 0 以上的整數");
   }
   let weight: number | null = null;
   if (weightRaw) {
     const w = Number(weightRaw);
     if (!Number.isFinite(w) || w < 0 || w > 1_000_000) {
-      return fail("重量需为 0 以上的数字（克）");
+      return fail("重量需為 0 以上的數字（克）");
     }
     weight = Math.round(w);
   }
@@ -86,14 +86,14 @@ export const POST: APIRoute = async (ctx) => {
   const imgErr = checkImages(files);
   if (imgErr) return fail(imgErr);
   if (keep.length + files.length > MAX_IMAGES) {
-    return fail(`最多 ${MAX_IMAGES} 张图片（含已有的），请先删除一些`);
+    return fail(`最多 ${MAX_IMAGES} 張圖片（含已有的），請先刪除一些`);
   }
   if (product.status === "active" && keep.length + files.length === 0) {
-    return fail("已上架的商品至少要保留 1 张图片（请先下架再删除）");
+    return fail("已上架的商品至少要保留 1 張圖片（請先下架再刪除）");
   }
 
   const r2 = env.PRODUCT_IMAGES;
-  if (files.length > 0 && !r2) return fail("R2 未绑定，无法上传图片");
+  if (files.length > 0 && !r2) return fail("R2 未繫結，無法上傳圖片");
   const newUrls =
     files.length > 0
       ? await uploadImages(r2, id, files, current.length + 1)
@@ -151,7 +151,7 @@ export const POST: APIRoute = async (ctx) => {
     await db.batch(stmts);
   } catch (e) {
     if (r2) await deleteImages(r2, newUrls);
-    return fail(e instanceof Error ? e.message : "保存失败，请稍后重试");
+    return fail(e instanceof Error ? e.message : "儲存失敗，請稍後重試");
   }
 
   // 資料庫寫入成功後，再清掉被刪除的舊圖

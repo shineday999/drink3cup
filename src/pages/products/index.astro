@@ -1,7 +1,7 @@
 ---
 import { env } from "cloudflare:workers";
 
-// 前台商品列表頁(SSR)
+// 前臺商品列表頁(SSR)
 import Layout from "@layouts/Layout.astro";
 import ProductCard from "@components/ProductCard.astro";
 import { createT } from "../../i18n/t";
@@ -41,7 +41,7 @@ const sortOptions = (
   return { key, label, href: u.pathname + u.search, current: sort === key };
 });
 
-// 分類標籤與標題：讀後台「分类图片」的分類（含新增的），不再寫死兩個
+// 分類標籤與標題：讀後臺「分類圖片」的分類（含新增的），不再寫死兩個
 const LEGACY_CHIP: Record<string, string> = {
   jewelry: String(t("products.filter_jewelry")),
   incense: String(t("products.filter_incense")),

@@ -1,7 +1,7 @@
 ---
 import { env } from "cloudflare:workers";
 
-// /admin/banners — 首頁橫幅管理（「设置」群組的「首页横幅」頁籤）
+// /admin/banners — 首頁橫幅管理（「設定」群組的「首頁橫幅」頁籤）
 // 上傳、啟用／停用、編輯說明與排序、換手機版圖片、刪除。
 // 對應的 API：/api/admin/banners（新增）、/api/admin/banners/[id]（PATCH／DELETE，以 _method 覆寫）。
 import AdminLayout from "../../../layouts/AdminLayout.astro";
@@ -36,9 +36,9 @@ const accept = "image/jpeg,image/png,image/webp,image/gif";
 
 <AdminLayout title={t("admin.banners.title")} active="settings">
   <p class="mb-4 text-sm text-text-muted">
-    {t("admin.banners.dimension_label")} 1920×1080 ・ 共 {list.length} 张，启用 {
+    {t("admin.banners.dimension_label")} 1920×1080 ・ 共 {list.length} 張，啟用 {
       activeCount
-    } 张
+    } 張
   </p>
 
   <details
@@ -140,7 +140,7 @@ const accept = "image/jpeg,image/png,image/webp,image/gif";
                   b.active === 1 ? "bg-forest-700" : "bg-text-muted"
                 }`}
               >
-                {b.active === 1 ? "启用中" : "已停用"}
+                {b.active === 1 ? "啟用中" : "已停用"}
               </span>
               {b.mobile_image_url && (
                 <img
@@ -188,7 +188,7 @@ const accept = "image/jpeg,image/png,image/webp,image/gif";
 
             <details class="border-t border-text-muted/15 px-3 py-2 text-sm">
               <summary class="cursor-pointer list-none text-xs text-text-secondary [&::-webkit-details-marker]:hidden">
-                编辑说明、排序、手机版图片 ▾
+                編輯說明、排序、手機版圖片 ▾
               </summary>
               <form
                 method="POST"
@@ -257,7 +257,7 @@ const accept = "image/jpeg,image/png,image/webp,image/gif";
 
   <script is:inline>
     (function () {
-      var confirmText = "确定删除该横幅？图片会从 R2 一并移除";
+      var confirmText = "確定刪除該橫幅？圖片會從 R2 一併移除";
       document.querySelectorAll("[data-banner-id]").forEach(function (btn) {
         btn.addEventListener("click", function () {
           var id = btn.getAttribute("data-banner-id");

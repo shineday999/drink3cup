@@ -197,7 +197,7 @@ const nav = [
 
     <title>{title}</title>
     <style is:inline data-critical-shell>
-      /* app-shell 6.4e：導覽列在 mobile.css 載入前也不佔文件流，避免樣式到達時整頁位移 */
+      /* app-shell 6.4e：導覽列在 mobile.css 載入前也不佔檔案流，避免樣式到達時整頁位移 */
       @media (max-width: 767.98px) {
         .m-header,
         .m-tabbar {
@@ -238,7 +238,7 @@ const nav = [
       href="#main-content"
       class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-accent-700 focus:text-bg-base focus:rounded"
     >
-      跳至主要内容
+      跳至主要內容
     </a>
     <!-- Wave 12: Awwwards-tier scroll progress indicator (z-60 above mobile menu z-50; aria-hidden; JS-only state) -->
     <div class="scroll-progress" aria-hidden="true">

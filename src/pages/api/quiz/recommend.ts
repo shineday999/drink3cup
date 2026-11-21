@@ -13,7 +13,7 @@ export const POST: APIRoute = async (ctx) => {
     return new Response("Invalid quiz type", { status: 400 });
   }
 
-  // 商品分類代碼：jewelry / incense 固定；tea 用後台「分类图片」裡那個茶葉分類的實際代碼
+  // 商品分類程式碼：jewelry / incense 固定；tea 用後臺「分類圖片」裡那個茶葉分類的實際程式碼
   let category: string = type;
   if (type === "tea") {
     category = "";

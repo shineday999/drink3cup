@@ -10,7 +10,7 @@ const messagesImporters: Record<Locale, () => Promise<{ default: Messages }>> =
 const cache = new Map<Locale, Messages>();
 
 // F-06: prototype pollution defense — 過濾 __proto__/constructor/prototype keys,
-// 即使 attacker 控制 messages JSON 也無法污染 Object.prototype
+// 即使 attacker 控制 messages JSON 也無法汙染 Object.prototype
 const FORBIDDEN_KEY_PARTS = new Set(["__proto__", "constructor", "prototype"]);
 
 function sanitizeMessages(value: unknown): unknown {

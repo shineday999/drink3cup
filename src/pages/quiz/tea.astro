@@ -9,7 +9,7 @@ const locale = (Astro.locals.locale ?? defaultLocale) as Locale;
 const messages = (Astro.locals.messages ?? {}) as Record<string, unknown>;
 const t = createT(messages);
 
-// 茶葉分類在後台的實際代碼（首頁卡片帶進來；沒帶就用 tea）
+// 茶葉分類在後臺的實際程式碼（首頁卡片帶進來；沒帶就用 tea）
 const catParam = Astro.url.searchParams.get("cat") ?? "tea";
 const cat = /^[a-z0-9][a-z0-9-]{0,29}$/.test(catParam) ? catParam : "tea";
 

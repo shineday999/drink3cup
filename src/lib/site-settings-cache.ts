@@ -1,6 +1,6 @@
 // site_settings 的短暫快取（每個 Worker isolate 各自一份）。
 // middleware 每個請求都會讀 site_settings；沒有快取時每次請求都多一趟 D1 往返，直接墊高 TTFB。
-// 跟 rates.ts 同樣做法：TTL 內不再查 D1，後台改設定時主動讓快取失效。
+// 跟 rates.ts 同樣做法：TTL 內不再查 D1，後臺改設定時主動讓快取失效。
 const TTL_MS = 30_000;
 
 let cached: { value: unknown; expiresAt: number } | null = null;

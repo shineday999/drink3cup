@@ -1,4 +1,4 @@
-// 後台認證 — 本地 email+password 登入 + session JWT cookie
+// 後臺認證 — 本地 email+password 登入 + session JWT cookie
 // 取代 2026-10-01 之前的 Cloudflare Access 流程(已拔除)
 // F-01: bcryptjs verify password against admin_users.password_hash (cost 12)
 // F-02: jose HS256 簽 session JWT cookie,12h exp

@@ -3,7 +3,7 @@ import { env } from "cloudflare:workers";
 import { setSessionCookie, verifyPassword } from "../../../lib/auth";
 
 // 登入限流：同 IP 15 分鐘內失敗 5 次即鎖定 15 分鐘。
-// 計數存在 KV（SESSION），跨 Worker 實例、重新部署都有效。
+// 計數存在 KV（SESSION），跨 Worker 例項、重新部署都有效。
 // KV 為最終一致，極短時間內的並發請求可能少算幾次，足以擋住暴力破解。
 const MAX_ATTEMPTS = 5;
 const WINDOW_MS = 15 * 60 * 1000;

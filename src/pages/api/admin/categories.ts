@@ -7,7 +7,7 @@ import {
   ensureCategoryTable,
 } from "../../../lib/categories";
 
-// 後台「分類」：新增 / 儲存標題簡介排序 / 刪除。圖片上傳另見 category-images.ts。
+// 後臺「分類」：新增 / 儲存標題簡介排序 / 刪除。圖片上傳另見 category-images.ts。
 const PREFIX = "/api/images/";
 
 const json = (body: Record<string, unknown>, status = 200) =>
@@ -44,19 +44,19 @@ export const POST: APIRoute = async (ctx) => {
       .toLowerCase();
     if (!CODE_RE.test(code)) {
       return json(
-        { error: "代码只能用小写英文、数字、连字符（最长 30 字）" },
+        { error: "程式碼只能用小寫英文、數字、連字元（最長 30 字）" },
         400,
       );
     }
     const titles = cleanTextMap(body.titles, 60);
     if (!titles["zh-Hant"]) {
-      return json({ error: "请填写简体中文标题" }, 400);
+      return json({ error: "請填寫簡體中文標題" }, 400);
     }
     const exists = await db
       .prepare("SELECT 1 AS x FROM site_categories WHERE code = ?")
       .bind(code)
       .first();
-    if (exists) return json({ error: "这个代码已经存在" }, 409);
+    if (exists) return json({ error: "這個程式碼已經存在" }, 409);
     const max = await db
       .prepare("SELECT COALESCE(MAX(sort_order), 0) AS m FROM site_categories")
       .first<{ m: number }>();
@@ -107,7 +107,7 @@ export const POST: APIRoute = async (ctx) => {
       .prepare("SELECT COUNT(*) AS n FROM site_categories")
       .first<{ n: number }>();
     if ((total?.n ?? 0) <= 1) {
-      return json({ error: "至少要保留一个分类" }, 409);
+      return json({ error: "至少要保留一個分類" }, 409);
     }
 
     try {
@@ -117,7 +117,7 @@ export const POST: APIRoute = async (ctx) => {
         .first<{ n: number }>();
       if ((used?.n ?? 0) > 0) {
         return json(
-          { error: `还有 ${used?.n} 个商品属于这个分类，请先改掉它们的分类` },
+          { error: `還有 ${used?.n} 個商品屬於這個分類，請先改掉它們的分類` },
           409,
         );
       }

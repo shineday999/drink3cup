@@ -31,7 +31,7 @@ if (!Astro.locals.admin) {
 
 const t = createT(zhHansMessages as Record<string, unknown>);
 
-// 分類選項 = 「分类图片」页的分类（代码 + 简体中文标题），不再写死两个
+// 分類選項 = 「分類圖片」頁的分類（程式碼 + 簡體中文標題），不再寫死兩個
 const LEGACY_LABEL: Record<string, string> = {
   jewelry: String(t("admin.category_images.slot_jewelry")),
   incense: String(t("admin.category_images.slot_incense")),
@@ -45,7 +45,7 @@ try {
   siteCategories = [];
 }
 if (siteCategories.length === 0) {
-  // 读不到分类表时退回内建两个，页面仍可使用
+  // 讀不到分類表時退回內建兩個，頁面仍可使用
   siteCategories = CATEGORIES.map((code, i) => ({
     code,
     sort_order: i + 1,
@@ -92,13 +92,13 @@ if (Astro.request.method === "POST") {
         303,
       );
     } catch (e) {
-      errors = [e instanceof Error ? e.message : "保存失败，请稍后重试"];
+      errors = [e instanceof Error ? e.message : "儲存失敗，請稍後重試"];
     }
   }
 }
 
 const stamp = todayStamp();
-// 價格預覽用：1 新台幣 = 多少該幣別（來自後台「汇率」表）
+// 價格預覽用：1 新臺幣 = 多少該幣別（來自後臺「匯率」表）
 const rates = Object.fromEntries(
   ["TWD", "USD", "MYR", "IDR"].map((c) => [c, getRates()[c] ?? 1]),
 );
@@ -110,7 +110,7 @@ const card =
 
 <AdminLayout title={t("admin.products_new.title")} active="products">
   <p class="mb-3 max-w-3xl text-sm text-text-secondary">
-    填完下面 4 个部分就可以上架。编号和规格编号由系统自动生成，不需要手动填写。
+    填完下面 4 個部分就可以上架。編號和規格編號由系統自動生成，不需要手動填寫。
   </p>
 
   {
@@ -119,13 +119,13 @@ const card =
         role="alert"
         class="mb-4 max-w-3xl rounded-card border border-error/40 bg-error/10 p-4 text-sm"
       >
-        <p class="font-medium text-error mb-1">还有几项需要处理：</p>
+        <p class="font-medium text-error mb-1">還有幾項需要處理：</p>
         <ul class="list-disc pl-5 space-y-0.5">
           {errors.map((m) => (
             <li>{m}</li>
           ))}
         </ul>
-        <p class="mt-2 text-text-muted">图片不会被保留，请重新选择。</p>
+        <p class="mt-2 text-text-muted">圖片不會被保留，請重新選擇。</p>
       </div>
     )
   }
@@ -139,13 +139,13 @@ const card =
   >
     <input type="hidden" name="intent" value="draft" />
 
-    <!-- 1. 基本资料 -->
+    <!-- 1. 基本資料 -->
     <section class={card}>
-      <h2 class="font-serif text-lg">① 这是什么商品</h2>
+      <h2 class="font-serif text-lg">① 這是什麼商品</h2>
 
       <fieldset>
         <legend class="block text-sm font-medium mb-2">
-          分类 <span class="text-error">*</span>
+          分類 <span class="text-error">*</span>
         </legend>
         <div class="grid grid-cols-2 gap-3">
           {
@@ -166,7 +166,7 @@ const card =
       </fieldset>
 
       <div>
-        <label class="block text-sm font-medium mb-1" for="np-sub">子分类</label
+        <label class="block text-sm font-medium mb-1" for="np-sub">子分類</label
         >
         <select id="np-sub" name="subcategory" class={field}>
           <option value="">—</option>
@@ -189,7 +189,7 @@ const card =
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label class="block text-sm font-medium mb-1" for="np-name-zh"
-            >中文名称 <span class="text-error">*</span></label
+            >中文名稱 <span class="text-error">*</span></label
           >
           <input
             id="np-name-zh"
@@ -198,7 +198,7 @@ const card =
             required
             maxlength="100"
             value={values.name_zh}
-            placeholder="如：抚顺琥珀吊坠"
+            placeholder="如：撫順琥珀吊墜"
             class={field}
           />
         </div>
@@ -219,14 +219,14 @@ const card =
         </div>
       </div>
       <p class="text-xs text-text-muted -mt-2">
-        编号：<span id="np-slug-preview" class="font-mono text-text-secondary"
+        編號：<span id="np-slug-preview" class="font-mono text-text-secondary"
         ></span>
-        （保存时如果重复，系统会自动加序号）
+        （儲存時如果重複，系統會自動加序號）
       </p>
 
       <div>
         <label class="block text-sm font-medium mb-1" for="np-short-zh"
-          >一句话简介（选填）</label
+          >一句話簡介（選填）</label
         >
         <input
           id="np-short-zh"
@@ -248,13 +248,13 @@ const card =
       </div>
     </section>
 
-    <!-- 2. 售价与库存 -->
+    <!-- 2. 售價與庫存 -->
     <section class={card}>
-      <h2 class="font-serif text-lg">② 售价与库存</h2>
+      <h2 class="font-serif text-lg">② 售價與庫存</h2>
       <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
         <div>
           <label class="block text-sm font-medium mb-1" for="np-price"
-            >售价（新台幣 NT$） <span class="text-error">*</span></label
+            >售價（新臺幣 NT$） <span class="text-error">*</span></label
           >
           <input
             id="np-price"
@@ -269,7 +269,7 @@ const card =
         </div>
         <div>
           <label class="block text-sm font-medium mb-1" for="np-stock"
-            >库存 <span class="text-error">*</span></label
+            >庫存 <span class="text-error">*</span></label
           >
           <input
             id="np-stock"
@@ -284,7 +284,7 @@ const card =
         </div>
         <div>
           <label class="block text-sm font-medium mb-1" for="np-weight"
-            >重量（克，选填）</label
+            >重量（克，選填）</label
           >
           <input
             id="np-weight"
@@ -300,9 +300,9 @@ const card =
       <p id="np-price-preview" class="text-xs text-text-muted"></p>
     </section>
 
-    <!-- 3. 图片 -->
+    <!-- 3. 圖片 -->
     <section class={card}>
-      <h2 class="font-serif text-lg">③ 图片</h2>
+      <h2 class="font-serif text-lg">③ 圖片</h2>
       <div>
         <input
           id="np-images"
@@ -313,19 +313,19 @@ const card =
           class={`${field} file:mr-4 file:py-1 file:px-3 file:border-0 file:bg-forest-700 file:text-bg-base file:rounded file:cursor-pointer text-sm`}
         />
         <p class="text-xs text-text-muted mt-1">
-          第一张是封面。最多 {MAX_IMAGES} 张，每张 5MB 以内（JPG / PNG / WebP / GIF）。立即上架至少需要
-          1 张。
+          第一張是封面。最多 {MAX_IMAGES} 張，每張 5MB 以內（JPG / PNG / WebP / GIF）。立即上架至少需要
+          1 張。
         </p>
       </div>
       <p id="np-img-msg" class="text-sm text-error" role="alert"></p>
       <div id="np-img-grid" class="grid grid-cols-3 sm:grid-cols-6 gap-2"></div>
     </section>
 
-    <!-- 4. 标签 -->
+    <!-- 4. 標籤 -->
     <section class={card}>
-      <h2 class="font-serif text-lg">④ 标签</h2>
+      <h2 class="font-serif text-lg">④ 標籤</h2>
       <p class="text-xs text-text-muted -mt-2">
-        「为我推荐」测验会拿客人的答案来比对这些标签，勾得越准，推荐越准。
+        「為我推薦」測驗會拿客人的答案來比對這些標籤，勾得越準，推薦越準。
       </p>
       {
         categoryOptions
@@ -372,7 +372,7 @@ const card =
           value="draft"
           class="px-5 py-2.5 border border-text-muted/40 rounded-md hover:bg-bg-base transition-colors"
         >
-          存为草稿
+          存為草稿
         </button>
         <button
           type="submit"
@@ -387,8 +387,8 @@ const card =
         >
       </div>
       <p class="text-xs text-text-muted mt-2">
-        立即上架需要：中文名称、中文描述、售价、至少 1
-        张图片。缺图片时会先存成草稿。
+        立即上架需要：中文名稱、中文描述、售價、至少 1
+        張圖片。缺圖片時會先存成草稿。
       </p>
     </div>
   </form>
@@ -408,7 +408,7 @@ const card =
       );
       var stamp = form.getAttribute("data-stamp") || "";
 
-      // --- 分类切换：子分类选项与标签组 ---
+      // --- 分類切換：子分類選項與標籤組 ---
       var subSel = document.getElementById("np-sub");
       function curCat() {
         var c = form.querySelector('input[name="category"]:checked');
@@ -454,7 +454,7 @@ const card =
       );
       applyCat();
 
-      // --- 编号预览（与服务器规则相同；最终以服务器为准） ---
+      // --- 編號預覽（與伺服器規則相同；最終以伺服器為準） ---
       function slugify(s) {
         return s
           .normalize("NFKD")
@@ -471,12 +471,12 @@ const card =
         var s = slugify(nameEn.value);
         slugOut.textContent = s
           ? stamp + "-" + s
-          : stamp + "-（填写英文名称后显示）";
+          : stamp + "-（填寫英文名稱後顯示）";
       }
       nameEn.addEventListener("input", updSlug);
       updSlug();
 
-      // --- 售价预览：各语言前台实际会显示的价格 ---
+      // --- 售價預覽：各語言前臺實際會顯示的價格 ---
       var priceEl = document.getElementById("np-price");
       var priceOut = document.getElementById("np-price-preview");
       var targets = [["zh-Hant", "TWD"]];
@@ -496,11 +496,11 @@ const card =
         var v = parseFloat((priceEl.value || "").replace(/,/g, ""));
         if (!(v > 0)) {
           priceOut.textContent =
-            "填入售价后，这里会显示各语言前台的显示价格（依「汇率」页的数值换算）。";
+            "填入售價後，這裡會顯示各語言前臺的顯示價格（依「匯率」頁的數值換算）。";
           return;
         }
         priceOut.textContent =
-          "前台显示：" +
+          "前臺顯示：" +
           targets
             .map(function (t) {
               return fmt(t[0], t[1], v);
@@ -510,7 +510,7 @@ const card =
       priceEl.addEventListener("input", updPrice);
       updPrice();
 
-      // --- 图片预览与基本检查 ---
+      // --- 圖片預覽與基本檢查 ---
       var fileEl = document.getElementById("np-images");
       var grid = document.getElementById("np-img-grid");
       var msg = document.getElementById("np-img-msg");
@@ -520,12 +520,12 @@ const card =
         msg.textContent = "";
         var files = Array.prototype.slice.call(fileEl.files || []);
         var problem = "";
-        if (files.length > 6) problem = "最多上传 6 张图片";
+        if (files.length > 6) problem = "最多上傳 6 張圖片";
         files.forEach(function (f) {
           if (!problem && okTypes.indexOf(f.type) === -1)
-            problem = "不支持的图片格式：" + f.name;
+            problem = "不支援的圖片格式：" + f.name;
           if (!problem && f.size > 5 * 1024 * 1024)
-            problem = "图片过大：" + f.name + "（单张上限 5MB）";
+            problem = "圖片過大：" + f.name + "（單張上限 5MB）";
         });
         if (problem) {
           msg.textContent = problem;
@@ -552,7 +552,7 @@ const card =
         });
       });
 
-      // --- 送出：记录按下的是「草稿」还是「上架」，并防止重复送出 ---
+      // --- 送出：記錄按下的是「草稿」還是「上架」，並防止重複送出 ---
       var intentEl = form.querySelector('input[name="intent"]');
       form.addEventListener("submit", function (e) {
         var b = e.submitter;

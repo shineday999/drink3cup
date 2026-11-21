@@ -6,7 +6,7 @@ import { defaultLocale, type Locale } from "../../i18n/config";
 import zhHansMessages from "../../i18n/messages/zh-Hant.json";
 import { formatPrice, getRates } from "../../lib/format";
 
-// 概览：一屏看完「數字 → 待辦 → 最近訂單」。導覽入口都在側邊欄，這裡不再放重複的入口卡片。
+// 概覽：一屏看完「數字 → 待辦 → 最近訂單」。導覽入口都在側邊欄，這裡不再放重複的入口卡片。
 const locale = (Astro.locals.locale ?? defaultLocale) as Locale;
 const messages = zhHansMessages as Record<string, unknown>;
 const t = createT(messages);
@@ -38,7 +38,7 @@ if (env?.DB) {
     const revenueRows = await env.DB.prepare(
       "SELECT currency, COALESCE(SUM(total), 0) AS s FROM orders WHERE payment_status = 'paid' GROUP BY currency",
     ).all<{ currency: string; s: number }>();
-    // 舊訂單可能是美元，新訂單是新台幣：先各自換成新台幣再加總
+    // 舊訂單可能是美元，新訂單是新臺幣：先各自換成新臺幣再加總
     const rates = getRates();
     const revenueCny = (revenueRows.results ?? []).reduce(
       (sum, r) => sum + r.s / (rates[r.currency] ?? 1),
@@ -80,11 +80,11 @@ function statusColor(s: string) {
 
 const todos = [
   {
-    label: "待处理订单",
+    label: "待處理訂單",
     n: stats.pendingOrders,
     href: "/admin/orders?status=pending",
   },
-  { label: "待审核评论", n: stats.pendingReviews, href: "/admin/reviews" },
+  { label: "待稽核評論", n: stats.pendingReviews, href: "/admin/reviews" },
   {
     label: "草稿商品（未上架）",
     n: stats.draftProducts,
@@ -121,7 +121,7 @@ const allClear = todos.every((x) => x.n === 0);
 ---
 
 <AdminLayout title={t("admin.dashboard.title")} active="dashboard">
-  <section class="grid grid-cols-2 gap-3 lg:grid-cols-4" aria-label="数据概览">
+  <section class="grid grid-cols-2 gap-3 lg:grid-cols-4" aria-label="資料概覽">
     {
       cards.map((c) =>
         c.href ? (
@@ -148,10 +148,10 @@ const allClear = todos.every((x) => x.n === 0);
 
   <div class="mt-4 grid gap-4 lg:grid-cols-3">
     <section class="rounded-card border border-text-muted/20 bg-bg-card p-4">
-      <h2 class="mb-2 font-serif text-lg">待办</h2>
+      <h2 class="mb-2 font-serif text-lg">待辦</h2>
       {
         allClear ? (
-          <p class="py-4 text-sm text-text-muted">目前没有待办事项。</p>
+          <p class="py-4 text-sm text-text-muted">目前沒有待辦事項。</p>
         ) : (
           <ul class="divide-y divide-text-muted/10">
             {todos.map((x) => (
@@ -182,9 +182,9 @@ const allClear = todos.every((x) => x.n === 0);
       class="rounded-card border border-text-muted/20 bg-bg-card p-4 lg:col-span-2"
     >
       <div class="mb-2 flex items-center justify-between">
-        <h2 class="font-serif text-lg">最近订单</h2>
+        <h2 class="font-serif text-lg">最近訂單</h2>
         <a href="/admin/orders" class="text-sm text-accent-700 hover:underline"
-          >查看全部 →</a
+          >檢視全部 →</a
         >
       </div>
       {

@@ -27,7 +27,7 @@ export const POST: APIRoute = async (ctx) => {
   if (next === "active") {
     const missing = await checkReadiness(db, id);
     if (missing.length > 0) {
-      const msg = `还不能上架，缺少：${missing.join("、")}`;
+      const msg = `還不能上架，缺少：${missing.join("、")}`;
       return ctx.redirect(
         `/admin/products/${id}?tab=variants&error=${encodeURIComponent(msg)}`,
         303,

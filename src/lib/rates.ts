@@ -1,5 +1,5 @@
 // 匯率表（D1 exchange_rates）讀寫與快取。
-// 基準幣別是新台幣：per_cny = 1 新台幣可換多少該幣別。
+// 基準幣別是新臺幣：per_cny = 1 新臺幣可換多少該幣別。
 import { setRates, type RateTable } from "./format";
 
 const TTL_MS = 60_000; // 改匯率後，各處最多 1 分鐘內生效

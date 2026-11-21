@@ -159,7 +159,7 @@ if (variantImages.length === 0 && product.image_url) {
   variantImages = [product.image_url];
 }
 const cnyFen = priceRow?.amount ?? null;
-// 後台以新台幣輸入與顯示（資料庫也以新台幣記錄，單位：分）
+// 後臺以新臺幣輸入與顯示（資料庫也以新臺幣記錄，單位：分）
 const priceValue =
   cnyFen === null
     ? ""
@@ -195,7 +195,7 @@ const inputField =
   <span slot="actions" class="flex items-center gap-4 text-sm">
     <a
       href={`/products/${product.slug}`}
-      class="text-text-secondary hover:underline">查看前台</a
+      class="text-text-secondary hover:underline">檢視前臺</a
     >
     <a href="/admin/products" class="text-text-secondary hover:underline"
       >返回列表</a
@@ -204,9 +204,9 @@ const inputField =
   {
     notice.created && (
       <div class="mb-4 max-w-3xl rounded-card border border-forest-700/30 bg-forest-50 p-4 text-sm">
-        {notice.created === "active" ? "已创建并上架。" : "已创建为草稿。"}
+        {notice.created === "active" ? "已建立並上架。" : "已建立為草稿。"}
         {notice.blocked
-          ? `想上架但还缺：${notice.blocked}，请到「规格」页签补齐。`
+          ? `想上架但還缺：${notice.blocked}，請到「規格」頁籤補齊。`
           : ""}
       </div>
     )
@@ -214,7 +214,7 @@ const inputField =
   {
     notice.saved && !notice.created && (
       <div class="mb-4 max-w-3xl rounded-card border border-forest-700/30 bg-forest-50 p-4 text-sm">
-        已保存。
+        已儲存。
       </div>
     )
   }
@@ -231,10 +231,10 @@ const inputField =
   {
     product.status === "draft" && (
       <div class="mb-4 max-w-3xl rounded-card border border-text-muted/20 bg-bg-card p-4">
-        <p class="font-medium mb-2">上架前检查</p>
+        <p class="font-medium mb-2">上架前檢查</p>
         {missing.length === 0 ? (
           <>
-            <p class="text-sm text-forest-700 mb-3">✓ 资料都齐了，可以上架。</p>
+            <p class="text-sm text-forest-700 mb-3">✓ 資料都齊了，可以上架。</p>
             <form method="POST" action={`/api/admin/products/${id}/status`}>
               <button
                 type="submit"
@@ -248,14 +248,14 @@ const inputField =
           <>
             <ul class="mb-3 space-y-1 text-sm">
               {missing.map((m) => (
-                <li class="text-error">✗ 还缺：{m}</li>
+                <li class="text-error">✗ 還缺：{m}</li>
               ))}
             </ul>
             <a
               href={`/admin/products/${id}?tab=variants`}
               class="text-sm underline text-accent-700"
             >
-              去补齐 →
+              去補齊 →
             </a>
           </>
         )}
@@ -275,7 +275,7 @@ const inputField =
   >
     <div slot="core">
       <p class="mb-3 max-w-2xl text-sm text-text-muted">
-        图片、售价、库存都在「规格」页签里管理。
+        圖片、售價、庫存都在「規格」頁籤裡管理。
       </p>
       <form
         method="POST"
@@ -359,7 +359,7 @@ const inputField =
             class="w-full px-3 py-2 border border-text-muted/30 rounded-md bg-bg-base font-mono text-text-secondary"
           />
           <p class="text-xs text-text-muted mt-1">
-            编号由系统自动生成，前台网址会用到它，所以不能修改。
+            編號由系統自動生成，前臺網址會用到它，所以不能修改。
           </p>
         </div>
         <div>
@@ -367,7 +367,7 @@ const inputField =
             {t("admin.products_form.tags")}
           </p>
           <p class="text-xs text-text-muted mb-3">
-            「为我推荐」测验会拿客人的答案来比对这些标签。
+            「為我推薦」測驗會拿客人的答案來比對這些標籤。
           </p>
           <input type="hidden" name="tags_extra" value={extraTags.join(",")} />
           {
@@ -405,7 +405,7 @@ const inputField =
           {
             extraTags.length > 0 && (
               <p class="text-xs text-text-muted mt-3">
-                其他沿用的标签：{extraTags.join("、")}（保存时保留）
+                其他沿用的標籤：{extraTags.join("、")}（儲存時保留）
               </p>
             )
           }
@@ -434,7 +434,7 @@ const inputField =
           <button
             type="button"
             class="px-4 py-2 ml-auto border border-error/40 text-error rounded-md hover:bg-error/10 transition-colors"
-            onclick={`if (!confirm('确定删除该商品？所有规格、翻译、评论都会一并删除。')) return false; const f = document.createElement('form'); f.method='POST'; f.action='/api/admin/products/${id}'; const i=document.createElement('input'); i.type='hidden'; i.name='_action'; i.value='delete'; f.appendChild(i); document.body.appendChild(f); f.submit();`}
+            onclick={`if (!confirm('確定刪除該商品？所有規格、翻譯、評論都會一併刪除。')) return false; const f = document.createElement('form'); f.method='POST'; f.action='/api/admin/products/${id}'; const i=document.createElement('input'); i.type='hidden'; i.name='_action'; i.value='delete'; f.appendChild(i); document.body.appendChild(f); f.submit();`}
           >
             {t("admin.products_detail.delete")}
           </button>
@@ -498,13 +498,13 @@ const inputField =
               data-product-id={id}
               class="rounded-md border border-forest-700 px-3 py-1.5 text-sm text-forest-700 transition-colors hover:bg-forest-50 disabled:opacity-50"
             >
-              从 Google 表格读取描述
+              從 Google 表格讀取描述
             </button>
             <a
               href={PRODUCT_SHEET_EDIT_URL}
               target="_blank"
               rel="noopener noreferrer"
-              class="text-sm text-accent-700 hover:underline">打开表格 ↗</a
+              class="text-sm text-accent-700 hover:underline">開啟表格 ↗</a
             >
             <span
               data-sheet-status
@@ -512,7 +512,7 @@ const inputField =
               class="text-sm text-text-muted"></span>
           </div>
           <p class="mt-1 text-xs text-text-muted">
-            读取后只会填进栏位，检查没问题再点「保存全部」；表格里空白的格子不会覆盖现有内容。
+            讀取後只會填進欄位，檢查沒問題再點「儲存全部」；表格裡空白的格子不會覆蓋現有內容。
           </p>
         </div>
 
@@ -877,7 +877,7 @@ const inputField =
           }
           btn.addEventListener("click", function () {
             btn.disabled = true;
-            say("读取中…", false);
+            say("讀取中…", false);
             fetch("/api/admin/products/" + encodeURIComponent(id) + "/sheet", {
               credentials: "same-origin",
             })
@@ -890,7 +890,7 @@ const inputField =
                   .then(function (j) {
                     if (!res.ok)
                       throw new Error(
-                        j.error || "读取失败（HTTP " + res.status + "）",
+                        j.error || "讀取失敗（HTTP " + res.status + "）",
                       );
                     return j;
                   });
@@ -898,7 +898,7 @@ const inputField =
               .then(function (j) {
                 var n = 0;
                 var tooLong = [];
-                // 依序处理 zh-Hant、en、ms-MY、id-ID：先填英文，马来文／印尼文再覆盖
+                // 依序處理 zh-Hant、en、ms-MY、id-ID：先填英文，馬來文／印尼文再覆蓋
                 LOCALES.forEach(function (loc) {
                   var f = (j.fills || {})[loc];
                   if (!f) return;
@@ -911,7 +911,7 @@ const inputField =
                     if (!el) return;
                     if (el.maxLength > 0 && v.length > el.maxLength) {
                       tooLong.push(
-                        loc + (k === "description" ? " 描述" : " 简介"),
+                        loc + (k === "description" ? " 描述" : " 簡介"),
                       );
                       return;
                     }
@@ -922,18 +922,18 @@ const inputField =
                 });
                 var parts = [];
                 if (n === 0) {
-                  parts.push("表格里这个商品的格子都是空的，没有填入任何内容");
+                  parts.push("表格裡這個商品的格子都是空的，沒有填入任何內容");
                 } else {
-                  parts.push("已读取 " + n + " 个栏位，请检查后点「保存全部」");
+                  parts.push("已讀取 " + n + " 個欄位，請檢查後點「儲存全部」");
                 }
                 if (tooLong.length)
-                  parts.push("太长没填入：" + tooLong.join("、"));
+                  parts.push("太長沒填入：" + tooLong.join("、"));
                 if (j.missing && j.missing.length)
-                  parts.push("表格缺少栏位：" + j.missing.join("、"));
+                  parts.push("表格缺少欄位：" + j.missing.join("、"));
                 say(parts.join("；"), n === 0 || tooLong.length > 0);
               })
               .catch(function (err) {
-                say((err && err.message) || "读取失败", true);
+                say((err && err.message) || "讀取失敗", true);
               })
               .then(function () {
                 btn.disabled = false;
@@ -947,15 +947,15 @@ const inputField =
       {
         extraVariantCount > 0 && (
           <p class="rounded-card border border-text-muted/20 bg-bg-card p-4 text-sm text-text-secondary">
-            这个商品有 {extraVariantCount + 1}{" "}
-            个规格；这里只编辑排序最前的第一个规格。
+            這個商品有 {extraVariantCount + 1}{" "}
+            個規格；這裡只編輯排序最前的第一個規格。
           </p>
         )
       }
       {
         !variantRow && (
           <p class="rounded-card border border-accent-500/40 bg-accent-500/10 p-4 text-sm">
-            这个商品还没有规格（售价、库存、图片）。填写下面的表单并保存后，才能上架。
+            這個商品還沒有規格（售價、庫存、圖片）。填寫下面的表單並儲存後，才能上架。
           </p>
         )
       }
@@ -969,7 +969,7 @@ const inputField =
         {
           variantRow && (
             <p class="text-sm text-text-muted">
-              规格编号：
+              規格編號：
               <span class="font-mono text-text-secondary">
                 {variantRow.sku}
               </span>
@@ -979,7 +979,7 @@ const inputField =
 
         <div>
           <label class="block text-sm font-medium mb-1" for="v-price"
-            >售价（新台幣 NT$） <span class="text-error">*</span></label
+            >售價（新臺幣 NT$） <span class="text-error">*</span></label
           >
           <input
             id="v-price"
@@ -994,7 +994,7 @@ const inputField =
         {
           cnyFen !== null && (
             <p class="text-xs text-text-muted -mt-2">
-              前台顯示：{formatPrice(cnyFen, "TWD", "zh-Hant")}
+              前臺顯示：{formatPrice(cnyFen, "TWD", "zh-Hant")}
             </p>
           )
         }
@@ -1002,7 +1002,7 @@ const inputField =
         <div class="grid grid-cols-2 gap-3">
           <div>
             <label class="block text-sm font-medium mb-1" for="v-stock"
-              >库存 <span class="text-error">*</span></label
+              >庫存 <span class="text-error">*</span></label
             >
             <input
               id="v-stock"
@@ -1017,7 +1017,7 @@ const inputField =
           </div>
           <div>
             <label class="block text-sm font-medium mb-1" for="v-weight"
-              >重量（克，选填）</label
+              >重量（克，選填）</label
             >
             <input
               id="v-weight"
@@ -1032,7 +1032,7 @@ const inputField =
         </div>
 
         <div>
-          <p class="block text-sm font-medium mb-2">图片（第一张是封面）</p>
+          <p class="block text-sm font-medium mb-2">圖片（第一張是封面）</p>
           {
             variantImages.length > 0 ? (
               <div class="grid grid-cols-3 sm:grid-cols-4 gap-3">
@@ -1057,18 +1057,18 @@ const inputField =
                     </label>
                     <label class="flex items-center gap-1 text-xs text-error">
                       <input type="checkbox" name="remove" value={u} />
-                      删除
+                      刪除
                     </label>
                   </div>
                 ))}
               </div>
             ) : (
-              <p class="text-sm text-text-muted">还没有图片。</p>
+              <p class="text-sm text-text-muted">還沒有圖片。</p>
             )
           }
           <div class="mt-3">
             <label class="block text-sm font-medium mb-1" for="v-images"
-              >新增图片（可多选）</label
+              >新增圖片（可多選）</label
             >
             <input
               id="v-images"
@@ -1079,7 +1079,7 @@ const inputField =
               class="w-full text-sm file:mr-2 file:py-1 file:px-3 file:border-0 file:bg-forest-700 file:text-bg-base file:rounded file:cursor-pointer"
             />
             <p class="text-xs text-text-muted mt-1">
-              最多 {MAX_IMAGES} 张（含已有的），每张 5MB 以内。
+              最多 {MAX_IMAGES} 張（含已有的），每張 5MB 以內。
             </p>
           </div>
         </div>
@@ -1090,7 +1090,7 @@ const inputField =
           <button
             type="submit"
             class="rounded-md bg-forest-700 px-4 py-2 text-bg-base transition-colors hover:bg-forest-900"
-            >保存规格</button
+            >儲存規格</button
           >
         </div>
       </form>

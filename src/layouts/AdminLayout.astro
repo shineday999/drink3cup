@@ -1,8 +1,8 @@
 ---
-// AdminLayout — 後台共用外殼
+// AdminLayout — 後臺共用外殼
 // 導覽依網址路徑自動判斷所在群組，頁面不必再傳 active：
-//   概览 · 商品 · 订单 · 内容（文章／评论）· 设置（站点／首页横幅／分类图片／汇率／常见问题）
-// 所有「參數」類頁面集中在「设置」群組，以頁籤切換。
+//   概覽 · 商品 · 訂單 · 內容（文章／評論）· 設定（站點／首頁橫幅／分類圖片／匯率／常見問題）
+// 所有「引數」類頁面集中在「設定」群組，以頁籤切換。
 // 認證由 middleware 處理（session JWT cookie）。
 import "../styles/global.css";
 import { createT } from "../i18n/t";
@@ -46,7 +46,7 @@ interface NavGroup {
 const NAV: NavGroup[] = [
   {
     key: "dashboard",
-    label: "概览",
+    label: "概覽",
     href: "/admin",
     icon: "home",
     match: ["/admin"],
@@ -60,25 +60,25 @@ const NAV: NavGroup[] = [
   },
   {
     key: "orders",
-    label: "订单",
+    label: "訂單",
     href: "/admin/orders",
     icon: "receipt",
     match: ["/admin/orders"],
   },
   {
     key: "content",
-    label: "内容",
+    label: "內容",
     href: "/admin/posts",
     icon: "doc",
     match: ["/admin/posts", "/admin/reviews"],
     children: [
       { label: "文章", href: "/admin/posts", match: ["/admin/posts"] },
-      { label: "评论", href: "/admin/reviews", match: ["/admin/reviews"] },
+      { label: "評論", href: "/admin/reviews", match: ["/admin/reviews"] },
     ],
   },
   {
     key: "settings",
-    label: "设置",
+    label: "設定",
     href: "/admin/settings",
     icon: "cog",
     match: [
@@ -89,15 +89,15 @@ const NAV: NavGroup[] = [
       "/admin/faqs",
     ],
     children: [
-      { label: "站点", href: "/admin/settings", match: ["/admin/settings"] },
-      { label: "首页横幅", href: "/admin/banners", match: ["/admin/banners"] },
+      { label: "站點", href: "/admin/settings", match: ["/admin/settings"] },
+      { label: "首頁橫幅", href: "/admin/banners", match: ["/admin/banners"] },
       {
-        label: "分类图片",
+        label: "分類圖片",
         href: "/admin/category-images",
         match: ["/admin/category-images"],
       },
-      { label: "汇率", href: "/admin/rates", match: ["/admin/rates"] },
-      { label: "常见问题", href: "/admin/faqs", match: ["/admin/faqs"] },
+      { label: "匯率", href: "/admin/rates", match: ["/admin/rates"] },
+      { label: "常見問題", href: "/admin/faqs", match: ["/admin/faqs"] },
     ],
   },
 ];
@@ -134,13 +134,13 @@ const initial = (admin?.email ?? "?").slice(0, 1).toUpperCase();
       href="#adm-main"
       class="sr-only focus:not-sr-only focus:fixed focus:left-3 focus:top-3 focus:z-50 focus:rounded focus:bg-forest-900 focus:px-3 focus:py-2 focus:text-bg-base"
     >
-      跳到主要内容
+      跳到主要內容
     </a>
 
     <!-- 桌面版：左側固定側邊欄 -->
     <aside
       class="hidden lg:flex fixed inset-y-0 left-0 z-40 w-56 flex-col bg-forest-900 text-bg-base"
-      aria-label="后台导航"
+      aria-label="後臺導航"
     >
       <div class="px-5 pt-5 pb-4 border-b border-bg-base/10">
         <div class="font-serif text-lg leading-tight">{siteName}</div>
@@ -202,7 +202,7 @@ const initial = (admin?.email ?? "?").slice(0, 1).toUpperCase();
           <details class="adm-menu relative lg:hidden">
             <summary
               class="flex h-10 w-10 cursor-pointer list-none items-center justify-center rounded-md hover:bg-forest-900/5 [&::-webkit-details-marker]:hidden"
-              aria-label="打开导航"
+              aria-label="開啟導航"
             >
               <svg
                 viewBox="0 0 24 24"
@@ -219,7 +219,7 @@ const initial = (admin?.email ?? "?").slice(0, 1).toUpperCase();
             </summary>
             <nav
               class="absolute left-0 top-12 z-50 w-56 rounded-card border border-text-muted/20 bg-bg-base p-2 shadow-lg"
-              aria-label="后台导航"
+              aria-label="後臺導航"
             >
               <ul class="space-y-0.5">
                 {
@@ -260,7 +260,7 @@ const initial = (admin?.email ?? "?").slice(0, 1).toUpperCase();
 
           <!-- 桌面版：目前位置 -->
           <p class="hidden lg:block text-sm text-text-muted">
-            {currentGroup?.label ?? "后台"}
+            {currentGroup?.label ?? "後臺"}
             {currentChild && <span> / {currentChild.label}</span>}
           </p>
 
@@ -277,7 +277,7 @@ const initial = (admin?.email ?? "?").slice(0, 1).toUpperCase();
             <details class="adm-user relative">
               <summary
                 class="flex h-10 w-10 cursor-pointer list-none items-center justify-center rounded-full bg-forest-900 text-sm font-medium text-bg-base [&::-webkit-details-marker]:hidden"
-                aria-label="账号菜单"
+                aria-label="賬號選單"
               >
                 {initial}
               </summary>
@@ -321,12 +321,12 @@ const initial = (admin?.email ?? "?").slice(0, 1).toUpperCase();
           </div>
         </div>
 
-        <!-- 子頁籤：同一群組的頁面（例如「设置」裡的參數頁）集中在這裡切換 -->
+        <!-- 子頁籤：同一群組的頁面（例如「設定」裡的引數頁）集中在這裡切換 -->
         {
           currentGroup?.children && (
             <nav
               class="px-4 sm:px-6 -mt-px"
-              aria-label={`${currentGroup.label}分页`}
+              aria-label={`${currentGroup.label}分頁`}
             >
               <ul class="flex gap-1 overflow-x-auto whitespace-nowrap">
                 {currentGroup.children.map((c) => (
@@ -377,7 +377,7 @@ const initial = (admin?.email ?? "?").slice(0, 1).toUpperCase();
     />
 
     <style is:global>
-      /* 後台整體排版收緊：各頁沿用的大間距與大標題在這裡統一縮小（個別頁面之後再逐頁精簡） */
+      /* 後臺整體排版收緊：各頁沿用的大間距與大標題在這裡統一縮小（個別頁面之後再逐頁精簡） */
       .adm-main h2.font-serif.text-xl {
         font-size: 1.125rem;
         line-height: 1.4;

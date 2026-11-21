@@ -2,8 +2,8 @@
 import { env } from "cloudflare:workers";
 
 // /admin/settings — 網站名稱 / 首頁副標題 / 主題 / 次主題（4 個欄位 × 4 種語言）
-// 純文字標籤，管理員自由填寫。前台 layout 用 current locale，缺值 fallback zh-Hant。
-// 首頁橫幅管理已獨立成「首页横幅」頁籤（/admin/banners）。
+// 純文字標籤，管理員自由填寫。前臺 layout 用 current locale，缺值 fallback zh-Hant。
+// 首頁橫幅管理已獨立成「首頁橫幅」頁籤（/admin/banners）。
 import AdminLayout from "../../layouts/AdminLayout.astro";
 import { createT } from "../../i18n/t";
 import zhHansMessages from "../../i18n/messages/zh-Hant.json";
@@ -141,7 +141,7 @@ const gridCols = "lg:grid-cols-[9rem_repeat(4,minmax(0,1fr))]";
       >
         {t("admin.common.save")}
       </button>
-      <span class="text-xs text-text-muted">空白栏位不会覆盖已有的文字</span>
+      <span class="text-xs text-text-muted">空白欄位不會覆蓋已有的文字</span>
     </div>
   </form>
 </AdminLayout>

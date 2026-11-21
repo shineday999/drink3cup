@@ -25,7 +25,7 @@ function sample(over: Record<string, unknown> = {}) {
     slug: "test-pendant",
     tags: ["calm", "gift"],
     translations: [
-      { locale: "zh-Hant", name: "测试吊坠", description: "描述" },
+      { locale: "zh-Hant", name: "測試吊墜", description: "描述" },
     ],
     variants: [
       {
@@ -182,12 +182,12 @@ describe.skipIf(!db)("products repository", () => {
         slug: "plain-item",
         variants: [{ sku: "A2" }],
         translations: [
-          { locale: "zh-Hant", name: "100% 纯银", description: "d" },
+          { locale: "zh-Hant", name: "100% 純銀", description: "d" },
         ],
       }),
     );
     expect((await listProducts(db!, { q: "amber" })).total).toBe(1);
-    expect((await listProducts(db!, { q: "纯银" })).total).toBe(1);
+    expect((await listProducts(db!, { q: "純銀" })).total).toBe(1);
     expect((await listProducts(db!, { q: "%" })).total).toBe(1); // 只比對字面的 %
     expect((await listProducts(db!, { q: "_" })).total).toBe(0); // _ 不是萬用字元
     expect((await listProducts(db!, { q: "不存在" })).total).toBe(0);
@@ -201,7 +201,7 @@ describe.skipIf(!db)("products repository", () => {
       translations: [
         {
           locale: "zh-Hant",
-          name: "新名称",
+          name: "新名稱",
           description: "新描述",
           short_description: null,
           story: null,
@@ -216,7 +216,7 @@ describe.skipIf(!db)("products repository", () => {
     expect(p?.category).toBe("jewelry"); // 沒帶 → 不變
     expect(p?.tags).toEqual(["calm", "gift"]);
     expect(p?.translations.map((t) => t.locale)).toEqual(["zh-Hant"]);
-    expect(p?.translations[0]?.name).toBe("新名称");
+    expect(p?.translations[0]?.name).toBe("新名稱");
   });
 
   it("updateProduct：slug 可以維持自己的，不能撞別人的", async () => {

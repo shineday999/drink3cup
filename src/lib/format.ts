@@ -1,16 +1,16 @@
 /**
  * Locale-aware price formatter with currency conversion.
  *
- * 價格以新台幣（TWD）記錄：D1 product_prices 的 TWD 列（單位：分）是商品的唯一售價。
- * 各語言前台再依匯率表換算成當地熟悉的貨幣顯示：
- *   zh-Hant -> TWD (新台幣 NT$)
+ * 價格以新臺幣（TWD）記錄：D1 product_prices 的 TWD 列（單位：分）是商品的唯一售價。
+ * 各語言前臺再依匯率表換算成當地熟悉的貨幣顯示：
+ *   zh-Hant -> TWD (新臺幣 NT$)
  *
- * 匯率存在 D1 exchange_rates（後台「汇率」頁維護），由 middleware 經 lib/rates.ts
+ * 匯率存在 D1 exchange_rates（後臺「匯率」頁維護），由 middleware 經 lib/rates.ts
  * 載入並呼叫 setRates()；讀不到時使用下方預設值。
  * Falls back to raw "CUR amount" if Intl.NumberFormat rejects the locale.
  */
 
-/** 1 新台幣 = 多少該幣別 */
+/** 1 新臺幣 = 多少該幣別 */
 export type RateTable = Record<string, number>;
 
 export const DEFAULT_RATES_PER_CNY: RateTable = {

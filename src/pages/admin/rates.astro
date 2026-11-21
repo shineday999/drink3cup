@@ -3,18 +3,18 @@ import AdminLayout from "../../layouts/AdminLayout.astro";
 import { getDB } from "../../lib/db";
 import { loadRates, saveRates, type RateRow } from "../../lib/rates";
 
-// 汇率设置：基准是新台幣，per_cny = 1 新台幣可换多少该币别
+// 匯率設定：基準是新臺幣，per_cny = 1 新臺幣可換多少該幣別
 if (!Astro.locals.admin) {
   return new Response("Unauthorized", { status: 401 });
 }
 
 const NAMES: Record<string, string> = {
   USD: "美元 $（英文站）",
-  MYR: "马来西亚令吉 RM（马来站）",
+  MYR: "馬來西亞令吉 RM（馬來站）",
   IDR: "印尼盾 Rp（印尼站）",
-  AED: "阿联酋迪拉姆",
-  SAR: "沙特里亚尔",
-  TWD: "新台币",
+  AED: "阿聯酋迪拉姆",
+  SAR: "沙特里亞爾",
+  TWD: "新臺幣",
 };
 
 const db = getDB();
@@ -32,7 +32,7 @@ if (Astro.request.method === "POST") {
         .trim();
       const n = Number(raw);
       if (!raw || !Number.isFinite(n) || n <= 0 || n > 1_000_000_000) {
-        errors.push(`${r.currency}：请填写大于 0 的数字`);
+        errors.push(`${r.currency}：請填寫大於 0 的數字`);
         continue;
       }
       updates[r.currency] = n;
@@ -42,7 +42,7 @@ if (Astro.request.method === "POST") {
       return Astro.redirect("/admin/rates?saved=1", 303);
     }
   } catch (e) {
-    errors.push(e instanceof Error ? e.message : "保存失败，请稍后重试");
+    errors.push(e instanceof Error ? e.message : "儲存失敗，請稍後重試");
   }
 }
 
@@ -58,16 +58,16 @@ const field =
   "w-40 px-3 py-2 border border-text-muted/30 rounded-md bg-bg-base font-mono";
 ---
 
-<AdminLayout title="汇率设置" active="products">
+<AdminLayout title="匯率設定" active="products">
   <p class="mb-3 max-w-3xl text-sm text-text-secondary">
-    商品售价以新台幣记录。各语言前台会依下面的汇率换算成当地货币显示（简体站
-    NT$、英文站 $、马来站 RM、印尼站 Rp）。修改后约 1 分钟内全站生效。
+    商品售價以新臺幣記錄。各語言前臺會依下面的匯率換算成當地貨幣顯示（簡體站
+    NT$、英文站 $、馬來站 RM、印尼站 Rp）。修改後約 1 分鐘內全站生效。
   </p>
 
   {
     saved && (
       <div class="mb-4 max-w-3xl rounded-card border border-forest-700/30 bg-forest-50 p-4 text-sm">
-        已保存。
+        已儲存。
       </div>
     )
   }
@@ -91,7 +91,7 @@ const field =
         role="alert"
         class="mb-4 max-w-3xl rounded-card border border-error/40 bg-error/10 p-4 text-sm text-error"
       >
-        读不到汇率表。请确认已套用 migration 0018（wrangler d1 migrations
+        讀不到匯率表。請確認已套用 migration 0018（wrangler d1 migrations
         apply）。
       </div>
     )
@@ -101,7 +101,7 @@ const field =
     method="POST"
     class="max-w-3xl bg-bg-card border border-text-muted/20 rounded-card p-4 space-y-3"
   >
-    <p class="text-sm font-medium">1 新台幣 NT$ ＝ ？</p>
+    <p class="text-sm font-medium">1 新臺幣 NT$ ＝ ？</p>
     {
       rows.map((r) => (
         <div class="flex flex-wrap items-center gap-3">
@@ -121,7 +121,7 @@ const field =
             class={field}
           />
           <span class="text-xs text-text-muted">
-            1 {r.currency} ≈ NT${(1 / r.per_cny).toFixed(4)} ・ 更新于{" "}
+            1 {r.currency} ≈ NT${(1 / r.per_cny).toFixed(4)} ・ 更新於{" "}
             {new Date(r.updated_at * 1000).toLocaleString("zh-CN", {
               timeZone: "Asia/Taipei",
             })}
@@ -133,7 +133,7 @@ const field =
       type="submit"
       class="px-4 py-2 bg-forest-700 text-bg-base rounded-md hover:bg-forest-900 transition-colors"
     >
-      保存汇率
+      儲存匯率
     </button>
   </form>
 </AdminLayout>

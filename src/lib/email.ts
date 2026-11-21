@@ -89,14 +89,14 @@ export function orderConfirmationEmail(
       <p>${safe(customerName)} 您好,</p>
       <p>我們已收到您的預訂單 <strong>${safe(orderId)}</strong>。</p>
       <p>${safe(itemsSummary)}</p>
-      <p>客服將在 1-2 個工作天內與您聯繫,確認運費與付款方式。</p>
+      <p>客服將在 1-2 個工作天內與您聯絡,確認運費與付款方式。</p>
       <hr style="border: none; border-top: 1px solid #DCE5DC; margin: 24px 0;" />
       <p style="color: #8A938A; font-size: 12px;">
         喝三杯咖啡 · 精品咖啡 · weider@0061qwen.cc.cd
       </p>
     </div>
   `;
-  const text = `感謝您的預訂 #${orderId}。${customerName} 您好,我們已收到您的預訂單。客服將在 1-2 個工作天內與您聯繫。`;
+  const text = `感謝您的預訂 #${orderId}。${customerName} 您好,我們已收到您的預訂單。客服將在 1-2 個工作天內與您聯絡。`;
   return { subject, html, text };
 }
 
@@ -137,7 +137,7 @@ export function welcomeNewsletterEmail(
     "zh-Hant": {
       html: `<p>${safeEmail} 您好,</p>
         <p>感謝訂閱 ${safeName}。我們會不定期寄出咖啡知識、新到的咖啡豆與沖煮小筆記。</p>
-        <p>若您願意,也可以從 <a href="https://mycafe.de5.net/quiz">口味測驗</a> 開始,讓我們更了解您喜歡的風味。</p>
+        <p>若您願意,也可以從 <a href="https://mycafe.de5.net/quiz">口味測驗</a> 開始,讓我們更瞭解您喜歡的風味。</p>
         <p>—— ${safeName}</p>`,
       text: `${email} 您好,感謝訂閱 ${safeName}。我們會不定期寄出咖啡知識、新到的咖啡豆與沖煮小筆記。`,
     },

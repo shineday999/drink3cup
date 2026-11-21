@@ -1,5 +1,5 @@
-// 後台產品資料契約（zod）
-// 後台 API、repository、表單共用。修改請開 PR 並在 docs/ADMIN-PRODUCTS-PLAN.md 更新紀錄註明。
+// 後臺產品資料契約（zod）
+// 後臺 API、repository、表單共用。修改請開 PR 並在 docs/ADMIN-PRODUCTS-PLAN.md 更新紀錄註明。
 import { z } from "zod";
 
 export const LOCALES = ["zh-Hant"] as const;

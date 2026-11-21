@@ -3,7 +3,7 @@ import { createT } from "../../i18n/t";
 
 describe("createT", () => {
   const messages = {
-    common: { site_name: "喝三杯咖啡", loading: "加载中..." },
+    common: { site_name: "喝三杯咖啡", loading: "載入中..." },
     home: {
       hero_title: "把森林穿戴在身上",
       welcome: "歡迎 {name}",

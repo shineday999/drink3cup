@@ -1,8 +1,8 @@
 // KV 版登入／改密碼限流（共用）
 // 同一個 key（prefix + IP）在 windowMs 內失敗 maxAttempts 次，鎖定 lockoutMs。
-// 計數存在 KV，跨 Worker 實例與重新部署都有效。KV 為最終一致，
+// 計數存在 KV，跨 Worker 例項與重新部署都有效。KV 為最終一致，
 // 極短時間內的並發請求可能少算幾次，足以擋住暴力破解。
-// KV 不可用（未綁定或讀寫失敗）時 fail open：不擋人，只記 warn。
+// KV 不可用（未繫結或讀寫失敗）時 fail open：不擋人，只記 warn。
 
 export interface RateLimiterOptions {
   prefix: string;

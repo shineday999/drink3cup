@@ -46,7 +46,7 @@ export function cleanTextMap(
   return out;
 }
 
-// 飾品 / 香品卡片原本寫在語言檔裡的說明文字；後台簡介還是空的時候，一次性填進去讓後台可以維護。
+// 飾品 / 香品卡片原本寫在語言檔裡的說明文字；後臺簡介還是空的時候，一次性填進去讓後臺可以維護。
 const LEGACY_DESCS: Record<string, Record<string, string>> = {
   jewelry: {
     "zh-Hant": zhHant.home.cat_amber_desc,
@@ -69,16 +69,16 @@ async function backfillLegacyDescs(db: DB): Promise<void> {
   await db
     .prepare(
       `UPDATE site_categories SET descs = ?, updated_at = ?
-       WHERE (code = 'tea' OR json_extract(titles, '$."zh-Hant"') IN ('茶叶', '茶葉'))
+       WHERE (code = 'tea' OR json_extract(titles, '$."zh-Hant"') IN ('茶葉', '茶葉'))
          AND (descs IS NULL OR descs = '' OR descs = '{}')`,
     )
     .bind(JSON.stringify(TEA_DESCS), now)
     .run();
 }
 
-// 茶叶分类（后台新增的）：代码是 tea，或简体中文标题是「茶叶 / 茶葉」，且简介还是空的，就填入这段文字。
+// 茶葉分類（後臺新增的）：程式碼是 tea，或簡體中文標題是「茶葉 / 茶葉」，且簡介還是空的，就填入這段文字。
 const TEA_DESCS: Record<string, string> = {
-  "zh-Hant": "从山间的晨雾到一盏温热,每一片茶叶都记得阳光与雨水。",
+  "zh-Hant": "從山間的晨霧到一盞溫熱,每一片茶葉都記得陽光與雨水。",
 };
 
 export async function ensureCategoryTable(db: DB): Promise<void> {
@@ -96,15 +96,15 @@ export async function ensureCategoryTable(db: DB): Promise<void> {
   const row = await db
     .prepare("SELECT COUNT(*) AS n FROM site_categories")
     .first<{ n: number }>();
-  // 旧默认名称「琥珀饰品 / 东方香品」若曾被存进标题，统一改成「饰品 / 香品」（只动完全等于旧名称的）
+  // 舊預設名稱「琥珀飾品 / 東方香品」若曾被存進標題，統一改成「飾品 / 香品」（只動完全等於舊名稱的）
   await db
     .prepare(
       `UPDATE site_categories
          SET titles = json_set(titles, '$."zh-Hant"', CASE json_extract(titles, '$."zh-Hant"')
-               WHEN '琥珀饰品' THEN '饰品' WHEN '琥珀飾品' THEN '飾品'
-               WHEN '东方香品' THEN '香品' WHEN '東方香品' THEN '香品' END)
+               WHEN '琥珀飾品' THEN '飾品' WHEN '琥珀飾品' THEN '飾品'
+               WHEN '東方香品' THEN '香品' WHEN '東方香品' THEN '香品' END)
        WHERE json_valid(titles)
-         AND json_extract(titles, '$."zh-Hant"') IN ('琥珀饰品','琥珀飾品','东方香品','東方香品')`,
+         AND json_extract(titles, '$."zh-Hant"') IN ('琥珀飾品','琥珀飾品','東方香品','東方香品')`,
     )
     .run();
   if (!row || row.n === 0) {
