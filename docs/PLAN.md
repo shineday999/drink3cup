@@ -20,14 +20,19 @@
 - 狀態:⬜ 待辦 · 🟨 進行中 · ✅ 完成 · 🟥 卡住(寫明原因)
 - 標籤:🤖 任何人可做的程式/內容工作 · 👤 需要網站擁有者(帳號、密碼、決策)
 
-## 待擁有者決定
-| # | 問題 | 未回覆時的預設 |
-|---|------|----------------|
-| D1 | 品牌名稱 | 「MyCafe」 |
-| D2 | 保留哪些語言 | 先做繁體中文 + 英文,馬來文/印尼文之後再做 |
-| D3 | 是否線上販售 | 保留現有預訂制流程 |
-| D4 | 聯絡信箱 | hello@mycafe.de5.net(需設定 Cloudflare Email Routing) |
-| D5 | 新 GitHub repo 名稱 | `mycafe` |
+## 已確認的決策(擁有者 2026-11-21)
+| # | 項目 | 決定 |
+|---|------|------|
+| D1 | 品牌名稱 | **喝三杯咖啡** |
+| D2 | 語言 | **只做繁體中文**(其他語言之後再說) |
+| D3 | 購買方式 | **保留預訂制**;未來會串接物流,讓用戶直接下單 |
+| D4 | 聯絡信箱 | **weider@0061qwen.cc.cd**(暫定) |
+| D5 | 新 GitHub repo 名稱 | 預設 `mycafe`(尚待擁有者確認) |
+
+## 仍待擁有者提供
+- 新品牌的社群帳號(小紅書/IG/LINE 等);目前聯絡頁已自動隱藏空欄位。
+- 咖啡產品照片(自有或有授權)。
+- 品牌 LOGO / favicon / 192、512 圖示(目前仍是舊品牌圖,見 S13)。
 
 ## 步驟
 ### A 階段 — 隔離與安全
@@ -36,25 +41,25 @@
 | S00 | 🤖 | 建立隔離副本、全新 `git init`、無 remote | ✅ | Claude |
 | S01 | 🤖 | wrangler.jsonc ID 換成佔位符;修正 deploy.yml、launch.json、lighthouserc、package.json | ✅ | Claude |
 | S02 | 🤖 | 刪除舊品牌文件/報告(含舊 ID 與 Email) | ✅ | Claude |
-| S03 | 🤖 | 完成 `scripts/check-no-original-refs.sh` 檢查、改寫 LICENSE 與 README | ⬜ | |
+| S03 | 🤖 | 完成原專案檢查腳本、改寫 LICENSE 與 README | ✅ | Claude |
 
 ### B 階段 — 程式碼層改造(尚不寫文案)
 | ID | 標籤 | 步驟 | 狀態 | 負責人 |
 |----|------|------|------|--------|
-| S04 | 🤖 | 取代寫死的 Email/網址:`src/lib/email.ts`、`api/contact.ts`、`api/orders/create.ts`、`contact.astro` | ⬜ | |
-| S05 | 🤖 | 網站名稱/meta/manifest/sw.js/robots/offline.html/404/500、`Layout.astro`、`Footer.astro` | ⬜ | |
+| S04 | 🤖 | 取代寫死的 Email;歡迎信改寫;移除舊品牌小紅書/微信欄位(`social.ts`、`contact.astro`) | ✅ | Claude |
+| S05 | 🤖 | Cookie/快取/網址/站名改為新品牌(`Layout`、`sw.js`、`robots`、`offline`、`manifest` 等) | ✅ | Claude |
+| S05b | 🤖 | 語系改為只有繁體中文:`zh-Hans`→`zh-Hant`(`i18n/config.ts`、`loader`、`middleware`、`LocaleSwitcher`、`sitemap`、hreflang、`[lang]` 路由、測試),移除 en/ms-MY/id-ID;`manifest.webmanifest` 的 `lang` 與 description、`email.ts` 的 `zh-Hans` key 一併改 | ⬜ | |
 | S06 | 🤖 | 路由與分類改名:amber→`beans`、incense→`brewing`、materials→`origins`、craft→`roasting`;問答改為 `quiz/brew-method`、`quiz/taste`;更新 `categories.ts`、`category-kind.ts`、`quiz.ts`、`MobileNav` 等 | ⬜ | |
 
 ### C 階段 — 內容(一步一種語言)
 | ID | 標籤 | 步驟 | 狀態 | 負責人 |
 |----|------|------|------|--------|
-| S07 | 🤖 | 重寫繁體中文語系檔(咖啡內容) | ⬜ | |
-| S08 | 🤖 | 重寫 `en.json`(依 S07 翻譯) | ⬜ | |
-| S09 | 🤖 | `ms-MY.json`、`id-ID.json`(或依 D2 移除) | ⬜ | |
+| S07 | 🤖 | 重寫 `zh-Hant.json`(咖啡內容;需先完成 S05b,並處理 `site_name`、`hero_title`、`faq_a2_a`、後台 `brand` 等舊品牌鍵) | ⬜ | |
 | S10 | 🤖 | 品牌頁:story、beans、brewing、origins、roasting、vision、more、about | ⬜ | |
 | S11 | 🤖 | 知識文章種子(產地、水洗 vs 日曬、研磨度、V60、義式、保存) | ⬜ | |
 | S12 | 🤖 | 資料庫種子:新 `scripts/seed*.sql`、商品 FAQ、migrations 0007/0009/0011/0014 的站名與分類 | ⬜ | |
 | S13 | 🤖 | 更換 `public/images/**`(舊圖屬舊品牌),僅用自有或有授權的照片 | ⬜ | |
+| S13b | 🤖 | 配色/設計 token 由「森林綠」改為咖啡色系(`tailwind.config.cjs`、`global.css`,class 名稱 `forest-*` 可保留或改名);重新製作 favicon/圖示 | ⬜ | |
 | S14 | 🤖 | SEO:sitemap、`llms.txt`、`llms-full.txt`、結構化資料 | ⬜ | |
 
 ### D 階段 — 驗證
@@ -73,9 +78,11 @@
 | S21 | 👤 | Cloudflare Pages 建立新專案 `mycafe` 連接新 repo;GitHub secrets 設定**新的**受限權限 API Token | ⬜ | |
 | S22 | 👤 | Pages → 自訂網域 → 新增 `mycafe.de5.net`(自動建立 CNAME → `mycafe.pages.dev`) | ⬜ | |
 | S23 | 👤 | 建立管理員帳號與金鑰(管理密碼、JWT secret、Resend key),全部用新值 | ⬜ | |
+| S25 | 🤖 | 【未來】物流串接與直接下單(取代預訂制):先調查物流商 API、金流、運費規則,另開計畫 | ⬜ | |
 | S24 | 🤖/👤 | 手機/桌面最終 QA:表單、後台登入、Email | ⬜ | |
 
 ## 紀錄
+- 2026-11-21 Claude:完成 S03–S05(各自獨立 commit)。收到決策 D1–D4。新增 S05b(語系改繁中)、S13b(咖啡色系)、S25(未來物流下單);S08/S09 因只做繁中而移除。守衛腳本目前仍為 NOT CLEAN,剩餘殘留僅在語系檔(S07)與 SQL/腳本(S12)。
 - 2026-11-21 Claude:完成 S00–S02。移除指向原專案 D1/KV/R2 的 ID、deploy.yml 中的原 Pages 專案名稱、lighthouserc 的原網域,並刪除舊文件。
 - 2026-11-21 Claude:改為繁體中文文件,新增語言規則。
 
