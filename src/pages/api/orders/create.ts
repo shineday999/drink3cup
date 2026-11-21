@@ -93,7 +93,7 @@ export const POST: APIRoute = async (ctx) => {
     .run();
 
   // 清空 cart cookie
-  ctx.cookies.set("cnamber_cart", "", { path: "/", maxAge: 0 });
+  ctx.cookies.set("mycafe_cart", "", { path: "/", maxAge: 0 });
 
   // 寄確認信(非阻塞失敗)
   const itemsSummary = items.map((i) => `${i.slug} × ${i.qty}`).join(", ");
@@ -103,12 +103,12 @@ export const POST: APIRoute = async (ctx) => {
     subject: template.subject,
     html: template.html,
     text: template.text,
-    replyTo: "oxsupport@0061qwen.cc.cd",
+    replyTo: "weider@0061qwen.cc.cd",
   }).catch((e) => console.error("[orders/create] email failed", e));
 
   // 同時寄通知給管理員(若有 email setting)
   void sendEmail(emailEnvFromContext(), {
-    to: "oxsupport@0061qwen.cc.cd",
+    to: "weider@0061qwen.cc.cd",
     subject: `[New Order] ${orderId} from ${name}`,
     html: `<p>${name} (${email}) placed a new order.</p><pre>${JSON.stringify(items, null, 2)}</pre><p>Notes: ${notes ?? "(none)"}</p>`,
   }).catch(() => {});

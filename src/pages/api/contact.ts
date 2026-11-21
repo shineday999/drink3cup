@@ -46,7 +46,7 @@ export const POST: APIRoute = async (ctx) => {
   // 寄通知給管理員(若有 RESEND_API_KEY)
   const template = contactNotificationEmail(name, email, message);
   void sendEmail(emailEnvFromContext(), {
-    to: "oxsupport@0061qwen.cc.cd",
+    to: "weider@0061qwen.cc.cd",
     subject: template.subject,
     html: template.html,
     text: template.text,
