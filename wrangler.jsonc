@@ -10,7 +10,7 @@
     {
       "binding": "DB",
       "database_name": "mycafe",
-      "database_id": "REPLACE_WITH_NEW_D1_ID",
+      "database_id": "bbc01b28-0f51-458b-9a1a-36b73fd8fef7",
       "migrations_dir": "migrations",
     },
   ],
@@ -21,8 +21,8 @@
     },
   ],
   "kv_namespaces": [
-    { "binding": "I18N", "id": "REPLACE_WITH_NEW_KV_I18N_ID" },
-    { "binding": "SESSION", "id": "REPLACE_WITH_NEW_KV_SESSION_ID" },
+    { "binding": "I18N", "id": "97403ca1a3b245089e8364ffc98197eb" },
+    { "binding": "SESSION", "id": "0e89a95b442b4f6482e49348512aacc4" },
   ],
   "ai": { "binding": "AI" },
   "vars": {
