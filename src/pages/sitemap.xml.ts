@@ -6,7 +6,7 @@ import type { APIRoute } from "astro";
 import { locales, localizedPath } from "../i18n/config";
 import { getDB } from "../lib/db";
 
-const SITE_URL = "https://cnamber.ccwu.cc";
+const SITE_URL = "https://mycafe.de5.net";
 
 // Static pages included in sitemap (no /admin/*, /api/*, /checkout/*, /cart — session-gated or low-value)
 const STATIC_PATHS = [

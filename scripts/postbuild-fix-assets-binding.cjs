@@ -72,7 +72,7 @@ if (fs.existsSync(wranglerJsonPath)) {
   }
   // Wave 39 fix: Astro 7 cloudflare adapter injects SESSION KV binding without id,
   // but wrangler 4.147.0 rejects SESSION bindings missing "id" field.
-  // cnamber-store uses own cookie-based auth (setSessionCookie, not Astro session driver),
+  // mycafe uses own cookie-based auth (setSessionCookie, not Astro session driver),
   // so it's safe to drop the empty SESSION binding entirely.
   if (Array.isArray(cfg.kv_namespaces)) {
     const before = cfg.kv_namespaces.length;
@@ -81,7 +81,7 @@ if (fs.existsSync(wranglerJsonPath)) {
     );
     if (cfg.kv_namespaces.length !== before) {
       console.log(
-        "[postbuild] ✓ removed SESSION binding (cnamber-store uses own cookie auth, not Astro session)",
+        "[postbuild] ✓ removed SESSION binding (mycafe uses own cookie auth, not Astro session)",
       );
     }
   }

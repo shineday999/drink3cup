@@ -29,7 +29,7 @@ declare namespace App {
   }
 }
 
-// cnamber-store Cloudflare bindings — augment @cloudflare/workers-types 的 Cloudflare.Env
+// mycafe Cloudflare bindings — augment @cloudflare/workers-types 的 Cloudflare.Env
 // (Astro v6+ env 從 "cloudflare:workers" 拿,type 推為 Cloudflare.Env,所以要 merge 到該 namespace)
 declare namespace Cloudflare {
   interface Env {

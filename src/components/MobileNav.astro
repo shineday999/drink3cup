@@ -234,14 +234,14 @@ const icons: Record<string, string> = {
 </nav>
 
 <script>
-  // 1) 點語言連結時寫入 cnamber_locale，否則回到「簡體中文（無前綴）」時 middleware 會讀到舊 cookie
+  // 1) 點語言連結時寫入 mycafe_locale，否則回到「簡體中文（無前綴）」時 middleware 會讀到舊 cookie
   document.addEventListener("click", (e) => {
     const a = (e.target as HTMLElement | null)?.closest<HTMLAnchorElement>(
       "a[data-locale]",
     );
     if (!a) return;
     const secure = location.protocol === "https:" ? "; secure" : "";
-    document.cookie = `cnamber_locale=${a.dataset.locale}; path=/; max-age=2592000; samesite=lax${secure}`;
+    document.cookie = `mycafe_locale=${a.dataset.locale}; path=/; max-age=2592000; samesite=lax${secure}`;
   });
 
   // 2) 子畫面：填入標題、返回鍵優先用站內上一頁
@@ -289,11 +289,11 @@ const icons: Record<string, string> = {
     const raw = document.cookie
       .split(";")
       .map((c) => c.trim())
-      .find((c) => c.startsWith("cnamber_cart="));
+      .find((c) => c.startsWith("mycafe_cart="));
     if (!raw) return; // 讀不到（沒有或 HttpOnly）就保留伺服器渲染的值
     try {
       const items = JSON.parse(
-        atob(decodeURIComponent(raw.slice("cnamber_cart=".length))),
+        atob(decodeURIComponent(raw.slice("mycafe_cart=".length))),
       ) as { qty?: number }[];
       const n = Array.isArray(items)
         ? items.reduce((sum, i) => sum + (Number(i.qty) || 0), 0)

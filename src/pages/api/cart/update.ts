@@ -38,7 +38,7 @@ export const POST: APIRoute = async (ctx) => {
     next = items.map((i) => (i === existing ? { ...i, qty } : i));
   }
 
-  ctx.cookies.set("cnamber_cart", writeCart(next), {
+  ctx.cookies.set("mycafe_cart", writeCart(next), {
     path: "/",
     maxAge: 60 * 60 * 24 * 30,
     sameSite: "lax",

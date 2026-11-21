@@ -1,10 +1,10 @@
-# 牛马得饰 / OxHorseCraft (完整版)
+# 喝三杯咖啡 / 喝三杯咖啡 (完整版)
 
 > 森林系琥珀飾品與東方香品電商,把森林穿戴在身上。預訂制手動接單,4 語國際化(zh-Hans / en / ms-MY / id-ID)。
 
 ## 品牌摘要
 
-cnamber-store 是一間位於 APAC 的小型琥珀飾品與東方香品工作室。所有商品為手工製作或選品,預訂制下單,1-2 個工作天內 email 聯絡確認運送與付款選項。沒有自動即時付款流程,沒有人為的催促,沒有人造的折扣活動。
+mycafe 是一間位於 APAC 的小型琥珀飾品與東方香品工作室。所有商品為手工製作或選品,預訂制下單,1-2 個工作天內 email 聯絡確認運送與付款選項。沒有自動即時付款流程,沒有人為的催促,沒有人造的折扣活動。
 
 森林以南的手寫敘事,風格為文青 + 禪意,慢、靜、留白。所有文案都經過 4 語言的人工翻譯;作品自己說話。
 
@@ -45,10 +45,10 @@ cnamber-store 是一間位於 APAC 的小型琥珀飾品與東方香品工作室
 ## 國際化(4 個 locale)
 
 每個 URL 都可加 locale prefix,預設 zh-Hans:
-- zh-Hans (預設): https://cnamber.ccwu.cc/
-- en: https://cnamber.ccwu.cc/en/
-- ms-MY: https://cnamber.ccwu.cc/ms-MY/
-- id-ID: https://cnamber.ccwu.cc/id-ID/
+- zh-Hans (預設): https://mycafe.de5.net/
+- en: https://mycafe.de5.net/en/
+- ms-MY: https://mycafe.de5.net/ms-MY/
+- id-ID: https://mycafe.de5.net/id-ID/
 
 `hreflang` 標籤在每個頁面都有正確標注,`x-default` 指向預設 locale。
 

@@ -1,4 +1,4 @@
-# cnamber.ccwu.cc robots.txt
+# mycafe.de5.net robots.txt
 # Wave 32 SEO + AEO + GEO: allow all standard crawlers + explicit AI bot allowlist
 
 User-agent: *
@@ -48,4 +48,4 @@ Allow: /
 User-agent: CCBot
 Allow: /
 
-Sitemap: https://cnamber.ccwu.cc/sitemap.xml
+Sitemap: https://mycafe.de5.net/sitemap.xml

@@ -12,7 +12,7 @@ import { getAdminFromContext } from "./lib/auth";
 import { ensureRates } from "./lib/rates";
 import { cachedSiteSettings } from "./lib/site-settings-cache";
 
-const LOCALE_COOKIE = "cnamber_locale";
+const LOCALE_COOKIE = "mycafe_locale";
 
 interface SiteSettings {
   siteName: Partial<Record<string, string>>;

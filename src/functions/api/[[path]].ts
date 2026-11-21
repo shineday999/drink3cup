@@ -17,8 +17,8 @@ app.use(
       if (!origin) return "*";
       if (c.env?.ASSETS) {
         const allowed = [
-          "https://cnamber.ccwu.cc",
-          "https://cnamber-store.pages.dev",
+          "https://mycafe.de5.net",
+          "https://mycafe.pages.dev",
         ];
         return allowed.includes(origin) ? origin : null;
       }
@@ -29,7 +29,7 @@ app.use(
 );
 
 app.get("/api/health", (c) =>
-  c.json({ ok: true, service: "cnamber-store", ts: Date.now() }),
+  c.json({ ok: true, service: "mycafe", ts: Date.now() }),
 );
 
 app.get("/api/i18n/:locale", async (c) => {

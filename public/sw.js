@@ -1,4 +1,4 @@
-/* cnamber-store service worker (6.6)
+/* mycafe service worker (6.6)
  * 原則：只快取「不含個人資料」的靜態資源；HTML 一律走網路，斷線時才顯示離線頁。
  *  - 導覽（HTML）：network-first，網路失敗才回 /offline.html（不快取任何頁面，購物車／登入狀態不會過期）
  *  - /_astro/*、/api/images/*（內容固定或檔名含時間戳）：cache-first
@@ -7,7 +7,7 @@
  * 改動快取行為時請遞增 VERSION，舊快取會在 activate 時清掉。
  */
 const VERSION = "v1";
-const CACHE = "cnamber-static-" + VERSION;
+const CACHE = "mycafe-static-" + VERSION;
 const OFFLINE_URL = "/offline.html";
 const MAX_ENTRIES = 120;
 
@@ -40,7 +40,7 @@ self.addEventListener("activate", (event) => {
       const keys = await caches.keys();
       await Promise.all(
         keys
-          .filter((k) => k.startsWith("cnamber-static-") && k !== CACHE)
+          .filter((k) => k.startsWith("mycafe-static-") && k !== CACHE)
           .map((k) => caches.delete(k)),
       );
       await self.clients.claim();

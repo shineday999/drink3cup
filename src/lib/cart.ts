@@ -1,7 +1,7 @@
 // Cart helpers — 用 cookie 存 server-readable 購物車
 // 簡化版:Phase 4 用 cookie-based cart(避免 localStorage SSR 漂移)
 
-const CART_COOKIE = "cnamber_cart";
+const CART_COOKIE = "mycafe_cart";
 
 export interface CartItem {
   slug: string;

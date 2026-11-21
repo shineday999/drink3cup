@@ -3,7 +3,7 @@ import { createT } from "../../i18n/t";
 
 describe("createT", () => {
   const messages = {
-    common: { site_name: "牛马得饰", loading: "加载中..." },
+    common: { site_name: "喝三杯咖啡", loading: "加载中..." },
     home: {
       hero_title: "把森林穿戴在身上",
       welcome: "歡迎 {name}",
@@ -13,7 +13,7 @@ describe("createT", () => {
 
   it("returns string for existing key", () => {
     const t = createT(messages);
-    expect(t("common.site_name")).toBe("牛马得饰");
+    expect(t("common.site_name")).toBe("喝三杯咖啡");
   });
 
   it("returns nested key", () => {

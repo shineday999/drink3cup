@@ -43,7 +43,7 @@ export const POST: APIRoute = async (ctx) => {
   const items = readCart(cookieHeader);
   const next = addToCart(items, { slug, sku, qty, addedAt: Date.now() });
 
-  ctx.cookies.set("cnamber_cart", writeCart(next), {
+  ctx.cookies.set("mycafe_cart", writeCart(next), {
     path: "/",
     maxAge: 60 * 60 * 24 * 30,
     sameSite: "lax",

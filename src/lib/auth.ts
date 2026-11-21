@@ -18,7 +18,7 @@ export interface AdminSession {
   displayName: string;
 }
 
-const SESSION_COOKIE = "cnamber_admin_session";
+const SESSION_COOKIE = "mycafe_admin_session";
 const SESSION_MAX_AGE_SECONDS = 60 * 60 * 12; // 12h
 const BCRYPT_COST = 12;
 

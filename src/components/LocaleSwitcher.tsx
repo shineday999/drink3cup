@@ -25,7 +25,7 @@ export default function LocaleSwitcher({ currentLocale }: Props) {
   }, []);
 
   function switchTo(locale: Locale) {
-    document.cookie = `cnamber_locale=${locale}; path=/; max-age=${60 * 60 * 24 * 365}; samesite=lax`;
+    document.cookie = `mycafe_locale=${locale}; path=/; max-age=${60 * 60 * 24 * 365}; samesite=lax`;
     // Use live pathname (not .astro wrapper's stripped currentPath) so en URL
     // → zh-Hans correctly drops the /en prefix. Locale detection on the
     // destination side is driven by the cookie via middleware.
