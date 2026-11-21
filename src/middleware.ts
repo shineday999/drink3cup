@@ -78,7 +78,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
 
   // 1. Locale detection
   // Wave 41.2: catch-all `[lang]/[...path].astro` 的 `Astro.rewrite(subPath)`
-  // 會 re-run middleware,第二次 URL 已 strip locale prefix,會 fallback 到 zh-Hans
+  // 會 re-run middleware,第二次 URL 已 strip locale prefix,會 fallback 到 zh-Hant
   // 蓋掉原本 en/ms-MY/id-ID。reuse 已存在的 locale 解決。
   let locale =
     (context.locals.locale as Locale | undefined) ??
@@ -89,11 +89,6 @@ export const onRequest = defineMiddleware(async (context, next) => {
     if (isLocale(cookieLocale)) {
       locale = cookieLocale;
     }
-  }
-
-  if (!locale) {
-    const acceptLanguage = context.request.headers.get("accept-language") ?? "";
-    locale = detectLocaleFromHeader(acceptLanguage);
   }
 
   if (!locale) {
@@ -205,27 +200,5 @@ export const onRequest = defineMiddleware(async (context, next) => {
 
   return withSecurityHeaders(await next());
 });
-
-function detectLocaleFromHeader(header: string): Locale | null {
-  const parts = header
-    .split(",")
-    .map((p) => {
-      const [tag, qPart] = p.trim().split(";");
-      const q = qPart?.startsWith("q=") ? parseFloat(qPart.slice(2)) : 1;
-      return { tag: (tag ?? "").toLowerCase(), q: Number.isNaN(q) ? 1 : q };
-    })
-    .sort((a, b) => b.q - a.q);
-
-  for (const { tag } of parts) {
-    if (tag === "zh-hans" || tag === "zh-cn" || tag.startsWith("zh-cn"))
-      return "zh-Hans";
-    if (tag === "zh-hant" || tag === "zh-tw" || tag === "zh-hk")
-      return "zh-Hans";
-    if (tag === "ms-my") return "ms-MY";
-    if (tag === "id" || tag === "id-id") return "id-ID";
-    if (tag === "en" || tag.startsWith("en-")) return "en";
-  }
-  return null;
-}
 
 void locales;

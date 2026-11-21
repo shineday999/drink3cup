@@ -16,10 +16,7 @@ app.use(
     origin: (origin, c) => {
       if (!origin) return "*";
       if (c.env?.ASSETS) {
-        const allowed = [
-          "https://mycafe.de5.net",
-          "https://mycafe.pages.dev",
-        ];
+        const allowed = ["https://mycafe.de5.net", "https://mycafe.pages.dev"];
         return allowed.includes(origin) ? origin : null;
       }
       return origin;
@@ -34,7 +31,7 @@ app.get("/api/health", (c) =>
 
 app.get("/api/i18n/:locale", async (c) => {
   const locale = c.req.param("locale");
-  const allowed = ["zh-Hans", "en", "ms-MY", "id-ID"];
+  const allowed = ["zh-Hant"];
   if (!allowed.includes(locale)) {
     return c.json({ error: "unsupported_locale" }, 400);
   }

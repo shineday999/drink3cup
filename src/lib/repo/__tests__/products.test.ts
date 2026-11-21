@@ -25,8 +25,7 @@ function sample(over: Record<string, unknown> = {}) {
     slug: "test-pendant",
     tags: ["calm", "gift"],
     translations: [
-      { locale: "zh-Hans", name: "测试吊坠", description: "描述" },
-      { locale: "en", name: "Test Pendant", description: "Desc" },
+      { locale: "zh-Hant", name: "测试吊坠", description: "描述" },
     ],
     variants: [
       {
@@ -82,7 +81,7 @@ describe.skipIf(!db)("products repository", () => {
   it("createProduct 一次寫入商品、翻譯、變體、價格", async () => {
     const id = await createProduct(db!, sample());
     expect(await count("products")).toBe(1);
-    expect(await count("product_translations")).toBe(2);
+    expect(await count("product_translations")).toBe(1);
     expect(await count("product_variants")).toBe(2);
     expect(await count("product_prices")).toBe(3);
 
@@ -128,7 +127,7 @@ describe.skipIf(!db)("products repository", () => {
       ),
     ).rejects.toMatchObject({ code: "sku_taken" });
     expect(await count("products")).toBe(1);
-    expect(await count("product_translations")).toBe(2);
+    expect(await count("product_translations")).toBe(1);
   });
 
   it("同一輸入內 SKU 重複也會回滾", async () => {
@@ -152,7 +151,7 @@ describe.skipIf(!db)("products repository", () => {
           status: i === 1 ? "active" : "draft",
           variants: [{ sku: `SKU-${i}` }],
           translations: [
-            { locale: "zh-Hans", name: `商品${i}`, description: "d" },
+            { locale: "zh-Hant", name: `商品${i}`, description: "d" },
           ],
         }),
       );
@@ -183,7 +182,7 @@ describe.skipIf(!db)("products repository", () => {
         slug: "plain-item",
         variants: [{ sku: "A2" }],
         translations: [
-          { locale: "zh-Hans", name: "100% 纯银", description: "d" },
+          { locale: "zh-Hant", name: "100% 纯银", description: "d" },
         ],
       }),
     );
@@ -201,7 +200,7 @@ describe.skipIf(!db)("products repository", () => {
       subcategory: null,
       translations: [
         {
-          locale: "zh-Hans",
+          locale: "zh-Hant",
           name: "新名称",
           description: "新描述",
           short_description: null,
@@ -216,7 +215,7 @@ describe.skipIf(!db)("products repository", () => {
     expect(p?.subcategory).toBeNull();
     expect(p?.category).toBe("jewelry"); // 沒帶 → 不變
     expect(p?.tags).toEqual(["calm", "gift"]);
-    expect(p?.translations.map((t) => t.locale)).toEqual(["zh-Hans"]);
+    expect(p?.translations.map((t) => t.locale)).toEqual(["zh-Hant"]);
     expect(p?.translations[0]?.name).toBe("新名称");
   });
 

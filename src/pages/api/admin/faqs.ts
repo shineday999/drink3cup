@@ -4,7 +4,7 @@
 import type { APIRoute } from "astro";
 import { getDB } from "../../../lib/db";
 
-const LOCALES = ["zh-Hans", "en", "ms-MY", "id-ID"] as const;
+const LOCALES = ["zh-Hant"] as const;
 
 export const POST: APIRoute = async (ctx) => {
   if (!ctx.locals.admin) return new Response("Unauthorized", { status: 401 });
@@ -36,10 +36,7 @@ export const POST: APIRoute = async (ctx) => {
 
   // 收集欄位式輸入:faq_{loc}_q_{i} / faq_{loc}_a_{i}(index 可跳號,依序排序)
   const byLoc: Record<string, Map<number, { q: string; a: string }>> = {
-    "zh-Hans": new Map(),
-    en: new Map(),
-    "ms-MY": new Map(),
-    "id-ID": new Map(),
+    "zh-Hant": new Map(),
   };
   for (const [key, value] of form.entries()) {
     const m = /^faq_(.+?)_(q|a)_(\d+)$/.exec(key);

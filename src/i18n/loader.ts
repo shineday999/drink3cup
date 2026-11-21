@@ -4,10 +4,7 @@ type Messages = Record<string, unknown>;
 
 const messagesImporters: Record<Locale, () => Promise<{ default: Messages }>> =
   {
-    "zh-Hans": () => import("./messages/zh-Hans.json"),
-    en: () => import("./messages/en.json"),
-    "ms-MY": () => import("./messages/ms-MY.json"),
-    "id-ID": () => import("./messages/id-ID.json"),
+    "zh-Hant": () => import("./messages/zh-Hant.json"),
   };
 
 const cache = new Map<Locale, Messages>();

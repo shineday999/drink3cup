@@ -6,14 +6,14 @@ import AdminLayout from "../../layouts/AdminLayout.astro";
 import { env } from "cloudflare:workers";
 import { createT } from "../../i18n/t";
 import { defaultLocale, type Locale } from "../../i18n/config";
-import zhHansMessages from "../../i18n/messages/zh-Hans.json";
+import zhHansMessages from "../../i18n/messages/zh-Hant.json";
 
 const locale = (Astro.locals.locale ?? defaultLocale) as Locale;
 const messages = zhHansMessages as Record<string, unknown>;
 const t = createT(messages);
 void locale;
 
-const LOCALES = ["zh-Hans", "en", "ms-MY", "id-ID"] as const;
+const LOCALES = ["zh-Hant"] as const;
 
 // type toggle:?type=products|posts,default products
 const typeParam = Astro.url.searchParams.get("type");
@@ -46,11 +46,11 @@ let names: { results: NameRow[] } = { results: [] };
 if (env?.DB) {
   if (currentType === "products") {
     names = await env.DB.prepare(
-      "SELECT product_id AS id, name FROM product_translations WHERE locale = 'zh-Hans'",
+      "SELECT product_id AS id, name FROM product_translations WHERE locale = 'zh-Hant'",
     ).all<NameRow>();
   } else {
     names = await env.DB.prepare(
-      "SELECT post_id AS id, title AS name FROM post_translations WHERE locale = 'zh-Hans'",
+      "SELECT post_id AS id, title AS name FROM post_translations WHERE locale = 'zh-Hant'",
     ).all<NameRow>();
   }
 }
@@ -190,7 +190,7 @@ if (selected && env?.DB) {
           const items = faqByLocale[loc] ?? [];
           return (
             <details
-              open={loc === "zh-Hans" || items.length > 0}
+              open={loc === "zh-Hant" || items.length > 0}
               class="rounded-card border border-text-muted/20 bg-bg-card p-4"
             >
               <summary class="mb-3 cursor-pointer font-serif text-lg">

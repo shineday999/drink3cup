@@ -11,7 +11,7 @@ const ALLOWED_KEYS = [
   "sub_theme",
   "hero_subtitle",
 ] as const;
-const ALLOWED_LOCALES = ["zh-Hans", "en", "ms-MY", "id-ID"] as const;
+const ALLOWED_LOCALES = ["zh-Hant"] as const;
 
 export const POST: APIRoute = async (ctx) => {
   if (!ctx.locals.admin) {

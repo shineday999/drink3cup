@@ -49,7 +49,7 @@ export const POST: APIRoute = async (ctx) => {
       );
     }
     const titles = cleanTextMap(body.titles, 60);
-    if (!titles["zh-Hans"]) {
+    if (!titles["zh-Hant"]) {
       return json({ error: "请填写简体中文标题" }, 400);
     }
     const exists = await db

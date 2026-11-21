@@ -14,15 +14,15 @@ CREATE TABLE IF NOT EXISTS site_settings (
 CREATE INDEX IF NOT EXISTS idx_site_settings_key ON site_settings(key);
 
 INSERT OR IGNORE INTO site_settings (key, locale, value, updated_at, updated_by) VALUES
-  ('site_name', 'zh-Hans', '牛马得饰',     strftime('%s','now'), 'seed'),
+  ('site_name', 'zh-Hant', '牛马得饰',     strftime('%s','now'), 'seed'),
   ('site_name', 'en',      'OxHorseCraft', strftime('%s','now'), 'seed'),
   ('site_name', 'ms-MY',   'OxHorseCraft', strftime('%s','now'), 'seed'),
   ('site_name', 'id-ID',   'OxHorseCraft', strftime('%s','now'), 'seed'),
-  ('theme',     'zh-Hans', '森林系',         strftime('%s','now'), 'seed'),
+  ('theme',     'zh-Hant', '森林系',         strftime('%s','now'), 'seed'),
   ('theme',     'en',      'Forest',         strftime('%s','now'), 'seed'),
   ('theme',     'ms-MY',   'Hutan',          strftime('%s','now'), 'seed'),
   ('theme',     'id-ID',   'Hutan',          strftime('%s','now'), 'seed'),
-  ('sub_theme', 'zh-Hans', '暖色',           strftime('%s','now'), 'seed'),
+  ('sub_theme', 'zh-Hant', '暖色',           strftime('%s','now'), 'seed'),
   ('sub_theme', 'en',      'Warm palette',   strftime('%s','now'), 'seed'),
   ('sub_theme', 'ms-MY',   'Palet hangat',   strftime('%s','now'), 'seed'),
   ('sub_theme', 'id-ID',   'Palet hangat',   strftime('%s','now'), 'seed');

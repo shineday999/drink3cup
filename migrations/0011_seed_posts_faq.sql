@@ -1,7 +1,7 @@
 -- Wave 37.1: seed 3 published posts with 4-locale FAQ JSON template
 UPDATE posts
 SET faq = json_object(
-  'zh-Hans', json_array(
+  'zh-Hant', json_array(
     json_object('q', '這篇文章談什麼?', 'a', '從森林、琥珀、香三條線,談材質與工藝的細節。'),
     json_object('q', '可以引用嗎?', 'a', '可以,請註明出處 cnamber-store 與原文連結。'),
     json_object('q', '有商品推薦嗎?', 'a', '文章結尾如有「相關作品」連結,是我們挑選的搭配,可從那裡看。'),

@@ -2,11 +2,11 @@
 import { env } from "cloudflare:workers";
 
 // /admin/settings — 網站名稱 / 首頁副標題 / 主題 / 次主題（4 個欄位 × 4 種語言）
-// 純文字標籤，管理員自由填寫。前台 layout 用 current locale，缺值 fallback zh-Hans。
+// 純文字標籤，管理員自由填寫。前台 layout 用 current locale，缺值 fallback zh-Hant。
 // 首頁橫幅管理已獨立成「首页横幅」頁籤（/admin/banners）。
 import AdminLayout from "../../layouts/AdminLayout.astro";
 import { createT } from "../../i18n/t";
-import zhHansMessages from "../../i18n/messages/zh-Hans.json";
+import zhHansMessages from "../../i18n/messages/zh-Hant.json";
 
 const messages = zhHansMessages as Record<string, unknown>;
 const t = createT(messages);
@@ -37,12 +37,7 @@ for (const r of rows.results ?? []) {
   }
 }
 
-const LOCALES = [
-  { code: "zh-Hans", label: "中文 (简体)" },
-  { code: "en", label: "English" },
-  { code: "ms-MY", label: "Bahasa Melayu" },
-  { code: "id-ID", label: "Bahasa Indonesia" },
-] as const;
+const LOCALES = [{ code: "zh-Hant", label: "繁體中文" }] as const;
 
 const KEY_SECTIONS = [
   {

@@ -70,7 +70,7 @@ const fallback = env?.DB
   ? await env.DB.prepare(
       "SELECT name, description, short_description, story FROM product_translations WHERE product_id = ? AND locale = ?",
     )
-      .bind(product.id, "en")
+      .bind(product.id, "zh-Hant")
       .first<Translation>()
   : null;
 
@@ -109,7 +109,7 @@ const prices = env?.DB
 let productFaqs: { q: string; a: string }[] = [];
 try {
   const parsed = product.faq ? JSON.parse(product.faq) : {};
-  productFaqs = parsed[locale] || parsed["en"] || [];
+  productFaqs = parsed[locale] || parsed["zh-Hant"] || [];
 } catch {
   productFaqs = [];
 }
@@ -143,7 +143,7 @@ const siteUrl = Astro.url.origin || "https://mycafe.de5.net";
 const siteSettings = Astro.locals.siteSettings;
 const siteName =
   siteSettings?.siteName?.[locale] ??
-  siteSettings?.siteName?.["zh-Hans"] ??
+  siteSettings?.siteName?.["zh-Hant"] ??
   t("common.site_name");
 
 // Wave 33 Phase 2.2: Product JSON-LD (per-product structured data)

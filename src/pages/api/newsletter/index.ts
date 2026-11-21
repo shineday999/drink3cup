@@ -2,7 +2,7 @@ import type { APIRoute } from "astro";
 import { getDB, genId } from "../../../lib/db";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const ALLOWED_LOCALES = new Set(["zh-Hans", "en", "ms-MY", "id-ID"]);
+const ALLOWED_LOCALES = new Set(["zh-Hant"]);
 
 export const POST: APIRoute = async (ctx) => {
   const form = await ctx.request.formData();
@@ -10,9 +10,9 @@ export const POST: APIRoute = async (ctx) => {
     .trim()
     .toLowerCase();
   const localeRaw = String(
-    form.get("locale") ?? ctx.locals.locale ?? "zh-Hans",
+    form.get("locale") ?? ctx.locals.locale ?? "zh-Hant",
   );
-  const locale = ALLOWED_LOCALES.has(localeRaw) ? localeRaw : "zh-Hans";
+  const locale = ALLOWED_LOCALES.has(localeRaw) ? localeRaw : "zh-Hant";
 
   if (!EMAIL_RE.test(email) || email.length > 254) {
     return new Response("Invalid email", { status: 400 });

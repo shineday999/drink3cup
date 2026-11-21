@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="zh-Hans">
+<html lang="zh-Hant">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -90,40 +90,13 @@
     <script>
       (function () {
         var T = {
-          "zh-Hans": [
-            "目前没有网络连接",
-            "请检查网络后重试。商品与购物车需要联网才能更新。",
-            "重新加载",
-          ],
-          en: [
-            "You're offline",
-            "Please check your connection and try again. Products and your cart need a network connection.",
-            "Try again",
-          ],
-          "ms-MY": [
-            "Anda di luar talian",
-            "Sila semak sambungan anda dan cuba lagi. Produk dan troli memerlukan sambungan internet.",
-            "Cuba lagi",
-          ],
-          "id-ID": [
-            "Anda sedang offline",
-            "Periksa koneksi Anda lalu coba lagi. Produk dan keranjang memerlukan koneksi internet.",
-            "Coba lagi",
+          "zh-Hant": [
+            "目前沒有網路連線",
+            "請檢查網路後重試。商品與購物車需要連線才能更新。",
+            "重新載入",
           ],
         };
-        var m = document.cookie.match(/(?:^|; )mycafe_locale=([^;]+)/);
-        var l = m ? decodeURIComponent(m[1]) : "";
-        if (!T[l]) {
-          var n = (navigator.language || "").toLowerCase();
-          l =
-            n.indexOf("ms") === 0
-              ? "ms-MY"
-              : n.indexOf("id") === 0
-                ? "id-ID"
-                : n.indexOf("en") === 0
-                  ? "en"
-                  : "zh-Hans";
-        }
+        var l = "zh-Hant";
         document.documentElement.lang = l;
         document.title = T[l][0];
         document.getElementById("t").textContent = T[l][0];

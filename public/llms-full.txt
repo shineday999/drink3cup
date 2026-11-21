@@ -1,6 +1,6 @@
 # 喝三杯咖啡 / 喝三杯咖啡 (完整版)
 
-> 森林系琥珀飾品與東方香品電商,把森林穿戴在身上。預訂制手動接單,4 語國際化(zh-Hans / en / ms-MY / id-ID)。
+> 森林系琥珀飾品與東方香品電商,把森林穿戴在身上。預訂制手動接單,4 語國際化(zh-Hant / en / ms-MY / id-ID)。
 
 ## 品牌摘要
 
@@ -44,8 +44,8 @@ mycafe 是一間位於 APAC 的小型琥珀飾品與東方香品工作室。所�
 
 ## 國際化(4 個 locale)
 
-每個 URL 都可加 locale prefix,預設 zh-Hans:
-- zh-Hans (預設): https://mycafe.de5.net/
+每個 URL 都可加 locale prefix,預設 zh-Hant:
+- zh-Hant (預設): https://mycafe.de5.net/
 - en: https://mycafe.de5.net/en/
 - ms-MY: https://mycafe.de5.net/ms-MY/
 - id-ID: https://mycafe.de5.net/id-ID/

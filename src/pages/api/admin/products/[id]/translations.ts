@@ -1,7 +1,7 @@
 import type { APIRoute } from "astro";
 import { getDB } from "../../../../../lib/db";
 
-const LOCALES = ["zh-Hans", "en", "ms-MY", "id-ID"] as const;
+const LOCALES = ["zh-Hant"] as const;
 
 const LIMITS = {
   name: 200,

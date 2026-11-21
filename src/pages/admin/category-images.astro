@@ -2,7 +2,7 @@
 import { env } from "cloudflare:workers";
 import AdminLayout from "../../layouts/AdminLayout.astro";
 import { createT } from "../../i18n/t";
-import zhHansMessages from "../../i18n/messages/zh-Hans.json";
+import zhHansMessages from "../../i18n/messages/zh-Hant.json";
 import { locales, localeNames } from "../../i18n/config";
 import { getDB } from "../../lib/db";
 import {
@@ -50,7 +50,7 @@ if (env?.DB) {
 }
 const saved = Astro.url.searchParams.get("saved") === "1";
 const label = (c: SiteCategory) =>
-  c.titles["zh-Hans"] || LEGACY_LABEL[c.code] || c.code;
+  c.titles["zh-Hant"] || LEGACY_LABEL[c.code] || c.code;
 ---
 
 <AdminLayout title={t("admin.category_images.title")} active="category_images">
@@ -476,8 +476,8 @@ const label = (c: SiteCategory) =>
           api({
             action: "create",
             code: codeEl.value,
-            titles: { "zh-Hans": titleEl.value },
-            descs: { "zh-Hans": document.getElementById("ci-new-desc").value },
+            titles: { "zh-Hant": titleEl.value },
+            descs: { "zh-Hant": document.getElementById("ci-new-desc").value },
           })
             .then(function () {
               window.location.href = "/admin/category-images?saved=1";

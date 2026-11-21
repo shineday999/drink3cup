@@ -7,11 +7,11 @@ INSERT INTO products (id, category, subcategory, slug, status, created_at, updat
    CAST(strftime('%s','now') AS INTEGER), CAST(strftime('%s','now') AS INTEGER), NULL, 'anxiety,calm,relax,sleep,stick,woody,evening,bedtime', '{}');
 
 INSERT INTO product_translations (product_id, locale, name, description, short_description, story, meta_title, meta_description) VALUES
-  ('prod_demo_pendant', 'zh-Hans', '抚顺琥珀吊坠', '以抚顺琥珀手工打磨的吊坠，温润通透。', '手工打磨琥珀吊坠', NULL, NULL, NULL),
+  ('prod_demo_pendant', 'zh-Hant', '抚顺琥珀吊坠', '以抚顺琥珀手工打磨的吊坠，温润通透。', '手工打磨琥珀吊坠', NULL, NULL, NULL),
   ('prod_demo_pendant', 'en',      'Fushun Amber Pendant', 'A hand-polished pendant made from Fushun amber, warm and translucent.', 'Hand-polished amber pendant', NULL, NULL, NULL),
   ('prod_demo_pendant', 'ms-MY',   'Loket Ambar Fushun', 'Loket ambar Fushun yang digilap dengan tangan.', 'Loket ambar digilap tangan', NULL, NULL, NULL),
   ('prod_demo_pendant', 'id-ID',   'Liontin Amber Fushun', 'Liontin amber Fushun yang dipoles dengan tangan.', 'Liontin amber poles tangan', NULL, NULL, NULL),
-  ('prod_demo_incense', 'zh-Hans', '安神助眠线香', '以木质与树脂香调调配的线香，适合睡前使用。', '睡前线香', NULL, NULL, NULL),
+  ('prod_demo_incense', 'zh-Hant', '安神助眠线香', '以木质与树脂香调调配的线香，适合睡前使用。', '睡前线香', NULL, NULL, NULL),
   ('prod_demo_incense', 'en',      'Calm & Sleep Incense Sticks', 'Incense sticks blending woody and resin notes, ideal before bedtime.', 'Bedtime incense sticks', NULL, NULL, NULL),
   ('prod_demo_incense', 'ms-MY',   'Colok Wangian Tenang & Tidur', 'Colok wangian dengan nota kayu dan resin, sesuai sebelum tidur.', 'Colok wangian waktu tidur', NULL, NULL, NULL),
   ('prod_demo_incense', 'id-ID',   'Dupa Batang Tenang & Tidur', 'Dupa batang beraroma kayu dan resin, cocok sebelum tidur.', 'Dupa batang sebelum tidur', NULL, NULL, NULL);

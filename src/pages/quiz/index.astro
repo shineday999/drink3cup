@@ -45,7 +45,7 @@ const entries: QuizEntry[] = [];
 const seen = new Set<QuizKind>();
 for (const r of rows) {
   const titles = parseTextMap(r.titles);
-  const kind = kindOf(r.code, titles["zh-Hans"]);
+  const kind = kindOf(r.code, titles["zh-Hant"]);
   if (!kind || seen.has(kind)) continue;
   seen.add(kind);
   entries.push({

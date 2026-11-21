@@ -164,15 +164,15 @@ const homeCatDefaults = catImages as unknown as Record<
 const homeCategories: HomeCategory[] = homeCatRows.map((c) => {
   const lk = LEGACY_CAT_KEYS[c.code];
   const title =
-    c.titles[locale] || legacyT(lk?.title) || c.titles["zh-Hans"] || c.code;
+    c.titles[locale] || legacyT(lk?.title) || c.titles["zh-Hant"] || c.code;
   const img = homeCatImages[c.code] ?? homeCatDefaults[c.code] ?? null;
   return {
     code: c.code,
-    zhTitle: c.titles["zh-Hans"] ?? "",
+    zhTitle: c.titles["zh-Hant"] ?? "",
     // 後台有設定名稱時，名稱只顯示後台的；沒設定才退回舊的導覽名稱
-    kicker: c.titles[locale] || c.titles["zh-Hans"] ? "" : legacyT(lk?.kicker),
+    kicker: c.titles[locale] || c.titles["zh-Hant"] ? "" : legacyT(lk?.kicker),
     title,
-    desc: c.descs[locale] || legacyT(lk?.desc) || c.descs["zh-Hans"] || "",
+    desc: c.descs[locale] || legacyT(lk?.desc) || c.descs["zh-Hant"] || "",
     alt: legacyT(lk?.alt) || title,
     src: img?.src ?? null,
     small: img?.small ?? null,
@@ -240,11 +240,11 @@ const quizCards: QuizCard[] = homeCategories.map((c) => {
 const siteSettings = Astro.locals.siteSettings;
 const heroTitle =
   siteSettings?.siteName?.[locale] ??
-  siteSettings?.siteName?.["zh-Hans"] ??
+  siteSettings?.siteName?.["zh-Hant"] ??
   t("home.hero_title");
 const heroSubtitle =
   siteSettings?.heroSubtitle?.[locale] ??
-  siteSettings?.heroSubtitle?.["zh-Hans"] ??
+  siteSettings?.heroSubtitle?.["zh-Hant"] ??
   t("home.hero_subtitle");
 
 interface FeaturedProduct {

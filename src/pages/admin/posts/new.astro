@@ -2,10 +2,10 @@
 import AdminLayout from "../../../layouts/AdminLayout.astro";
 import { createT } from "../../../i18n/t";
 import { defaultLocale, type Locale } from "../../../i18n/config";
-import zhHansMessages from "../../../i18n/messages/zh-Hans.json";
+import zhHansMessages from "../../../i18n/messages/zh-Hant.json";
 
-const LOCALES = ["zh-Hans", "en", "ms-MY", "id-ID"] as const;
-const OTHER_LOCALES = LOCALES.filter((l) => l !== "zh-Hans");
+const LOCALES = ["zh-Hant"] as const;
+const OTHER_LOCALES = LOCALES.filter((l) => l !== "zh-Hant");
 const locale = (Astro.locals.locale ?? defaultLocale) as Locale;
 const messages = zhHansMessages as Record<string, unknown>;
 const t = createT(messages);
@@ -63,42 +63,42 @@ const field =
 
     <section class={card}>
       <h2 class="font-serif text-lg">
-        zh-Hans {t("admin.posts_new.locale_required")}
+        zh-Hant {t("admin.posts_new.locale_required")}
       </h2>
       <input
         type="hidden"
-        name="translations[zh-Hans][locale]"
-        value="zh-Hans"
+        name="translations[zh-Hant][locale]"
+        value="zh-Hant"
       />
       <div>
-        <label class="mb-1 block text-sm font-medium" for="title-zh-Hans">
+        <label class="mb-1 block text-sm font-medium" for="title-zh-Hant">
           {t("admin.posts_new.label_title")}
         </label>
         <input
-          id="title-zh-Hans"
-          name="translations[zh-Hans][title]"
+          id="title-zh-Hant"
+          name="translations[zh-Hant][title]"
           required
           class={field}
         />
       </div>
       <div>
-        <label class="mb-1 block text-sm font-medium" for="excerpt-zh-Hans">
+        <label class="mb-1 block text-sm font-medium" for="excerpt-zh-Hant">
           {t("admin.posts_new.label_excerpt")}
         </label>
         <textarea
-          id="excerpt-zh-Hans"
-          name="translations[zh-Hans][excerpt]"
+          id="excerpt-zh-Hant"
+          name="translations[zh-Hant][excerpt]"
           rows="2"
           class={field}></textarea>
       </div>
       <div>
-        <label class="mb-1 block text-sm font-medium" for="body-zh-Hans">
+        <label class="mb-1 block text-sm font-medium" for="body-zh-Hant">
           {t("admin.posts_new.label_body")}
           {t("admin.posts_new.body_required")}
         </label>
         <textarea
-          id="body-zh-Hans"
-          name="translations[zh-Hans][body_markdown]"
+          id="body-zh-Hant"
+          name="translations[zh-Hant][body_markdown]"
           rows="10"
           required
           class={`${field} font-mono text-sm`}></textarea>

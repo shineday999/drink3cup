@@ -9,7 +9,7 @@ INSERT INTO posts (id, slug, status, category, cover_image_url, author_email, pu
 
 -- post 1: 波羅的海琥珀的形成與產地(material)
 INSERT INTO post_translations (post_id, locale, title, excerpt, body_markdown) VALUES
-  ('post_baltic_origin', 'zh-Hans', '波羅的海琥珀:凝結四千萬年的森林之光',
+  ('post_baltic_origin', 'zh-Hant', '波羅的海琥珀:凝結四千萬年的森林之光',
    '從波羅的海的沙灘到您的頸間,每一顆琥珀都藏著一段地質故事。',
    '## 什麼是琥珀
 
@@ -132,7 +132,7 @@ Cahaya hutan, dibekukan di leher Anda, adalah waktu itu sendiri.');
 
 -- post 2: 森林靜物美學(culture)
 INSERT INTO post_translations (post_id, locale, title, excerpt, body_markdown) VALUES
-  ('post_forest_stillness', 'zh-Hans', '森林靜物:我們的攝影美學',
+  ('post_forest_stillness', 'zh-Hant', '森林靜物:我們的攝影美學',
    '為什麼我們的產品照不擺滿道具?只讓自然光、紋理、留白說話。',
    '## 借鏡歐美靜物電影
 
@@ -231,7 +231,7 @@ Ialah cincin amber Fushun. Pantulan amber itu menarik masuk butiran kayu bersebe
 
 -- post 3: 雲南沉香的慢工藝(craft)
 INSERT INTO post_translations (post_id, locale, title, excerpt, body_markdown) VALUES
-  ('post_yunnan_agarwood', 'zh-Hans', '雲南沉香:慢的工藝',
+  ('post_yunnan_agarwood', 'zh-Hant', '雲南沉香:慢的工藝',
    '從受傷的樹木到能點燃的香,沉香需要 30 年以上。',
    '## 沉香是什麼
 

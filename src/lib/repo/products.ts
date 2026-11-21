@@ -113,7 +113,7 @@ export async function listProducts(
   db: D1Database,
   params: ListProductsParams = {},
 ): Promise<Page<ProductListItem>> {
-  const locale = params.locale ?? "zh-Hans";
+  const locale = params.locale ?? "zh-Hant";
   const pageSize = clamp(Math.trunc(params.pageSize ?? 20), 1, 100);
   const page = Math.max(1, Math.trunc(params.page ?? 1));
 
@@ -148,7 +148,7 @@ export async function listProducts(
               p.created_at, p.updated_at,
               COALESCE(
                 (SELECT name FROM product_translations WHERE product_id = p.id AND locale = ?),
-                (SELECT name FROM product_translations WHERE product_id = p.id AND locale = 'zh-Hans')
+                (SELECT name FROM product_translations WHERE product_id = p.id AND locale = 'zh-Hant')
               ) AS name,
               (SELECT COUNT(*) FROM product_variants WHERE product_id = p.id) AS variant_count
          FROM products p

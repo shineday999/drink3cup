@@ -64,17 +64,17 @@ export const POST: APIRoute = async (ctx) => {
     .bind(id, category, subcategory, slug, "draft", imageUrl, tags, now, now)
     .run();
 
-  // Initial zh-Hans translation if provided
-  const name = String(form.get("translations[zh-Hans][name]") ?? "");
+  // Initial zh-Hant translation if provided
+  const name = String(form.get("translations[zh-Hant][name]") ?? "");
   const description = String(
-    form.get("translations[zh-Hans][description]") ?? "",
+    form.get("translations[zh-Hant][description]") ?? "",
   );
   if (name && description) {
     await db
       .prepare(
         "INSERT INTO product_translations (product_id, locale, name, description) VALUES (?, ?, ?, ?)",
       )
-      .bind(id, "zh-Hans", name, description)
+      .bind(id, "zh-Hant", name, description)
       .run();
   }
 

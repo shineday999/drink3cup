@@ -7,7 +7,7 @@
 import "../styles/global.css";
 import { createT } from "../i18n/t";
 import { defaultLocale, type Locale } from "../i18n/config";
-import zhHansMessages from "../i18n/messages/zh-Hans.json";
+import zhHansMessages from "../i18n/messages/zh-Hant.json";
 import ChangePasswordModal from "../components/admin/ChangePasswordModal.astro";
 
 interface Props {
@@ -26,8 +26,7 @@ const admin = Astro.locals.admin;
 // 網站標題跟著 siteSettings.siteName 變動
 const siteName: string =
   Astro.locals.siteSettings?.siteName[locale] ??
-  Astro.locals.siteSettings?.siteName["zh-Hans"] ??
-  Astro.locals.siteSettings?.siteName["en"] ??
+  Astro.locals.siteSettings?.siteName["zh-Hant"] ??
   "mycafe";
 
 interface NavChild {

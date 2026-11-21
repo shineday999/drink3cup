@@ -3,7 +3,7 @@ import AdminLayout from "../../../layouts/AdminLayout.astro";
 import { env } from "cloudflare:workers";
 import { createT, tEnum } from "../../../i18n/t";
 import { defaultLocale, type Locale } from "../../../i18n/config";
-import zhHansMessages from "../../../i18n/messages/zh-Hans.json";
+import zhHansMessages from "../../../i18n/messages/zh-Hant.json";
 import { formatPrice } from "../../../lib/format";
 import { PRODUCT_SHEET_EDIT_URL } from "../../../lib/sheet-sync";
 
@@ -37,7 +37,7 @@ const sql = `SELECT p.id, p.slug, p.category, p.subcategory, p.status, p.image_u
                 ORDER BY pv.sku LIMIT 1) AS cny_cents
        FROM products p
        LEFT JOIN product_translations pt
-         ON pt.product_id = p.id AND pt.locale = 'zh-Hans'
+         ON pt.product_id = p.id AND pt.locale = 'zh-Hant'
        ${filter ? "WHERE p.status = ?" : ""}
        ORDER BY p.created_at DESC LIMIT 100`;
 
@@ -162,7 +162,7 @@ const th =
               </td>
               <td class="whitespace-nowrap px-3 py-2">
                 {p.cny_cents != null ? (
-                  formatPrice(p.cny_cents, "CNY", "zh-Hans")
+                  formatPrice(p.cny_cents, "CNY", "zh-Hant")
                 ) : (
                   <span class="text-text-muted">—</span>
                 )}

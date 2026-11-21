@@ -7,5 +7,5 @@ CREATE TABLE IF NOT EXISTS product_categories (
 );
 
 INSERT OR IGNORE INTO product_categories (code, sort_order, names) VALUES
-  ('jewelry', 1, '{"zh-Hans":"首饰","en":"Jewelry"}'),
-  ('incense', 2, '{"zh-Hans":"香品","en":"Incense"}');
+  ('jewelry', 1, '{"zh-Hant":"首饰","en":"Jewelry"}'),
+  ('incense', 2, '{"zh-Hant":"香品","en":"Incense"}');

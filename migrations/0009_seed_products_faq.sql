@@ -1,7 +1,7 @@
 -- cnamber-store products.faq default seed
 -- 2026-10-04 Wave 36 Phase 2.4.c: 4 Q&A × 4 locale JSON template for all active products
 UPDATE products SET faq = '{
-  "zh-Hans": [
+  "zh-Hant": [
     {"q": "預訂制下單流程?", "a": "點預訂按鈕,我們會在一到兩個工作天內 email 確認材料、運送與付款細節。"},
     {"q": "多久會出貨?", "a": "下單確認後 7-14 個工作天,視材料與工時而定。"},
     {"q": "國際運費?", "a": "依目的地與重量報價,APAC 七到十四天,其他地區十四到二十一天。"},

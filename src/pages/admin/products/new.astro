@@ -2,7 +2,7 @@
 import AdminLayout from "../../../layouts/AdminLayout.astro";
 import { env } from "cloudflare:workers";
 import { createT, tEnum } from "../../../i18n/t";
-import zhHansMessages from "../../../i18n/messages/zh-Hans.json";
+import zhHansMessages from "../../../i18n/messages/zh-Hant.json";
 import { getDB } from "../../../lib/db";
 import {
   ensureCategoryTable,
@@ -55,8 +55,8 @@ if (siteCategories.length === 0) {
 }
 const categoryOptions = siteCategories.map((c) => ({
   code: c.code,
-  label: c.titles["zh-Hans"] || LEGACY_LABEL[c.code] || c.code,
-  kind: kindOf(c.code, c.titles["zh-Hans"]),
+  label: c.titles["zh-Hant"] || LEGACY_LABEL[c.code] || c.code,
+  kind: kindOf(c.code, c.titles["zh-Hant"]),
 }));
 const kinds = Object.fromEntries(categoryOptions.map((o) => [o.code, o.kind]));
 const categoryCodes = categoryOptions.map((c) => c.code);
@@ -204,7 +204,7 @@ const card =
         </div>
         <div>
           <label class="block text-sm font-medium mb-1" for="np-name-en"
-            >英文名称 <span class="text-error">*</span></label
+            >英文名稱(用於網址) <span class="text-error">*</span></label
           >
           <input
             id="np-name-en"
@@ -213,7 +213,7 @@ const card =
             required
             maxlength="100"
             value={values.name_en}
-            placeholder="如：Fushun Amber Pendant"
+            placeholder="如:Ethiopia Yirgacheffe Washed"
             class={field}
           />
         </div>
@@ -246,15 +246,6 @@ const card =
           >{values.desc_zh}</textarea
         >
       </div>
-
-      <details class="text-sm">
-        <summary class="cursor-pointer text-text-secondary"
-          >英文描述（选填，之后也可以在「翻译」里补）</summary
-        >
-        <textarea name="desc_en" rows="3" class={`${field} mt-2`}
-          >{values.desc_en}</textarea
-        >
-      </details>
     </section>
 
     <!-- 2. 售价与库存 -->
@@ -488,12 +479,7 @@ const card =
       // --- 售价预览：各语言前台实际会显示的价格 ---
       var priceEl = document.getElementById("np-price");
       var priceOut = document.getElementById("np-price-preview");
-      var targets = [
-        ["zh-Hans", "CNY"],
-        ["en", "USD"],
-        ["ms-MY", "MYR"],
-        ["id-ID", "IDR"],
-      ];
+      var targets = [["zh-Hant", "CNY"]];
       function fmt(loc, cur, cny) {
         var v = cny * (rates[cur] || 1);
         try {

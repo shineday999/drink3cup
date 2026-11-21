@@ -208,7 +208,6 @@ export interface NewProductValues {
   name_en: string;
   short_zh: string;
   desc_zh: string;
-  desc_en: string;
   price: string;
   stock: string;
   weight: string;
@@ -223,7 +222,6 @@ export function emptyNewProduct(defaultCategory = "jewelry"): NewProductValues {
     name_en: "",
     short_zh: "",
     desc_zh: "",
-    desc_en: "",
     price: "",
     stock: "1",
     weight: "",
@@ -240,7 +238,6 @@ export function readNewProductForm(form: FormData): NewProductValues {
     name_en: s("name_en"),
     short_zh: s("short_zh"),
     desc_zh: s("desc_zh"),
-    desc_en: s("desc_en"),
     price: s("price"),
     stock: s("stock") || "1",
     weight: s("weight"),
@@ -266,9 +263,9 @@ export function validateNewProduct(
   }
   if (!v.name_zh) errors.push("请填写中文名称");
   if (!v.name_en) {
-    errors.push("请填写英文名称（用来自动生成编号）");
+    errors.push("請填寫英文名稱（用來自動產生商品網址與編號）");
   } else if (!slugifyEnglish(v.name_en)) {
-    errors.push("英文名称需要包含英文字母或数字（用来自动生成编号）");
+    errors.push("英文名稱需要包含英文字母或數字（用來自動產生商品網址與編號）");
   }
   if (!v.desc_zh) errors.push("请填写中文描述");
   if (parsePrice(v.price) === null)
@@ -356,12 +353,7 @@ export async function createProduct(
         .prepare(
           "INSERT INTO product_translations (product_id, locale, name, description, short_description) VALUES (?, ?, ?, ?, ?)",
         )
-        .bind(id, "zh-Hans", v.name_zh, v.desc_zh, v.short_zh || null),
-      db
-        .prepare(
-          "INSERT INTO product_translations (product_id, locale, name, description, short_description) VALUES (?, ?, ?, ?, ?)",
-        )
-        .bind(id, "en", v.name_en, v.desc_en, null),
+        .bind(id, "zh-Hant", v.name_zh, v.desc_zh, v.short_zh || null),
       db
         .prepare(
           "INSERT INTO product_variants (id, product_id, sku, attributes, stock, weight_grams, price_base, image_urls) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
@@ -400,7 +392,7 @@ export async function checkReadiness(
 
   const tr = await db
     .prepare(
-      "SELECT name, description FROM product_translations WHERE product_id = ? AND locale = 'zh-Hans'",
+      "SELECT name, description FROM product_translations WHERE product_id = ? AND locale = 'zh-Hant'",
     )
     .bind(productId)
     .first<{ name: string; description: string }>();

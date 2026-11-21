@@ -1,7 +1,7 @@
-// 商品描述試算表同步：解析「發布到網路」的 CSV，找出某個商品那一列的簡介／描述（4 種語言）。
-// 試算表第一列是標題列，必須有 slug 欄，以及「<語言> 简介」「<語言> 描述」欄（欄位順序不拘）。
+// 商品描述試算表同步：解析「發布到網路」的 CSV，找出某個商品那一列的簡介／描述（目前只有繁體中文）。
+// 試算表第一列是標題列，必須有 slug 欄，以及「<語言> 簡介」「<語言> 描述」欄（欄位順序不拘）。
 
-export const SHEET_LOCALES = ["zh-Hans", "en", "ms-MY", "id-ID"] as const;
+export const SHEET_LOCALES = ["zh-Hant"] as const;
 export type SheetLocale = (typeof SHEET_LOCALES)[number];
 
 export interface SheetFill {
@@ -17,7 +17,7 @@ interface SheetColumn {
 }
 
 export const SHEET_COLUMNS: SheetColumn[] = SHEET_LOCALES.flatMap((locale) => [
-  { header: `${locale} 简介`, locale, field: "short_description" as const },
+  { header: `${locale} 簡介`, locale, field: "short_description" as const },
   { header: `${locale} 描述`, locale, field: "description" as const },
 ]);
 

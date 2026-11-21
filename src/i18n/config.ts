@@ -1,19 +1,14 @@
-export const locales = ["zh-Hans", "en", "ms-MY", "id-ID"] as const;
+// 目前只做繁體中文。未來要加語言:在此加入代碼、補 loader 與 messages/<code>.json。
+export const locales = ["zh-Hant"] as const;
 export type Locale = (typeof locales)[number];
-export const defaultLocale: Locale = "zh-Hans";
+export const defaultLocale: Locale = "zh-Hant";
 
 export const localeHreflang: Record<Locale, string> = {
-  "zh-Hans": "zh-Hans",
-  en: "en",
-  "ms-MY": "ms-MY",
-  "id-ID": "id-ID",
+  "zh-Hant": "zh-Hant",
 };
 
 export const localeNames: Record<Locale, string> = {
-  "zh-Hans": "简体中文",
-  en: "English",
-  "ms-MY": "Bahasa Melayu",
-  "id-ID": "Bahasa Indonesia",
+  "zh-Hant": "繁體中文",
 };
 
 export function isLocale(value: string | undefined | null): value is Locale {

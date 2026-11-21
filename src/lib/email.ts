@@ -131,10 +131,10 @@ export function welcomeNewsletterEmail(
   const safeName = safe(siteName);
   const safeEmail = safe(email);
   const subjects: Record<string, string> = {
-    "zh-Hans": `歡迎來到 ${safeName} · 一杯一杯慢慢喝`,
+    "zh-Hant": `歡迎來到 ${safeName} · 一杯一杯慢慢喝`,
   };
   const bodies: Record<string, { html: string; text: string }> = {
-    "zh-Hans": {
+    "zh-Hant": {
       html: `<p>${safeEmail} 您好,</p>
         <p>感謝訂閱 ${safeName}。我們會不定期寄出咖啡知識、新到的咖啡豆與沖煮小筆記。</p>
         <p>若您願意,也可以從 <a href="https://mycafe.de5.net/quiz">口味測驗</a> 開始,讓我們更了解您喜歡的風味。</p>
@@ -142,8 +142,8 @@ export function welcomeNewsletterEmail(
       text: `${email} 您好,感謝訂閱 ${safeName}。我們會不定期寄出咖啡知識、新到的咖啡豆與沖煮小筆記。`,
     },
   };
-  const subject = subjects[locale] ?? subjects["zh-Hans"] ?? "";
-  const body = bodies[locale] ?? bodies["zh-Hans"] ?? { html: "", text: "" };
+  const subject = subjects[locale] ?? subjects["zh-Hant"] ?? "";
+  const body = bodies[locale] ?? bodies["zh-Hant"] ?? { html: "", text: "" };
   const html = `
     <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
       <h2 style="color: #1A2E1A; font-family: Georgia, serif;">${safeName}</h2>

@@ -3,7 +3,6 @@ import MobileNav from "../components/MobileNav.astro";
 import "../styles/mobile.css";
 // Layout — 全站共用 layout (2026-10-01: Awwwards-tier header with main nav)
 import "../styles/global.css";
-import LocaleSwitcher from "@components/LocaleSwitcher.astro";
 import Footer from "@components/Footer.astro";
 import { createT } from "../i18n/t";
 import {
@@ -48,15 +47,15 @@ const homePath = localizedPath(currentLocale, "/");
 const siteSettings = Astro.locals.siteSettings;
 const siteName =
   siteSettings?.siteName?.[currentLocale] ??
-  siteSettings?.siteName?.["zh-Hans"] ??
+  siteSettings?.siteName?.["zh-Hant"] ??
   t("common.site_name");
 const themeLabel =
   siteSettings?.theme?.[currentLocale] ??
-  siteSettings?.theme?.["zh-Hans"] ??
+  siteSettings?.theme?.["zh-Hant"] ??
   "";
 const subThemeLabel =
   siteSettings?.subTheme?.[currentLocale] ??
-  siteSettings?.subTheme?.["zh-Hans"] ??
+  siteSettings?.subTheme?.["zh-Hant"] ??
   "";
 
 // Main nav (locale-aware)
@@ -110,7 +109,7 @@ const nav = [
         "@type": "WebSite",
         name: siteName,
         url: siteUrl,
-        inLanguage: ["zh-Hans", "en", "ms-MY", "id-ID"],
+        inLanguage: ["zh-Hant"],
       })}
     />
 
@@ -122,20 +121,7 @@ const nav = [
       content={ogImage.startsWith("http") ? ogImage : `${siteUrl}${ogImage}`}
     />
     <meta property="og:url" content={`${siteUrl}${Astro.url.pathname}`} />
-    <meta
-      property="og:locale"
-      content={localeHreflang[currentLocale].replace("-", "_")}
-    />
-    {
-      locales
-        .filter((l) => l !== currentLocale)
-        .map((l) => (
-          <meta
-            property="og:locale:alternate"
-            content={localeHreflang[l].replace("-", "_")}
-          />
-        ))
-    }
+    <meta property="og:locale" content="zh_TW" />
 
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
@@ -145,11 +131,7 @@ const nav = [
       content={ogImage.startsWith("http") ? ogImage : `${siteUrl}${ogImage}`}
     />
 
-    <link
-      rel="preconnect"
-      href="https://mycafe-images.r2.dev"
-      crossorigin
-    />
+    <link rel="preconnect" href="https://mycafe-images.r2.dev" crossorigin />
     <link rel="dns-prefetch" href="https://mycafe-images.r2.dev" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -424,7 +406,6 @@ const nav = [
               <line x1="4" y1="16" x2="20" y2="16"></line>
             </svg>
           </button>
-          <LocaleSwitcher />
         </div>
       </div>
     </header>
@@ -493,10 +474,6 @@ const nav = [
           })
         }
       </nav>
-
-      <div class="p-6 flex justify-center border-t border-forest-700/40">
-        <LocaleSwitcher />
-      </div>
     </div>
 
     <main id="main-content" tabindex="-1">

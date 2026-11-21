@@ -3,10 +3,7 @@
  *
  * 價格以人民幣（CNY）記錄：D1 product_prices 的 CNY 列（單位：分）是商品的唯一售價。
  * 各語言前台再依匯率表換算成當地熟悉的貨幣顯示：
- *   zh-Hans -> CNY (人民币 ¥)
- *   en      -> USD ($)
- *   ms-MY   -> MYR (RM)
- *   id-ID   -> IDR (Rp)
+ *   zh-Hant -> CNY (人民币 ¥)
  *
  * 匯率存在 D1 exchange_rates（後台「汇率」頁維護），由 middleware 經 lib/rates.ts
  * 載入並呼叫 setRates()；讀不到時使用下方預設值。
@@ -43,13 +40,8 @@ export function setRates(next: RateTable): void {
 }
 
 export const LOCALE_CURRENCY: Record<string, string> = {
-  "zh-Hans": "CNY",
+  "zh-Hant": "CNY",
   zh: "CNY",
-  en: "USD",
-  "ms-MY": "MYR",
-  ms: "MYR",
-  "id-ID": "IDR",
-  id: "IDR",
 };
 
 export function formatPrice(

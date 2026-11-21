@@ -52,12 +52,14 @@
 
 ### B 階段 — 程式碼層改造(尚不寫文案)
 
-| ID   | 標籤 | 步驟                                                                                                                                                                                                                                                   | 狀態 | 負責人 |
-| ---- | ---- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---- | ------ |
-| S04  | 🤖   | 取代寫死的 Email;歡迎信改寫;移除舊品牌小紅書/微信欄位(`social.ts`、`contact.astro`)                                                                                                                                                                    | ✅   | Claude |
-| S05  | 🤖   | Cookie/快取/網址/站名改為新品牌(`Layout`、`sw.js`、`robots`、`offline`、`manifest` 等)                                                                                                                                                                 | ✅   | Claude |
-| S05b | 🤖   | 語系改為只有繁體中文:`zh-Hans`→`zh-Hant`(`i18n/config.ts`、`loader`、`middleware`、`LocaleSwitcher`、`sitemap`、hreflang、`[lang]` 路由、測試),移除 en/ms-MY/id-ID;`manifest.webmanifest` 的 `lang` 與 description、`email.ts` 的 `zh-Hans` key 一併改 | ⬜   |        |
-| S06  | 🤖   | 路由與分類改名:amber→`beans`、incense→`brewing`、materials→`origins`、craft→`roasting`;問答改為 `quiz/brew-method`、`quiz/taste`;更新 `categories.ts`、`category-kind.ts`、`quiz.ts`、`MobileNav` 等                                                   | ⬜   |        |
+| ID   | 標籤  | 步驟                                                                                                                                                                                                                                                              | 狀態 | 負責人 |
+| ---- | ----- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---- | ------ |
+| S04  | 🤖    | 取代寫死的 Email;歡迎信改寫;移除舊品牌小紅書/微信欄位(`social.ts`、`contact.astro`)                                                                                                                                                                               | ✅   | Claude |
+| S05  | 🤖    | Cookie/快取/網址/站名改為新品牌(`Layout`、`sw.js`、`robots`、`offline`、`manifest` 等)                                                                                                                                                                            | ✅   | Claude |
+| S05b | 🤖    | 語系改為只有繁體中文:`zh-Hans`→`zh-Hant`;移除 en/ms-MY/id-ID 語系檔與程式分支;刪除語言切換器與未使用的翻譯元件/API;`/zh-Hant/*` 301 轉到無前綴網址;後台新增商品不再要求英文說明(英文名稱保留,僅用於產生網址)                                                      | ✅   | Claude |
+| S05c | 🤖/👤 | **幣別改為新台幣 TWD**(需先確認 D6)。目前價格以人民幣 CNY 為基準(`lib/format.ts`、`lib/rates.ts`、`exchange_rates.per_cny`、`product_prices` 的 CNY 列、後台「售價(人民幣)」字樣、`schemas/product.ts`)。評估是否直接把基準幣別換成 TWD、移除匯率換算與匯率後台頁 | ⬜   |        |
+| S05d | 🤖    | 後台介面文字簡體→繁體(後台頁面與 API 錯誤訊息寫死為簡體,非語系檔;可用 OpenCC 轉換後人工校對)。含 `admin/**`、`lib/admin-products.ts`、`lib/auth.ts` 等                                                                                                            | ⬜   |        |
+| S06  | 🤖    | 路由與分類改名:amber→`beans`、incense→`brewing`、materials→`origins`、craft→`roasting`;問答改為 `quiz/brew-method`、`quiz/taste`;更新 `categories.ts`、`category-kind.ts`、`quiz.ts`、`MobileNav` 等                                                              | ⬜   |        |
 
 ### C 階段 — 內容(一步一種語言)
 
@@ -93,6 +95,8 @@
 | S24 | 🤖/👤 | 手機/桌面最終 QA:表單、後台登入、Email                                                         | ⬜   |        |
 
 ## 紀錄
+
+- 2026-11-21 Claude:完成 S05b。驗證:`pnpm check` 0 錯誤、`pnpm test` 37/37 通過、`pnpm build` 成功。順帶發現專案有 husky + commitlint,commit 必須符合 `類型(步驟): 說明`。新增 S05c(幣別)、S05d(後台簡轉繁)。
 
 - 2026-11-21 Claude:完成 S03–S05(各自獨立 commit)。收到決策 D1–D4。新增 S05b(語系改繁中)、S13b(咖啡色系)、S25(未來物流下單);S08/S09 因只做繁中而移除。守衛腳本目前仍為 NOT CLEAN,剩餘殘留僅在語系檔(S07)與 SQL/腳本(S12)。
 - 2026-11-21 Claude:完成 S00–S02。移除指向原專案 D1/KV/R2 的 ID、deploy.yml 中的原 Pages 專案名稱、lighthouserc 的原網域,並刪除舊文件。

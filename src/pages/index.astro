@@ -9,7 +9,7 @@ const t = createT(messages);
 
 const pageTitle = `${t("common.site_name")} — ${t("common.tagline")}`;
 const pageDescription = t("home.hero_p3") ?? "";
-// Wave 62: SSR inject 動態 LCP preload (zh-Hans default)
+// Wave 62: SSR inject 動態 LCP preload (zh-Hant default)
 // try/catch 包 D1 query 防 SSR fail → 15 bytes partial HTML
 let lcpImageUrl: string | null = null;
 let lcpMobileImageUrl: string | null = null;

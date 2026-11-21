@@ -4,7 +4,7 @@ import { env } from "cloudflare:workers";
 import Tabs from "../../../components/Tabs.astro";
 import { createT, tEnum } from "../../../i18n/t";
 import { defaultLocale, type Locale } from "../../../i18n/config";
-import zhHansMessages from "../../../i18n/messages/zh-Hans.json";
+import zhHansMessages from "../../../i18n/messages/zh-Hant.json";
 import { formatPrice } from "../../../lib/format";
 import { PRODUCT_SHEET_EDIT_URL } from "../../../lib/sheet-sync";
 import {
@@ -63,7 +63,7 @@ const variants = env?.DB
       }>()
   : { results: [] };
 
-const LOCALES = ["zh-Hans", "en", "ms-MY", "id-ID"] as const;
+const LOCALES = ["zh-Hant"] as const;
 
 if (!product) {
   return Astro.redirect("/admin/products");
@@ -74,12 +74,10 @@ const trByLocale = (locale: string) =>
 
 // ---- 翻譯分頁（多語言單表單） ----
 const TR_NAMES: Record<string, string> = {
-  "zh-Hans": "简体中文",
-  en: "English",
-  "ms-MY": "Bahasa Melayu",
-  "id-ID": "Bahasa Indonesia",
+  "zh-Hant": "繁體中文",
 };
-const TR_AUTO: string[] = ["ms-MY", "id-ID"];
+// 目前只有繁體中文,沒有需要自動帶入的語言。日後新增語言時再填。
+const TR_AUTO: string[] = [];
 const TR_FIELDS = [
   {
     key: "name",
@@ -123,7 +121,7 @@ const trFlash = {
       : null,
   loc: (LOCALES as readonly string[]).includes(trLocRaw) ? trLocRaw : null,
 };
-const trInit = trFlash.loc ?? "zh-Hans";
+const trInit = trFlash.loc ?? "zh-Hant";
 
 // ---- 規格、圖片、上架檢查、標籤 ----
 const variantRow = env?.DB
@@ -191,7 +189,7 @@ const inputField =
 ---
 
 <AdminLayout
-  title={`${t("admin.products_detail.title_prefix")}${trByLocale("zh-Hans")?.name || product.slug}`}
+  title={`${t("admin.products_detail.title_prefix")}${trByLocale("zh-Hant")?.name || product.slug}`}
   active="products"
 >
   <span slot="actions" class="flex items-center gap-4 text-sm">
@@ -681,8 +679,8 @@ const inputField =
         (function () {
           var form = document.getElementById("tr-form");
           if (!form) return;
-          var LOCALES = ["zh-Hans", "en", "ms-MY", "id-ID"];
-          var AUTO = ["ms-MY", "id-ID"];
+          var LOCALES = ["zh-Hant"];
+          var AUTO = [];
           var FIELDS = ["name", "short_description", "description", "story"];
           var statusEl = document.getElementById("tr-status");
           var saveBtn = document.getElementById("tr-save");
@@ -757,7 +755,7 @@ const inputField =
             });
           });
           LOCALES.forEach(refreshLocale);
-          showTab(form.getAttribute("data-init") || "zh-Hans");
+          showTab(form.getAttribute("data-init") || "zh-Hant");
           if (prefilled) markDirty();
 
           form.addEventListener("input", function (e) {
@@ -871,7 +869,7 @@ const inputField =
           var out = document.querySelector("[data-sheet-status]");
           if (!btn || !form || !out) return;
           var id = btn.getAttribute("data-product-id");
-          var LOCALES = ["zh-Hans", "en", "ms-MY", "id-ID"];
+          var LOCALES = ["zh-Hant"];
           var KEYS = ["short_description", "description"];
           function say(text, bad) {
             out.textContent = text;
@@ -900,7 +898,7 @@ const inputField =
               .then(function (j) {
                 var n = 0;
                 var tooLong = [];
-                // 依序处理 zh-Hans、en、ms-MY、id-ID：先填英文，马来文／印尼文再覆盖
+                // 依序处理 zh-Hant、en、ms-MY、id-ID：先填英文，马来文／印尼文再覆盖
                 LOCALES.forEach(function (loc) {
                   var f = (j.fills || {})[loc];
                   if (!f) return;
@@ -996,10 +994,7 @@ const inputField =
         {
           cnyFen !== null && (
             <p class="text-xs text-text-muted -mt-2">
-              前台显示：简体站 {formatPrice(cnyFen, "CNY", "zh-Hans")} ・ 英文站{" "}
-              {formatPrice(cnyFen, "CNY", "en")} ・ 马来站{" "}
-              {formatPrice(cnyFen, "CNY", "ms-MY")} ・ 印尼站{" "}
-              {formatPrice(cnyFen, "CNY", "id-ID")}（依「汇率」页的数值换算）
+              前台顯示：{formatPrice(cnyFen, "CNY", "zh-Hant")}
             </p>
           )
         }

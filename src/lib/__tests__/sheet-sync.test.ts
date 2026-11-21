@@ -27,42 +27,33 @@ describe("parseCsv", () => {
   });
 });
 
-const HEADER =
-  "slug,名称（仅供参考）,zh-Hans 简介,zh-Hans 描述,en 简介,en 描述,ms-MY 简介,ms-MY 描述,id-ID 简介,id-ID 描述";
+const HEADER = "slug,名稱（僅供參考）,zh-Hant 簡介,zh-Hant 描述";
 
 describe("findProductRow", () => {
-  it("fills four locales and skips blank cells", () => {
-    const rows = parseCsv(
-      `${HEADER}\nring-1,戒指,简介一,"描述一\n第二行",short en,desc en,,desc ms,,\n`,
-    );
+  it("fills the supported locale and skips blank cells", () => {
+    const rows = parseCsv(`${HEADER}\nring-1,戒指,簡介一,"描述一\n第二行"\n`);
     const r = findProductRow(rows, "ring-1");
     expect(r.ok).toBe(true);
     if (!r.ok) return;
-    expect(r.fills["zh-Hans"]).toEqual({
-      short_description: "简介一",
+    expect(r.fills["zh-Hant"]).toEqual({
+      short_description: "簡介一",
       description: "描述一\n第二行",
     });
-    expect(r.fills.en).toEqual({
-      short_description: "short en",
-      description: "desc en",
-    });
-    expect(r.fills["ms-MY"]).toEqual({ description: "desc ms" });
-    expect(r.fills["id-ID"]).toBeUndefined();
-    expect(r.filled).toBe(5);
+    expect(r.filled).toBe(2);
     expect(r.missing).toEqual([]);
   });
 
   it("matches slug with surrounding spaces and any column order", () => {
-    const rows = parseCsv("zh-Hans 描述,slug\nhello, ring-2 \n");
+    const rows = parseCsv("zh-Hant 描述,slug\nhello, ring-2 \n");
     const r = findProductRow(rows, "ring-2");
     expect(r.ok).toBe(true);
     if (!r.ok) return;
-    expect(r.fills["zh-Hans"]).toEqual({ description: "hello" });
-    expect(r.missing).toContain("en 描述");
+    expect(r.fills["zh-Hant"]).toEqual({ description: "hello" });
+    expect(r.missing).toContain("zh-Hant 簡介");
   });
 
   it("reports not found / no slug column / empty", () => {
-    expect(findProductRow(parseCsv(`${HEADER}\na,,,,,,,,,\n`), "b")).toEqual({
+    expect(findProductRow(parseCsv(`${HEADER}\na,,,\n`), "b")).toEqual({
       ok: false,
       error: "not_found",
     });

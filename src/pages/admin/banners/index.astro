@@ -6,7 +6,7 @@ import { env } from "cloudflare:workers";
 // 對應的 API：/api/admin/banners（新增）、/api/admin/banners/[id]（PATCH／DELETE，以 _method 覆寫）。
 import AdminLayout from "../../../layouts/AdminLayout.astro";
 import { createT } from "../../../i18n/t";
-import zhHansMessages from "../../../i18n/messages/zh-Hans.json";
+import zhHansMessages from "../../../i18n/messages/zh-Hant.json";
 
 const t = createT(zhHansMessages as Record<string, unknown>);
 

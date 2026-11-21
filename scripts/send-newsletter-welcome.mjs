@@ -80,21 +80,21 @@ for (const r of siteNameRows) siteNameMap[r.locale] = r.value;
 function siteNameFor(locale) {
   return (
     siteNameMap[locale] ??
-    siteNameMap["zh-Hans"] ??
+    siteNameMap["zh-Hant"] ??
     siteNameMap["en"] ??
     "cnamber-store"
   );
 }
 
 const subjects = {
-  "zh-Hans": (n) => `歡迎來到 ${n} · 來自森林的慢信`,
+  "zh-Hant": (n) => `歡迎來到 ${n} · 來自森林的慢信`,
   en: (n) => `Welcome to ${n} · Letters from the forest`,
   "ms-MY": (n) => `Selamat datang ke ${n} · Surat dari hutan`,
   "id-ID": (n) => `Selamat datang di ${n} · Surat dari hutan`,
 };
 
 const bodies = {
-  "zh-Hans": (e, n) =>
+  "zh-Hant": (e, n) =>
     `${e} 您好,
 
 感謝訂閱 ${n}。我們每季會寄一封慢信,分享新作、調香實驗,以及森林系手作工作室的日常。

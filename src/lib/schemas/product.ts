@@ -2,7 +2,7 @@
 // 後台 API、repository、表單共用。修改請開 PR 並在 docs/ADMIN-PRODUCTS-PLAN.md 更新紀錄註明。
 import { z } from "zod";
 
-export const LOCALES = ["zh-Hans", "en", "ms-MY", "id-ID"] as const;
+export const LOCALES = ["zh-Hant"] as const;
 export const CURRENCIES = [
   "USD",
   "CNY",
@@ -65,8 +65,8 @@ export const TranslationsSchema = z
   .array(TranslationSchema)
   .min(1)
   .refine(
-    (ts) => ts.some((t) => t.locale === "zh-Hans"),
-    "必須包含 zh-Hans 翻譯",
+    (ts) => ts.some((t) => t.locale === "zh-Hant"),
+    "必須包含 zh-Hant 翻譯",
   )
   .refine(
     (ts) => new Set(ts.map((t) => t.locale)).size === ts.length,

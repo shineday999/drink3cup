@@ -4,7 +4,7 @@ import { env } from "cloudflare:workers";
 import Tabs from "../../../components/Tabs.astro";
 import { createT, tEnum } from "../../../i18n/t";
 import { defaultLocale, type Locale } from "../../../i18n/config";
-import zhHansMessages from "../../../i18n/messages/zh-Hans.json";
+import zhHansMessages from "../../../i18n/messages/zh-Hant.json";
 
 const id = Astro.params.id;
 const locale = (Astro.locals.locale ?? defaultLocale) as Locale;
@@ -36,7 +36,7 @@ const translations = env?.DB
       }>()
   : { results: [] };
 
-const LOCALES = ["zh-Hans", "en", "ms-MY", "id-ID"] as const;
+const LOCALES = ["zh-Hant"] as const;
 const trByLocale = (l: string) =>
   translations.results.find((t) => t.locale === l);
 
@@ -142,7 +142,7 @@ const field =
             const tr = trByLocale(loc);
             return (
               <details
-                open={loc === "zh-Hans"}
+                open={loc === "zh-Hant"}
                 class="rounded-card border border-text-muted/20 bg-bg-card p-4"
               >
                 <summary class="cursor-pointer">

@@ -1,12 +1,9 @@
 import type { getDB } from "./db";
-import zhHans from "../i18n/messages/zh-Hans.json";
-import en from "../i18n/messages/en.json";
-import msMY from "../i18n/messages/ms-MY.json";
-import idID from "../i18n/messages/id-ID.json";
+import zhHant from "../i18n/messages/zh-Hant.json";
 
 // 首頁「手作路線」分類卡片（site_categories）：標題 / 簡介 各語言一份，圖片仍放 site_images（key = cat_<code>）。
 // 表由程式自動建立，不需手動 migration。
-export const CATEGORY_LOCALES = ["zh-Hans", "en", "ms-MY", "id-ID"] as const;
+export const CATEGORY_LOCALES = ["zh-Hant"] as const;
 
 export const CODE_RE = /^[a-z0-9][a-z0-9-]{0,29}$/;
 
@@ -35,7 +32,7 @@ export function parseTextMap(raw: unknown): Record<string, string> {
   }
 }
 
-// 寫：只留四種語言、去空白、限制長度
+// 寫：只留支援的語言、去空白、限制長度
 export function cleanTextMap(
   input: unknown,
   maxLen: number,
@@ -52,16 +49,10 @@ export function cleanTextMap(
 // 飾品 / 香品卡片原本寫在語言檔裡的說明文字；後台簡介還是空的時候，一次性填進去讓後台可以維護。
 const LEGACY_DESCS: Record<string, Record<string, string>> = {
   jewelry: {
-    "zh-Hans": zhHans.home.cat_amber_desc,
-    en: en.home.cat_amber_desc,
-    "ms-MY": msMY.home.cat_amber_desc,
-    "id-ID": idID.home.cat_amber_desc,
+    "zh-Hant": zhHant.home.cat_amber_desc,
   },
   incense: {
-    "zh-Hans": zhHans.home.cat_incense_desc,
-    en: en.home.cat_incense_desc,
-    "ms-MY": msMY.home.cat_incense_desc,
-    "id-ID": idID.home.cat_incense_desc,
+    "zh-Hant": zhHant.home.cat_incense_desc,
   },
 };
 
@@ -78,7 +69,7 @@ async function backfillLegacyDescs(db: DB): Promise<void> {
   await db
     .prepare(
       `UPDATE site_categories SET descs = ?, updated_at = ?
-       WHERE (code = 'tea' OR json_extract(titles, '$."zh-Hans"') IN ('茶叶', '茶葉'))
+       WHERE (code = 'tea' OR json_extract(titles, '$."zh-Hant"') IN ('茶叶', '茶葉'))
          AND (descs IS NULL OR descs = '' OR descs = '{}')`,
     )
     .bind(JSON.stringify(TEA_DESCS), now)
@@ -87,12 +78,7 @@ async function backfillLegacyDescs(db: DB): Promise<void> {
 
 // 茶叶分类（后台新增的）：代码是 tea，或简体中文标题是「茶叶 / 茶葉」，且简介还是空的，就填入这段文字。
 const TEA_DESCS: Record<string, string> = {
-  "zh-Hans": "从山间的晨雾到一盏温热,每一片茶叶都记得阳光与雨水。",
-  en: "From misty mountain mornings to a warm cup, every leaf remembers the sun and the rain.",
-  "ms-MY":
-    "Dari kabus pagi di pergunungan ke secawan yang hangat, setiap helai daun teh mengingati cahaya matahari dan hujan.",
-  "id-ID":
-    "Dari kabut pagi di pegunungan hingga secangkir yang hangat, setiap helai daun teh mengingat sinar matahari dan hujan.",
+  "zh-Hant": "从山间的晨雾到一盏温热,每一片茶叶都记得阳光与雨水。",
 };
 
 export async function ensureCategoryTable(db: DB): Promise<void> {
@@ -114,11 +100,11 @@ export async function ensureCategoryTable(db: DB): Promise<void> {
   await db
     .prepare(
       `UPDATE site_categories
-         SET titles = json_set(titles, '$."zh-Hans"', CASE json_extract(titles, '$."zh-Hans"')
+         SET titles = json_set(titles, '$."zh-Hant"', CASE json_extract(titles, '$."zh-Hant"')
                WHEN '琥珀饰品' THEN '饰品' WHEN '琥珀飾品' THEN '飾品'
                WHEN '东方香品' THEN '香品' WHEN '東方香品' THEN '香品' END)
        WHERE json_valid(titles)
-         AND json_extract(titles, '$."zh-Hans"') IN ('琥珀饰品','琥珀飾品','东方香品','東方香品')`,
+         AND json_extract(titles, '$."zh-Hant"') IN ('琥珀饰品','琥珀飾品','东方香品','東方香品')`,
     )
     .run();
   if (!row || row.n === 0) {

@@ -25,7 +25,7 @@ export const POST: APIRoute = async (ctx) => {
     .bind(id, slug, status, category, publishedAt, now, now)
     .run();
 
-  // Collect translations (form keys: translations[zh-Hans][title], etc.)
+  // Collect translations (form keys: translations[zh-Hant][title], etc.)
   const translationsMap = new Map<
     string,
     { title?: string; excerpt?: string; body_markdown?: string }

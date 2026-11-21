@@ -29,7 +29,7 @@ export const POST: APIRoute = async (ctx) => {
       for (const r of rows.results ?? []) {
         let zh: string | undefined;
         try {
-          zh = (JSON.parse(r.titles) as Record<string, string>)["zh-Hans"];
+          zh = (JSON.parse(r.titles) as Record<string, string>)["zh-Hant"];
         } catch {
           zh = undefined;
         }

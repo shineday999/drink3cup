@@ -1,8 +1,0 @@
----
-import LocaleSwitcher from "./LocaleSwitcher";
-import { defaultLocale, type Locale } from "../i18n/config";
-
-const currentLocale = (Astro.locals.locale ?? defaultLocale) as Locale;
----
-
-<LocaleSwitcher client:load currentLocale={currentLocale} />
