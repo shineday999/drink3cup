@@ -13,7 +13,7 @@
 1. 本 repo 與原專案**沒有任何 git 關聯**(無共同歷史、無 remote、非 fork)。
 2. **絕對不可**修改、推送或部署到原 repo / 原網站 / 原 Cloudflare 資源。
 3. **絕對不可**沿用原專案的 D1 / R2 / KV ID、Pages 專案名稱、網域、Email 或 API 金鑰。
-4. 每次 push 前執行 `bash scripts/check-no-original-refs.sh`,必須顯示 `CLEAN`。
+4. **公開**(public repo / 正式上線)前,`bash scripts/check-no-original-refs.sh` 必須顯示 `CLEAN`。第一次推到 **Private** repo 作為協作基地可以例外(目前尚有舊品牌字樣,待 S07、S12 清除)。
 
 ## 同事使用方式
 
@@ -82,19 +82,21 @@
 
 ### E 階段 — 上線(需擁有者)
 
-| ID  | 標籤  | 步驟                                                                                           | 狀態 | 負責人 |
-| --- | ----- | ---------------------------------------------------------------------------------------------- | ---- | ------ |
-| S17 | 👤    | 建立**全新空白** GitHub repo(D5),不要 README/授權檔,提供推送權限                               | ⬜   |        |
-| S18 | 🤖/👤 | `git remote add origin <新 repo>` → `git push -u origin main`                                  | ⬜   |        |
-| S19 | 👤    | Cloudflare 建立新 D1 `mycafe`、R2 `mycafe-images`、2 個 KV;ID 填入 `wrangler.jsonc`            | ⬜   |        |
-| S20 | 👤    | 套用 migrations:`npx wrangler d1 migrations apply mycafe --remote`,再匯入種子                  | ⬜   |        |
-| S21 | 👤    | Cloudflare Pages 建立新專案 `mycafe` 連接新 repo;GitHub secrets 設定**新的**受限權限 API Token | ⬜   |        |
-| S22 | 👤    | Pages → 自訂網域 → 新增 `mycafe.de5.net`(自動建立 CNAME → `mycafe.pages.dev`)                  | ⬜   |        |
-| S23 | 👤    | 建立管理員帳號與金鑰(管理密碼、JWT secret、Resend key),全部用新值                              | ⬜   |        |
-| S25 | 🤖    | 【未來】物流串接與直接下單(取代預訂制):先調查物流商 API、金流、運費規則,另開計畫               | ⬜   |        |
-| S24 | 🤖/👤 | 手機/桌面最終 QA:表單、後台登入、Email                                                         | ⬜   |        |
+| ID  | 標籤  | 步驟                                                                                                                                                                                                                                                                | 狀態 | 負責人 |
+| --- | ----- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---- | ------ |
+| S17 | 👤    | 建立**全新空白 Private** GitHub repo `drink3cup`(不要勾 README/.gitignore/授權檔)。若要讓 Claude 代為推送:建立 **Fine-grained token,Repository access 只選 drink3cup**,權限 Contents: Read and write,效期 7 天,用完撤銷。**不要用能存取原專案的 token**(違反鐵則 2) | ⬜   |        |
+| S18 | 👤/🤖 | 推送:`git remote add origin https://github.com/shineday999/drink3cup.git` → `git push -u origin main`(Claude 沙盒無 GitHub 憑證,擁有者在本機執行即可)                                                                                                               | ⬜   |        |
+| S19 | 👤    | Cloudflare 建立新 D1 `mycafe`、R2 `mycafe-images`、2 個 KV;ID 填入 `wrangler.jsonc`                                                                                                                                                                                 | ⬜   |        |
+| S20 | 👤    | 套用 migrations:`npx wrangler d1 migrations apply mycafe --remote`,再匯入種子                                                                                                                                                                                       | ⬜   |        |
+| S21 | 👤    | Cloudflare Pages 建立新專案 `mycafe` 連接新 repo;GitHub secrets 設定**新的**受限權限 API Token                                                                                                                                                                      | ⬜   |        |
+| S22 | 👤    | Pages → 自訂網域 → 新增 `mycafe.de5.net`(自動建立 CNAME → `mycafe.pages.dev`)                                                                                                                                                                                       | ⬜   |        |
+| S23 | 👤    | 建立管理員帳號與金鑰(管理密碼、JWT secret、Resend key),全部用新值                                                                                                                                                                                                   | ⬜   |        |
+| S25 | 🤖    | 【未來】物流串接與直接下單(取代預訂制):先調查物流商 API、金流、運費規則,另開計畫                                                                                                                                                                                    | ⬜   |        |
+| S24 | 🤖/👤 | 手機/桌面最終 QA:表單、後台登入、Email                                                                                                                                                                                                                              | ⬜   |        |
 
 ## 紀錄
+
+- 2026-11-21 Claude:嘗試建立 repo,沙盒沒有 GitHub 憑證,無法代建/推送。已改寫 S17/S18 交接說明與鐵則 4(Private 首次推送可例外)。
 
 - 2026-11-21 Claude:完成 S05b。驗證:`pnpm check` 0 錯誤、`pnpm test` 37/37 通過、`pnpm build` 成功。順帶發現專案有 husky + commitlint,commit 必須符合 `類型(步驟): 說明`。新增 S05c(幣別)、S05d(後台簡轉繁)。
 
