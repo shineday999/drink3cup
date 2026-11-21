@@ -1,0 +1,66 @@
+===== build-check (44902405828) =====
+build	Run pnpm install --frozen-lockfile	﻿2026-11-21T12:08:43.2063847Z ##[group]Run pnpm install --frozen-lockfile
+build	Run pnpm install --frozen-lockfile	2026-11-21T12:08:43.2064330Z ^[[36;1mpnpm install --frozen-lockfile^[[0m
+build	Run pnpm install --frozen-lockfile	2026-11-21T12:08:43.4004105Z shell: /usr/bin/bash -e {0}
+build	Run pnpm install --frozen-lockfile	2026-11-21T12:08:43.4004694Z env:
+build	Run pnpm install --frozen-lockfile	2026-11-21T12:08:43.4004994Z   PNPM_HOME: /home/runner/setup-pnpm/node_modules/.bin
+build	Run pnpm install --frozen-lockfile	2026-11-21T12:08:43.4005352Z ##[endgroup]
+build	Run pnpm install --frozen-lockfile	2026-11-21T12:08:43.8495979Z ? Verifying lockfile against supply-chain policies (948 entries)...
+build	Run pnpm install --frozen-lockfile	2026-11-21T12:08:46.1342104Z ✓ Lockfile passes supply-chain policies (948 entries in 2.2s)
+build	Run pnpm install --frozen-lockfile	2026-11-21T12:08:46.1541131Z [ERR_PNPM_OUTDATED_LOCKFILE] Cannot install with "frozen-lockfile" because pnpm-lock.yaml is not up to date with <ROOT>/package.json
+build	Run pnpm install --frozen-lockfile	2026-11-21T12:08:46.1542059Z 
+build	Run pnpm install --frozen-lockfile	2026-11-21T12:08:46.1542687Z Note that in CI environments this setting is true by default. If you still need to run install in such cases, use "pnpm install --no-frozen-lockfile"
+build	Run pnpm install --frozen-lockfile	2026-11-21T12:08:46.1543428Z 
+build	Run pnpm install --frozen-lockfile	2026-11-21T12:08:46.1543563Z   Failure reason:
+build	Run pnpm install --frozen-lockfile	2026-11-21T12:08:46.1544139Z   specifiers in the lockfile don't match specifiers in package.json:
+build	Run pnpm install --frozen-lockfile	2026-11-21T12:08:46.1544910Z * 1 dependencies were added: @tailwindcss/vite@^4.3.5
+build	Run pnpm install --frozen-lockfile	2026-11-21T12:08:46.1545448Z * 1 dependencies were removed: @astrojs/tailwind@^6.0.2
+build	Run pnpm install --frozen-lockfile	2026-11-21T12:08:46.1545914Z * 2 dependencies are mismatched:
+build	Run pnpm install --frozen-lockfile	2026-11-21T12:08:46.1546405Z   - tailwindcss (lockfile: ^3.4.0, manifest: ^4.3.5)
+build	Run pnpm install --frozen-lockfile	2026-11-21T12:08:46.1546957Z   - prettier (lockfile: ^3.3.0, manifest: ^3.10.1)
+build	Run pnpm install --frozen-lockfile	2026-11-21T12:08:46.1547304Z 
+build	Run pnpm install --frozen-lockfile	2026-11-21T12:08:46.2070101Z ##[error]Process completed with exit code 1.
+===== Deploy (44902405794) =====
+build	Run pnpm install --frozen-lockfile --ignore-scripts	﻿2026-11-21T12:08:48.4473018Z ##[group]Run pnpm install --frozen-lockfile --ignore-scripts
+build	Run pnpm install --frozen-lockfile --ignore-scripts	2026-11-21T12:08:48.4473693Z ^[[36;1mpnpm install --frozen-lockfile --ignore-scripts^[[0m
+build	Run pnpm install --frozen-lockfile --ignore-scripts	2026-11-21T12:08:48.5853920Z shell: /usr/bin/bash -e {0}
+build	Run pnpm install --frozen-lockfile --ignore-scripts	2026-11-21T12:08:48.5854281Z env:
+build	Run pnpm install --frozen-lockfile --ignore-scripts	2026-11-21T12:08:48.5854656Z   PNPM_HOME: /home/runner/setup-pnpm/node_modules/.bin
+build	Run pnpm install --frozen-lockfile --ignore-scripts	2026-11-21T12:08:48.5855004Z ##[endgroup]
+build	Run pnpm install --frozen-lockfile --ignore-scripts	2026-11-21T12:08:49.0525677Z ? Verifying lockfile against supply-chain policies (948 entries)...
+build	Run pnpm install --frozen-lockfile --ignore-scripts	2026-11-21T12:08:51.3306317Z ✓ Lockfile passes supply-chain policies (948 entries in 2.2s)
+build	Run pnpm install --frozen-lockfile --ignore-scripts	2026-11-21T12:08:51.3469550Z [ERR_PNPM_OUTDATED_LOCKFILE] Cannot install with "frozen-lockfile" because pnpm-lock.yaml is not up to date with <ROOT>/package.json
+build	Run pnpm install --frozen-lockfile --ignore-scripts	2026-11-21T12:08:51.3470472Z 
+build	Run pnpm install --frozen-lockfile --ignore-scripts	2026-11-21T12:08:51.3472882Z Note that in CI environments this setting is true by default. If you still need to run install in such cases, use "pnpm install --no-frozen-lockfile"
+build	Run pnpm install --frozen-lockfile --ignore-scripts	2026-11-21T12:08:51.3473662Z 
+build	Run pnpm install --frozen-lockfile --ignore-scripts	2026-11-21T12:08:51.3473824Z   Failure reason:
+build	Run pnpm install --frozen-lockfile --ignore-scripts	2026-11-21T12:08:51.3474540Z   specifiers in the lockfile don't match specifiers in package.json:
+build	Run pnpm install --frozen-lockfile --ignore-scripts	2026-11-21T12:08:51.3475181Z * 1 dependencies were added: @tailwindcss/vite@^4.3.5
+build	Run pnpm install --frozen-lockfile --ignore-scripts	2026-11-21T12:08:51.3475726Z * 1 dependencies were removed: @astrojs/tailwind@^6.0.2
+build	Run pnpm install --frozen-lockfile --ignore-scripts	2026-11-21T12:08:51.3476269Z * 2 dependencies are mismatched:
+build	Run pnpm install --frozen-lockfile --ignore-scripts	2026-11-21T12:08:51.3476751Z   - tailwindcss (lockfile: ^3.4.0, manifest: ^4.3.5)
+build	Run pnpm install --frozen-lockfile --ignore-scripts	2026-11-21T12:08:51.3477324Z   - prettier (lockfile: ^3.3.0, manifest: ^3.10.1)
+build	Run pnpm install --frozen-lockfile --ignore-scripts	2026-11-21T12:08:51.3477600Z 
+build	Run pnpm install --frozen-lockfile --ignore-scripts	2026-11-21T12:08:51.3854132Z ##[error]Process completed with exit code 1.
+===== lint (44902405835) =====
+lint	Run pnpm install --frozen-lockfile	﻿2026-11-21T12:08:46.1213188Z ##[group]Run pnpm install --frozen-lockfile
+lint	Run pnpm install --frozen-lockfile	2026-11-21T12:08:46.1213591Z ^[[36;1mpnpm install --frozen-lockfile^[[0m
+lint	Run pnpm install --frozen-lockfile	2026-11-21T12:08:46.2488607Z shell: /usr/bin/bash -e {0}
+lint	Run pnpm install --frozen-lockfile	2026-11-21T12:08:46.2488899Z env:
+lint	Run pnpm install --frozen-lockfile	2026-11-21T12:08:46.2489512Z   PNPM_HOME: /home/runner/setup-pnpm/node_modules/.bin
+lint	Run pnpm install --frozen-lockfile	2026-11-21T12:08:46.2489872Z ##[endgroup]
+lint	Run pnpm install --frozen-lockfile	2026-11-21T12:08:46.7265826Z ? Verifying lockfile against supply-chain policies (948 entries)...
+lint	Run pnpm install --frozen-lockfile	2026-11-21T12:08:48.9821398Z ✓ Lockfile passes supply-chain policies (948 entries in 2.2s)
+lint	Run pnpm install --frozen-lockfile	2026-11-21T12:08:48.9992480Z [ERR_PNPM_OUTDATED_LOCKFILE] Cannot install with "frozen-lockfile" because pnpm-lock.yaml is not up to date with <ROOT>/package.json
+lint	Run pnpm install --frozen-lockfile	2026-11-21T12:08:48.9993393Z 
+lint	Run pnpm install --frozen-lockfile	2026-11-21T12:08:49.0001016Z Note that in CI environments this setting is true by default. If you still need to run install in such cases, use "pnpm install --no-frozen-lockfile"
+lint	Run pnpm install --frozen-lockfile	2026-11-21T12:08:49.0003358Z 
+lint	Run pnpm install --frozen-lockfile	2026-11-21T12:08:49.0017054Z   Failure reason:
+lint	Run pnpm install --frozen-lockfile	2026-11-21T12:08:49.0018415Z   specifiers in the lockfile don't match specifiers in package.json:
+lint	Run pnpm install --frozen-lockfile	2026-11-21T12:08:49.0019565Z * 1 dependencies were added: @tailwindcss/vite@^4.3.5
+lint	Run pnpm install --frozen-lockfile	2026-11-21T12:08:49.0020458Z * 1 dependencies were removed: @astrojs/tailwind@^6.0.2
+lint	Run pnpm install --frozen-lockfile	2026-11-21T12:08:49.0021196Z * 2 dependencies are mismatched:
+lint	Run pnpm install --frozen-lockfile	2026-11-21T12:08:49.0022003Z   - tailwindcss (lockfile: ^3.4.0, manifest: ^4.3.5)
+lint	Run pnpm install --frozen-lockfile	2026-11-21T12:08:49.0022759Z   - prettier (lockfile: ^3.3.0, manifest: ^3.10.1)
+lint	Run pnpm install --frozen-lockfile	2026-11-21T12:08:49.0023280Z 
+lint	Run pnpm install --frozen-lockfile	2026-11-21T12:08:49.0483004Z ##[error]Process completed with exit code 1.
