@@ -3,9 +3,9 @@
 --       wrangler d1 execute DB --remote --file=./scripts/seed-blog.sql(上線)
 
 INSERT INTO posts (id, slug, status, category, cover_image_url, author_email, published_at, created_at, updated_at) VALUES
-  ('post_baltic_origin', 'baltic-amber-origin', 'published', 'material', NULL, 'shineday999@gmail.com', 1700100000, 1700100000, 1700100000),
-  ('post_forest_stillness', 'forest-stillness-philosophy', 'published', 'culture', NULL, 'shineday999@gmail.com', 1700200000, 1700200000, 1700200000),
-  ('post_yunnan_agarwood', 'yunnan-agarwood-slow-craft', 'published', 'craft', NULL, 'shineday999@gmail.com', 1700300000, 1700300000, 1700300000);
+  ('post_baltic_origin', 'baltic-amber-origin', 'published', 'material', NULL, 'weider@0061qwen.cc.cd', 1700100000, 1700100000, 1700100000),
+  ('post_forest_stillness', 'forest-stillness-philosophy', 'published', 'culture', NULL, 'weider@0061qwen.cc.cd', 1700200000, 1700200000, 1700200000),
+  ('post_yunnan_agarwood', 'yunnan-agarwood-slow-craft', 'published', 'craft', NULL, 'weider@0061qwen.cc.cd', 1700300000, 1700300000, 1700300000);
 
 -- post 1: 波羅的海琥珀的形成與產地(material)
 INSERT INTO post_translations (post_id, locale, title, excerpt, body_markdown) VALUES

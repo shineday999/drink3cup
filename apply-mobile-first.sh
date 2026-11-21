@@ -53,9 +53,9 @@ const langs = [
 ---
 
 <header class="m-header" role="banner">
-  <a class="m-brand" href={prefix || '/'} aria-label="牛马得饰">
+  <a class="m-brand" href={prefix || '/'} aria-label="喝三杯咖啡">
     <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" set:html={icons.story} />
-    <span class="m-brand-text">牛马得饰</span>
+    <span class="m-brand-text">喝三杯咖啡</span>
   </a>
   <details class="m-lang">
     <summary aria-label="Language">
