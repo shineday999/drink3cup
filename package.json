@@ -20,7 +20,7 @@
     "format": "prettier --write \"**/*.{ts,tsx,astro,json,md,yml}\"",
     "format:check": "prettier --check \"**/*.{ts,tsx,astro,json,md,yml}\"",
     "prepare": "husky",
-    "postbuild": "node scripts/postbuild-fix-assets-binding.cjs",
+    "postbuild": "node scripts/postbuild-fix-assets-binding.cjs && node scripts/postbuild-copy-client.cjs",
     "preinstall": "npx only-allow pnpm"
   },
   "dependencies": {
