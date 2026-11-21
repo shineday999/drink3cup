@@ -162,21 +162,19 @@ const faqs = [
           </div>
           {
             XIAOHONGSHU_URL && (
-          <div
-            class="flex items-baseline gap-3 py-3 border-b border-forest-100/60"
-          >
-            <span
-              class="text-[10px] uppercase tracking-[0.3em] text-terra-500 font-sans w-20 shrink-0"
-              >{t("contact.channel_xiaohongshu")}</span
-            >
-            <a
-              href={XIAOHONGSHU_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              class="text-forest-700 hover:text-forest-800 underline-offset-2 hover:underline"
-              >{XIAOHONGSHU_HANDLE}</a
-            >
-          </div>
+              <div class="flex items-baseline gap-3 py-3 border-b border-forest-100/60">
+                <span class="text-[10px] uppercase tracking-[0.3em] text-terra-500 font-sans w-20 shrink-0">
+                  {t("contact.channel_xiaohongshu")}
+                </span>
+                <a
+                  href={XIAOHONGSHU_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="text-forest-700 hover:text-forest-800 underline-offset-2 hover:underline"
+                >
+                  {XIAOHONGSHU_HANDLE}
+                </a>
+              </div>
             )
           }
           <div
