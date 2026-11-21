@@ -140,7 +140,7 @@ const variantRow = env?.DB
 const priceRow =
   variantRow && env?.DB
     ? await env.DB.prepare(
-        "SELECT amount FROM product_prices WHERE variant_id = ? AND currency = 'CNY'",
+        "SELECT amount FROM product_prices WHERE variant_id = ? AND currency = 'TWD'",
       )
         .bind(variantRow.id)
         .first<{ amount: number }>()
@@ -159,7 +159,7 @@ if (variantImages.length === 0 && product.image_url) {
   variantImages = [product.image_url];
 }
 const cnyFen = priceRow?.amount ?? null;
-// 後台以人民幣輸入與顯示（資料庫也以人民幣記錄，單位：分）
+// 後台以新台幣輸入與顯示（資料庫也以新台幣記錄，單位：分）
 const priceValue =
   cnyFen === null
     ? ""
@@ -979,7 +979,7 @@ const inputField =
 
         <div>
           <label class="block text-sm font-medium mb-1" for="v-price"
-            >售价（人民币 ¥） <span class="text-error">*</span></label
+            >售价（新台幣 NT$） <span class="text-error">*</span></label
           >
           <input
             id="v-price"
@@ -994,7 +994,7 @@ const inputField =
         {
           cnyFen !== null && (
             <p class="text-xs text-text-muted -mt-2">
-              前台顯示：{formatPrice(cnyFen, "CNY", "zh-Hant")}
+              前台顯示：{formatPrice(cnyFen, "TWD", "zh-Hant")}
             </p>
           )
         }

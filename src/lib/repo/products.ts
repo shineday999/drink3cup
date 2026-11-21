@@ -53,10 +53,10 @@ function mapConstraintError(e: unknown): never {
 
 /**
  * product_variants.price_base 仍是 NOT NULL，要等 6.5 移除欄位前都得寫入。
- * 取 CNY（人民幣）價格（沒有就取第一個幣別）換成「元」字串，例如 92000 → "920.00"。
+ * 取 TWD（新台幣）價格（沒有就取第一個幣別）換成「元」字串，例如 92000 → "920.00"。
  */
 export function derivePriceBase(prices: Record<string, number>): string {
-  const cents = prices.CNY ?? Object.values(prices)[0];
+  const cents = prices.TWD ?? Object.values(prices)[0];
   return cents === undefined ? "0.00" : (cents / 100).toFixed(2);
 }
 

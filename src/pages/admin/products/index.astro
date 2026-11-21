@@ -32,7 +32,7 @@ const sql = `SELECT p.id, p.slug, p.category, p.subcategory, p.status, p.image_u
               pt.name AS name_zh,
               (SELECT pp.amount FROM product_variants pv
                  JOIN product_prices pp
-                   ON pp.variant_id = pv.id AND pp.currency = 'CNY'
+                   ON pp.variant_id = pv.id AND pp.currency = 'TWD'
                 WHERE pv.product_id = p.id
                 ORDER BY pv.sku LIMIT 1) AS cny_cents
        FROM products p
@@ -162,7 +162,7 @@ const th =
               </td>
               <td class="whitespace-nowrap px-3 py-2">
                 {p.cny_cents != null ? (
-                  formatPrice(p.cny_cents, "CNY", "zh-Hant")
+                  formatPrice(p.cny_cents, "TWD", "zh-Hant")
                 ) : (
                   <span class="text-text-muted">—</span>
                 )}

@@ -38,7 +38,7 @@ if (env?.DB) {
     const revenueRows = await env.DB.prepare(
       "SELECT currency, COALESCE(SUM(total), 0) AS s FROM orders WHERE payment_status = 'paid' GROUP BY currency",
     ).all<{ currency: string; s: number }>();
-    // 舊訂單可能是美元，新訂單是人民幣：先各自換成人民幣再加總
+    // 舊訂單可能是美元，新訂單是新台幣：先各自換成新台幣再加總
     const rates = getRates();
     const revenueCny = (revenueRows.results ?? []).reduce(
       (sum, r) => sum + r.s / (rates[r.currency] ?? 1),
@@ -112,7 +112,7 @@ const cards = [
   },
   {
     label: t("admin.dashboard.stat_revenue"),
-    value: formatPrice(stats.totalRevenue, "CNY", locale),
+    value: formatPrice(stats.totalRevenue, "TWD", locale),
     href: "",
     tone: "text-success",
   },

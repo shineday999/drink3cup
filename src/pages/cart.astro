@@ -14,7 +14,7 @@ const t = createT(messages);
 const cookieHeader = Astro.request.headers.get("cookie");
 const items = readCart(cookieHeader);
 
-// 修正 SQL 聚合:一個 (slug, sku) 一個 row,只抓 USD 價(轉 CNY 顯示),
+// 修正 SQL 聚合:一個 (slug, sku) 一個 row,只抓 USD 價(轉 TWD 顯示),
 // GROUP BY p.slug, pv.sku 防 product_variants 多 variant 拆多 row
 // + cart.cny subtotal 對齊 checkout。
 // 修正前:`MIN(pp.amount) AS min_amount` + `GROUP BY p.slug` 丟失 sku。
@@ -27,7 +27,7 @@ const enriched =
        FROM products p
        LEFT JOIN product_translations pt ON pt.product_id = p.id AND pt.locale = ?
        LEFT JOIN product_variants pv ON pv.product_id = p.id
-       LEFT JOIN product_prices pp ON pp.variant_id = pv.id AND pp.currency = 'CNY'
+       LEFT JOIN product_prices pp ON pp.variant_id = pv.id AND pp.currency = 'TWD'
        WHERE p.slug IN (${items.map(() => "?").join(",")})
        GROUP BY p.slug, pv.sku`,
       )
@@ -199,7 +199,7 @@ void t;
                   </div>
                   <div class="text-right">
                     <div class="font-mono">
-                      {formatPrice(lineCents * qty, "CNY", locale)}
+                      {formatPrice(lineCents * qty, "TWD", locale)}
                     </div>
                     <div
                       data-cart-remove-inline
@@ -246,7 +246,7 @@ void t;
                 {t("cart.subtotal") ?? "Subtotal"}:
               </div>
               <div class="text-2xl font-mono font-medium">
-                {formatPrice(subtotalCents, "CNY", locale)}
+                {formatPrice(subtotalCents, "TWD", locale)}
               </div>
             </div>
 

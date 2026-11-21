@@ -1,5 +1,5 @@
 // 匯率表（D1 exchange_rates）讀寫與快取。
-// 基準幣別是人民幣：per_cny = 1 人民幣可換多少該幣別。
+// 基準幣別是新台幣：per_cny = 1 新台幣可換多少該幣別。
 import { setRates, type RateTable } from "./format";
 
 const TTL_MS = 60_000; // 改匯率後，各處最多 1 分鐘內生效
@@ -40,14 +40,14 @@ export function invalidateRates(): void {
   nextLoadAt = 0;
 }
 
-/** 一次寫入多個幣別的匯率（updates: 幣別 → per_cny）。CNY 不可修改。 */
+/** 一次寫入多個幣別的匯率（updates: 幣別 → per_cny）。TWD 不可修改。 */
 export async function saveRates(
   db: D1Database,
   updates: Record<string, number>,
 ): Promise<void> {
   const now = Math.floor(Date.now() / 1000);
   const stmts = Object.entries(updates)
-    .filter(([currency]) => currency !== "CNY")
+    .filter(([currency]) => currency !== "TWD")
     .map(([currency, perCny]) =>
       db
         .prepare(

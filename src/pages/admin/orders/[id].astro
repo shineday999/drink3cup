@@ -57,7 +57,7 @@ if (missingSkus.length > 0 && env?.DB) {
     `SELECT pv.sku, pp.amount AS price_cents
      FROM product_variants pv
      JOIN product_prices pp ON pp.variant_id = pv.id
-     WHERE pv.sku IN (${placeholders}) AND pp.currency = 'CNY'`,
+     WHERE pv.sku IN (${placeholders}) AND pp.currency = 'TWD'`,
   )
     .bind(...missingSkus)
     .all<{ sku: string; price_cents: number }>();
@@ -179,7 +179,7 @@ function statusColor(s: string) {
                             {unit != null
                               ? formatPrice(
                                   unit,
-                                  i.priceCents != null ? order.currency : "CNY",
+                                  i.priceCents != null ? order.currency : "TWD",
                                   locale,
                                 )
                               : "—"}
@@ -188,7 +188,7 @@ function statusColor(s: string) {
                             {linePriceCents(i) != null
                               ? formatPrice(
                                   linePriceCents(i)!,
-                                  i.priceCents != null ? order.currency : "CNY",
+                                  i.priceCents != null ? order.currency : "TWD",
                                   locale,
                                 )
                               : "—"}

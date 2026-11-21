@@ -32,7 +32,7 @@ function sample(over: Record<string, unknown> = {}) {
         sku: "T-S",
         stock: 5,
         image_urls: ["/a.jpg"],
-        prices: { USD: 12800, CNY: 92000 },
+        prices: { USD: 12800, TWD: 92000 },
       },
       { sku: "T-M", stock: 3, prices: { USD: 18800 } },
     ],
@@ -62,10 +62,10 @@ async function resetAll() {
 }
 
 describe("derivePriceBase", () => {
-  it("優先用 CNY，換成元", () => {
-    expect(derivePriceBase({ CNY: 92000, USD: 12800 })).toBe("920.00");
+  it("優先用 TWD，換成元", () => {
+    expect(derivePriceBase({ TWD: 92000, USD: 12800 })).toBe("920.00");
   });
-  it("沒有 CNY 就用第一個幣別", () => {
+  it("沒有 TWD 就用第一個幣別", () => {
     expect(derivePriceBase({ MYR: 59000 })).toBe("590.00");
   });
   it("沒有價格回 0.00", () => {
@@ -92,7 +92,7 @@ describe.skipIf(!db)("products repository", () => {
     expect(p?.image_url).toBe("/a.jpg"); // 沒指定封面 → 取第一個變體第一張圖
     expect(p?.variants.map((v) => v.sku)).toEqual(["T-M", "T-S"]);
     const s = p?.variants.find((v) => v.sku === "T-S");
-    expect(s?.prices).toEqual({ USD: 12800, CNY: 92000 });
+    expect(s?.prices).toEqual({ USD: 12800, TWD: 92000 });
     expect(s?.image_urls).toEqual(["/a.jpg"]);
   });
 
@@ -294,7 +294,7 @@ describe.skipIf(!db)("products repository", () => {
         stock: 9,
         attributes: { size: "L" },
         image_urls: [],
-        prices: { CNY: 180000 },
+        prices: { TWD: 180000 },
         weight_grams: 20,
       }),
     );
@@ -302,7 +302,7 @@ describe.skipIf(!db)("products repository", () => {
     const l = p?.variants.find((v) => v.id === newId);
     expect(l?.stock).toBe(9);
     expect(l?.weight_grams).toBe(20);
-    expect(l?.prices).toEqual({ CNY: 180000 }); // USD 被取代掉
+    expect(l?.prices).toEqual({ TWD: 180000 }); // USD 被取代掉
 
     await expect(
       upsertVariant(
@@ -336,11 +336,11 @@ describe.skipIf(!db)("products repository", () => {
   it("setVariantPrices 整組取代並同步 price_base", async () => {
     const id = await createProduct(db!, sample());
     const v = (await getProduct(db!, id))!.variants[0]!;
-    await setVariantPrices(db!, id, v.id, { MYR: 5000, CNY: 1000 });
+    await setVariantPrices(db!, id, v.id, { MYR: 5000, TWD: 1000 });
     const after = (await getProduct(db!, id))!.variants.find(
       (x) => x.id === v.id,
     )!;
-    expect(after.prices).toEqual({ MYR: 5000, CNY: 1000 });
+    expect(after.prices).toEqual({ MYR: 5000, TWD: 1000 });
     const row = await db!
       .prepare("SELECT price_base FROM product_variants WHERE id = ?")
       .bind(v.id)

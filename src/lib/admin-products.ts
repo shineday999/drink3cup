@@ -125,9 +125,9 @@ export function newId(prefix: string): string {
 }
 
 // ---------- 價格 ----------
-// 售價以人民幣（CNY）記錄：product_prices 的 CNY 列，amount 單位為分。
+// 售價以新台幣（TWD）記錄：product_prices 的 TWD 列，amount 單位為分。
 // 各語言前台再依匯率表（exchange_rates）換算成當地貨幣顯示。
-export const PRICE_CURRENCY = "CNY";
+export const PRICE_CURRENCY = "TWD";
 
 export function parsePrice(raw: string): number | null {
   const n = Number(raw.replace(/,/g, "").trim());
@@ -269,7 +269,7 @@ export function validateNewProduct(
   }
   if (!v.desc_zh) errors.push("请填写中文描述");
   if (parsePrice(v.price) === null)
-    errors.push("请填写大于 0 的售价（人民币）");
+    errors.push("请填写大于 0 的售价（新台幣）");
   const stock = Number(v.stock);
   if (!Number.isInteger(stock) || stock < 0 || stock > 99999) {
     errors.push("库存需为 0 以上的整数");
@@ -370,7 +370,7 @@ export async function createProduct(
         ),
       db
         .prepare(
-          "INSERT INTO product_prices (variant_id, currency, amount, tax_included) VALUES (?, 'CNY', ?, 1)",
+          "INSERT INTO product_prices (variant_id, currency, amount, tax_included) VALUES (?, 'TWD', ?, 1)",
         )
         .bind(variantId, fen),
     ]);
@@ -413,7 +413,7 @@ export async function checkReadiness(
 
   const price = await db
     .prepare(
-      "SELECT amount FROM product_prices WHERE variant_id = ? AND currency = 'CNY'",
+      "SELECT amount FROM product_prices WHERE variant_id = ? AND currency = 'TWD'",
     )
     .bind(variant.id)
     .first<{ amount: number }>();

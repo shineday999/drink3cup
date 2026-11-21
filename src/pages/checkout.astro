@@ -21,7 +21,7 @@ const enriched =
         `SELECT p.slug, pv.sku, MIN(pp.amount) AS amount, pp.currency
        FROM products p
        LEFT JOIN product_variants pv ON pv.product_id = p.id
-       LEFT JOIN product_prices pp ON pp.variant_id = pv.id AND pp.currency = 'CNY'
+       LEFT JOIN product_prices pp ON pp.variant_id = pv.id AND pp.currency = 'TWD'
        WHERE p.slug IN (${items.map(() => "?").join(",")})
        GROUP BY p.slug, pv.sku`,
       )
@@ -49,7 +49,7 @@ const subtotalCents = visible.reduce((sum, row) => {
   return sum + ((row.amount as number) ?? 0) * qty;
 }, 0);
 
-const totalDisplay = formatPrice(subtotalCents, "CNY", locale);
+const totalDisplay = formatPrice(subtotalCents, "TWD", locale);
 ---
 
 <Layout
@@ -206,7 +206,7 @@ const totalDisplay = formatPrice(subtotalCents, "CNY", locale);
                   <span class="font-mono">
                     {formatPrice(
                       ((row.amount as number) ?? 0) * qty,
-                      "CNY",
+                      "TWD",
                       locale,
                     )}
                   </span>

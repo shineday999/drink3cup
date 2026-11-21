@@ -5,7 +5,7 @@ import { z } from "zod";
 export const LOCALES = ["zh-Hant"] as const;
 export const CURRENCIES = [
   "USD",
-  "CNY",
+  "TWD",
   "MYR",
   "IDR",
   "AED",

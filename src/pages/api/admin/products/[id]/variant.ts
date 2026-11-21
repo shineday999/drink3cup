@@ -13,7 +13,7 @@ import {
   uploadImages,
 } from "../../../../../lib/admin-products";
 
-// 儲存商品的規格：售價（人民幣，單位分）、庫存、重量、圖片。
+// 儲存商品的規格：售價（新台幣，單位分）、庫存、重量、圖片。
 // 還沒有規格的舊商品（只有封面圖）也從這裡補齊。
 export const POST: APIRoute = async (ctx) => {
   if (!ctx.locals.admin) return new Response("Unauthorized", { status: 401 });
@@ -42,7 +42,7 @@ export const POST: APIRoute = async (ctx) => {
   const price = parsePrice(String(form.get("price") ?? ""));
   const stock = Number(String(form.get("stock") ?? ""));
   const weightRaw = String(form.get("weight") ?? "").trim();
-  if (price === null) return fail("请填写大于 0 的售价（人民币）");
+  if (price === null) return fail("请填写大于 0 的售价（新台幣）");
   if (!Number.isInteger(stock) || stock < 0 || stock > 99999) {
     return fail("库存需为 0 以上的整数");
   }
@@ -137,7 +137,7 @@ export const POST: APIRoute = async (ctx) => {
   stmts.push(
     db
       .prepare(
-        "INSERT INTO product_prices (variant_id, currency, amount, tax_included) VALUES (?, 'CNY', ?, 1) ON CONFLICT (variant_id, currency) DO UPDATE SET amount = excluded.amount",
+        "INSERT INTO product_prices (variant_id, currency, amount, tax_included) VALUES (?, 'TWD', ?, 1) ON CONFLICT (variant_id, currency) DO UPDATE SET amount = excluded.amount",
       )
       .bind(variantId, fen),
   );

@@ -32,7 +32,7 @@ export const POST: APIRoute = async (ctx) => {
   const now = Math.floor(Date.now() / 1000);
   const locale = ctx.locals.locale;
 
-  // Wave 28.8: 算 CNY subtotal 從 product_prices + cart qty,
+  // Wave 28.8: 算 TWD subtotal 從 product_prices + cart qty,
   // 同時將 price snapshot 寫進 items JSON(歷史價格穩定,不隨 product_prices 變動)。
   // 沒 SKU 的 item (legacy) 跳過,subtotal 不算。
   const skuList = items
@@ -46,7 +46,7 @@ export const POST: APIRoute = async (ctx) => {
         `SELECT pv.sku, pp.amount AS price_cents
          FROM product_variants pv
          JOIN product_prices pp ON pp.variant_id = pv.id
-         WHERE pv.sku IN (${placeholders}) AND pp.currency = 'CNY'`,
+         WHERE pv.sku IN (${placeholders}) AND pp.currency = 'TWD'`,
       )
       .bind(...skuList)
       .all<{ sku: string; price_cents: number }>();
@@ -83,7 +83,7 @@ export const POST: APIRoute = async (ctx) => {
       locale,
       itemsJson,
       subtotal,
-      "CNY",
+      "TWD",
       shippingFee,
       total,
       notes,

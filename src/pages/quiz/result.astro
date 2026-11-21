@@ -42,7 +42,7 @@ const products =
          FROM products p
          LEFT JOIN product_translations pt ON pt.product_id = p.id AND pt.locale = ?
          LEFT JOIN product_variants pv ON pv.product_id = p.id
-         LEFT JOIN product_prices pp ON pp.variant_id = pv.id AND pp.currency = 'CNY'
+         LEFT JOIN product_prices pp ON pp.variant_id = pv.id AND pp.currency = 'TWD'
          WHERE p.id IN (${idsParam
            .split(",")
            .map(() => "?")
@@ -144,7 +144,7 @@ void locale;
                     p.min_price
                       ? formatPrice(
                           p.min_price,
-                          p.min_currency ?? "CNY",
+                          p.min_currency ?? "TWD",
                           locale,
                         )
                       : undefined

@@ -52,7 +52,7 @@ const [siteImgRes, siteCatRes, featuredRes, bannerRes] = await Promise.all([
          FROM products p
          LEFT JOIN product_translations pt ON pt.product_id = p.id AND pt.locale = ?
          LEFT JOIN product_variants pv ON pv.product_id = p.id
-         LEFT JOIN product_prices pp ON pp.variant_id = pv.id AND pp.currency = 'CNY'
+         LEFT JOIN product_prices pp ON pp.variant_id = pv.id AND pp.currency = 'TWD'
          WHERE p.status = 'active'
          GROUP BY p.id
          ORDER BY p.created_at DESC LIMIT 3`,
@@ -759,7 +759,7 @@ const slides = bannerRows.results.map((b) => ({
                   featured.results[0].min_price
                     ? formatPrice(
                         featured.results[0].min_price ?? 0,
-                        featured.results[0].min_currency ?? "CNY",
+                        featured.results[0].min_currency ?? "TWD",
                         locale,
                       )
                     : undefined
@@ -782,7 +782,7 @@ const slides = bannerRows.results.map((b) => ({
                   featured.results[1].min_price
                     ? formatPrice(
                         featured.results[1].min_price ?? 0,
-                        featured.results[1].min_currency ?? "CNY",
+                        featured.results[1].min_currency ?? "TWD",
                         locale,
                       )
                     : undefined
@@ -805,7 +805,7 @@ const slides = bannerRows.results.map((b) => ({
                   featured.results[2].min_price
                     ? formatPrice(
                         featured.results[2].min_price ?? 0,
-                        featured.results[2].min_currency ?? "CNY",
+                        featured.results[2].min_currency ?? "TWD",
                         locale,
                       )
                     : undefined

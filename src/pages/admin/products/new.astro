@@ -98,9 +98,9 @@ if (Astro.request.method === "POST") {
 }
 
 const stamp = todayStamp();
-// 價格預覽用：1 人民幣 = 多少該幣別（來自後台「汇率」表）
+// 價格預覽用：1 新台幣 = 多少該幣別（來自後台「汇率」表）
 const rates = Object.fromEntries(
-  ["CNY", "USD", "MYR", "IDR"].map((c) => [c, getRates()[c] ?? 1]),
+  ["TWD", "USD", "MYR", "IDR"].map((c) => [c, getRates()[c] ?? 1]),
 );
 const field =
   "w-full px-3 py-2 border border-text-muted/30 rounded-md bg-bg-base";
@@ -254,7 +254,7 @@ const card =
       <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
         <div>
           <label class="block text-sm font-medium mb-1" for="np-price"
-            >售价（人民币 ¥） <span class="text-error">*</span></label
+            >售价（新台幣 NT$） <span class="text-error">*</span></label
           >
           <input
             id="np-price"
@@ -479,7 +479,7 @@ const card =
       // --- 售价预览：各语言前台实际会显示的价格 ---
       var priceEl = document.getElementById("np-price");
       var priceOut = document.getElementById("np-price-preview");
-      var targets = [["zh-Hant", "CNY"]];
+      var targets = [["zh-Hant", "TWD"]];
       function fmt(loc, cur, cny) {
         var v = cny * (rates[cur] || 1);
         try {
