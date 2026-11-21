@@ -1,0 +1,202 @@
+---
+// 預訂（結帳）3 步精靈（手機版）。放在 <form data-checkout data-co-pending> 內。
+// 漸進增強：沒有 JS 或桌面寬度時，維持原本一次攤開的完整表單；欄位名稱與後端不動。
+import { createT } from "../i18n/t";
+
+const t = createT((Astro.locals.messages ?? {}) as Record<string, unknown>);
+const titles = [
+  t("checkout.step_contact"),
+  t("checkout.step_shipping"),
+  t("checkout.step_confirm"),
+];
+---
+
+<div class="co-progress" aria-hidden="true">
+  <div class="co-fill" data-co-fill></div>
+</div>
+<p class="co-count" data-co-count data-titles={JSON.stringify(titles)}></p>
+
+<div class="co-bar" data-co-bar>
+  <button
+    type="button"
+    class="co-prev"
+    data-co-prev
+    hidden
+    aria-label={t("common.back")}
+  >
+    <svg
+      viewBox="0 0 24 24"
+      width="22"
+      height="22"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M15 5l-7 7 7 7"></path>
+    </svg>
+  </button>
+  <span class="co-total" data-co-total hidden></span>
+  <button
+    type="button"
+    class="co-next"
+    data-co-next
+    data-label={t("quiz.next")}
+  >
+    {t("quiz.next")}
+  </button>
+</div>
+
+<noscript>
+  <style is:inline>
+    form[data-co-pending] > * {
+      display: revert !important;
+    }
+  </style>
+</noscript>
+
+<script>
+  const form = document.querySelector<HTMLFormElement>("form[data-checkout]");
+  const mobile = window.matchMedia("(max-width: 767.98px)").matches;
+
+  if (form && mobile) {
+    const prev = form.querySelector<HTMLButtonElement>("[data-co-prev]");
+    const next = form.querySelector<HTMLButtonElement>("[data-co-next]");
+    const fill = form.querySelector<HTMLElement>("[data-co-fill]");
+    const count = form.querySelector<HTMLElement>("[data-co-count]");
+    const totalEl = form.querySelector<HTMLElement>("[data-co-total]");
+    const submitBtn = form.querySelector<HTMLButtonElement>(
+      ':scope > button[type="submit"]',
+    );
+
+    // form 的直屬子元素裡，找出某欄位所在的那一列
+    const rowOf = (id: string) =>
+      document.getElementById(id)?.closest<HTMLElement>("form > *") ?? null;
+    const group = (ids: string[]) =>
+      Array.from(new Set(ids.map(rowOf).filter((x): x is HTMLElement => !!x)));
+
+    const s1 = group(["name", "email", "phone"]);
+    const s2 = group(["country", "city", "address", "postal", "notes"]);
+    const summary = (Array.from(form.children) as HTMLElement[]).find(
+      (el) =>
+        el.tagName === "DIV" &&
+        !el.querySelector("input,textarea") &&
+        !el.classList.contains("co-progress") &&
+        !el.classList.contains("co-bar"),
+    );
+
+    if (prev && next && s1.length && s2.length && summary) {
+      const steps: HTMLElement[][] = [s1, s2, [summary]];
+      const titles: string[] = JSON.parse(count?.dataset.titles || "[]");
+      const nextLabel = next.dataset.label || next.textContent?.trim() || "";
+      const submitLabel = submitBtn?.textContent?.trim() || nextLabel;
+      const totalText =
+        summary.querySelector(".font-mono.font-medium")?.textContent?.trim() ||
+        "";
+
+      // 第 3 步的資料回顧（只用 textContent，不用 innerHTML）
+      // 注意：workers-types 在 Element 上直接宣告 before/append（HTMLRewriter 簽章），
+      // 會蓋掉 DOM lib 的 ChildNode.before / ParentNode.append，所以這裡用
+      // insertAdjacentElement / appendChild 這類沒被遮蔽的 DOM API。
+      const recap = document.createElement("dl");
+      recap.className = "co-recap";
+      summary.insertAdjacentElement("beforebegin", recap);
+      const fieldIds = [
+        "name",
+        "email",
+        "phone",
+        "country",
+        "city",
+        "address",
+        "postal",
+        "notes",
+      ];
+      const buildRecap = () => {
+        recap.replaceChildren();
+        for (const id of fieldIds) {
+          const el = document.getElementById(id) as
+            HTMLInputElement | HTMLTextAreaElement | null;
+          const value = el?.value.trim();
+          if (!value) continue;
+          const label =
+            document
+              .querySelector(`label[for="${id}"]`)
+              ?.textContent?.replace("*", "")
+              .trim() || id;
+          const dt = document.createElement("dt");
+          dt.textContent = label;
+          const dd = document.createElement("dd");
+          dd.textContent = value;
+          recap.appendChild(dt);
+          recap.appendChild(dd);
+        }
+      };
+
+      let i = 0;
+      const render = (scroll: boolean) => {
+        steps.forEach((els, k) =>
+          els.forEach((el) => el.classList.toggle("co-off", k !== i)),
+        );
+        const last = i === steps.length - 1;
+        recap.hidden = !last;
+        if (last) buildRecap();
+        prev.hidden = i === 0;
+        next.type = last ? "submit" : "button";
+        next.textContent = last ? submitLabel : nextLabel;
+        if (totalEl) {
+          totalEl.hidden = !last;
+          totalEl.textContent = last ? totalText : "";
+        }
+        if (fill) fill.style.width = `${((i + 1) / steps.length) * 100}%`;
+        if (count)
+          count.textContent = `${i + 1} / ${steps.length} · ${titles[i] ?? ""}`;
+        form.dataset.coStep = String(i + 1);
+        if (scroll) window.scrollTo({ top: 0 });
+      };
+
+      const stepFields = () =>
+        steps[i]!.flatMap((el) =>
+          Array.from(
+            el.querySelectorAll<HTMLInputElement | HTMLTextAreaElement>(
+              "input,textarea",
+            ),
+          ),
+        );
+
+      delete form.dataset.coPending;
+      form.dataset.coOn = "1";
+      render(false);
+
+      prev.addEventListener("click", () => {
+        i = Math.max(i - 1, 0);
+        render(true);
+      });
+
+      next.addEventListener("click", () => {
+        if (next.type !== "button") return; // 最後一步是 submit，交給表單送出
+        const bad = stepFields().find((f) => !f.checkValidity());
+        if (bad) {
+          bad.reportValidity();
+          return;
+        }
+        i = Math.min(i + 1, steps.length - 1);
+        render(true);
+      });
+
+      // 在輸入框按 Enter：視為「下一步」，不直接送出整份表單
+      form.addEventListener("keydown", (e) => {
+        const target = e.target as HTMLElement;
+        if (
+          e.key === "Enter" &&
+          target.tagName === "INPUT" &&
+          next.type === "button"
+        ) {
+          e.preventDefault();
+          next.click();
+        }
+      });
+    }
+  }
+</script>

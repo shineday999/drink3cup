@@ -1,0 +1,81 @@
+---
+import Layout from "@layouts/Layout.astro";
+import RevealOnScroll from "@components/RevealOnScroll.astro";
+import ContinueReading from "@components/ContinueReading.astro";
+import BreadcrumbSchema from "@components/BreadcrumbSchema.astro";
+import { createT } from "../i18n/t";
+import { localizedPath, defaultLocale, type Locale } from "../i18n/config";
+
+const locale = (Astro.locals.locale ?? defaultLocale) as Locale;
+const messages = (Astro.locals.messages ?? {}) as Record<string, unknown>;
+const t = createT(messages);
+
+const breadcrumbItems = [
+  { name: t("nav.home"), url: "/" },
+  { name: t("nav.story"), url: "/story" },
+  { name: t("craft.title"), url: "/craft" },
+];
+---
+
+<Layout
+  title={`${t("craft.title")} — ${t("common.site_name")}`}
+  description={t("craft.p1")}
+>
+  <Fragment slot="head">
+    <BreadcrumbSchema items={breadcrumbItems} />
+  </Fragment>
+  <article class="max-w-3xl mx-auto px-6 py-section">
+    <RevealOnScroll>
+      <header class="mb-16 text-center">
+        <p
+          class="text-[10px] uppercase tracking-[0.4em] text-forest-600 font-sans mb-4"
+        >
+          {t("craft.kicker")}
+        </p>
+        <h1
+          class="text-display-sm md:text-display-md font-serif text-text-primary mb-4 leading-[1.08]"
+        >
+          {t("craft.title")}
+        </h1>
+      </header>
+    </RevealOnScroll>
+
+    <RevealOnScroll>
+      <div
+        class="prose prose-lg max-w-none space-y-6 text-text-secondary font-sans leading-relaxed text-base"
+      >
+        <p>{t("craft.p1")}</p>
+        <p>{t("craft.p2")}</p>
+        <p>{t("craft.p3")}</p>
+        <p>{t("craft.p4")}</p>
+        <blockquote class="my-10 py-5 border-y border-forest-100 text-center">
+          <p class="text-xl font-serif italic text-forest-700 leading-snug">
+            “{t("craft.p5")}”
+          </p>
+        </blockquote>
+      </div>
+    </RevealOnScroll>
+  </article>
+  <div class="max-w-5xl mx-auto px-6 pb-section">
+    <ContinueReading
+      heading={t("continue.heading")}
+      links={[
+        {
+          href: localizedPath(locale, "/materials"),
+          label: t("continue.craft_next_1_label"),
+          desc: t("continue.craft_next_1_desc"),
+        },
+        {
+          href: localizedPath(locale, "/amber"),
+          label: t("continue.craft_next_2_label"),
+          desc: t("continue.craft_next_2_desc"),
+        },
+        {
+          href: localizedPath(locale, "/incense"),
+          label: t("continue.craft_next_3_label"),
+          desc: t("continue.craft_next_3_desc"),
+        },
+      ]}
+    />
+  </div>
+</Layout>

@@ -1,0 +1,36 @@
+---
+// BreadcrumbSchema.astro — JSON-LD BreadcrumbList for SEO / AEO / GEO
+// Wave 33 Phase 2.3: per-page breadcrumb structured data
+import type { Locale } from "../i18n/config";
+import { localizedPath, defaultLocale } from "../i18n/config";
+
+interface Crumb {
+  name: string;
+  url: string;
+}
+
+interface Props {
+  items: Crumb[];
+}
+
+const { items } = Astro.props as Props;
+const currentLocale = (Astro.locals.locale ?? defaultLocale) as Locale;
+const siteUrl = Astro.url.origin || "https://cnamber.ccwu.cc";
+
+const listItems = items.map((c, i) => ({
+  "@type": "ListItem",
+  position: i + 1,
+  name: c.name,
+  item: c.url.startsWith("http")
+    ? c.url
+    : `${siteUrl}${localizedPath(currentLocale, c.url)}`,
+}));
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: listItems,
+};
+---
+
+<script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />

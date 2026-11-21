@@ -1,0 +1,987 @@
+---
+import { env } from "cloudflare:workers";
+
+// /products/[slug] — 2 區塊:大圖 + info。Editorial still-life feel.
+// 不要長篇 story / reviews / related — 將存呼吸感最重要。
+import Layout from "@layouts/Layout.astro";
+import { createT } from "../../i18n/t";
+import { defaultLocale, localizedPath, type Locale } from "../../i18n/config";
+import { formatPrice } from "@lib/format";
+import BreadcrumbSchema from "@components/BreadcrumbSchema.astro";
+import FaqSchema from "@components/FaqSchema.astro";
+import RevealOnScroll from "@components/RevealOnScroll.astro";
+
+const locale = (Astro.locals.locale ?? defaultLocale) as Locale;
+const messages = (Astro.locals.messages ?? {}) as Record<string, unknown>;
+const t = createT(messages);
+
+const slug = Astro.params.slug ?? "";
+const added = Astro.url.searchParams.get("added") === "1";
+
+interface Product {
+  id: string;
+  slug: string;
+  category: string;
+  status: string;
+  faq: string | null;
+}
+
+interface Translation {
+  name: string;
+  description: string;
+  short_description: string | null;
+  story: string | null;
+}
+
+interface Variant {
+  id: string;
+  sku: string;
+  attributes: string;
+  stock: number;
+}
+
+interface Price {
+  currency: string;
+  amount: number;
+}
+
+const product = env?.DB
+  ? await env.DB.prepare(
+      "SELECT id, slug, category, status, faq FROM products WHERE slug = ? AND status = ?",
+    )
+      .bind(slug, "active")
+      .first<Product>()
+  : null;
+
+if (!product) {
+  Astro.response.status = 404;
+  return Astro.rewrite("/404");
+}
+
+const translation = env?.DB
+  ? await env.DB.prepare(
+      "SELECT name, description, short_description, story FROM product_translations WHERE product_id = ? AND locale = ?",
+    )
+      .bind(product.id, locale)
+      .first<Translation>()
+  : null;
+
+const fallback = env?.DB
+  ? await env.DB.prepare(
+      "SELECT name, description, short_description, story FROM product_translations WHERE product_id = ? AND locale = ?",
+    )
+      .bind(product.id, "en")
+      .first<Translation>()
+  : null;
+
+const tr = translation ??
+  fallback ?? {
+    name: product.slug,
+    description: "",
+    short_description: null,
+    story: null,
+  };
+
+// 商品描述：逐行拆成段落；內容只是商品名稱的（舊資料或自動帶入）不顯示
+const descParas = (tr.description ?? "")
+  .split(/\r?\n+/)
+  .map((line) => line.trim())
+  .filter(Boolean);
+const showDesc = descParas.length > 0 && descParas.join("") !== tr.name.trim();
+
+const variants = env?.DB
+  ? await env.DB.prepare(
+      "SELECT id, sku, attributes, stock FROM product_variants WHERE product_id = ? ORDER BY sku",
+    )
+      .bind(product.id)
+      .all<Variant>()
+  : { results: [] };
+
+const prices = env?.DB
+  ? await env.DB.prepare(
+      "SELECT currency, amount FROM product_prices WHERE variant_id IN (SELECT id FROM product_variants WHERE product_id = ?) AND currency = ?",
+    )
+      .bind(product.id, "CNY")
+      .all<Price>()
+  : { results: [] };
+
+// Wave 36: parse product.faq JSON for per-locale FAQPage
+let productFaqs: { q: string; a: string }[] = [];
+try {
+  const parsed = product.faq ? JSON.parse(product.faq) : {};
+  productFaqs = parsed[locale] || parsed["en"] || [];
+} catch {
+  productFaqs = [];
+}
+
+let images: string[] = [];
+if (variants.results[0]?.id && env?.DB) {
+  const imgRow = await env.DB.prepare(
+    "SELECT image_urls FROM product_variants WHERE id = ?",
+  )
+    .bind(variants.results[0].id)
+    .first<{ image_urls: string }>();
+  try {
+    const parsed: unknown = imgRow?.image_urls
+      ? JSON.parse(imgRow.image_urls)
+      : [];
+    if (Array.isArray(parsed)) {
+      images = parsed.filter((u): u is string => typeof u === "string");
+    }
+  } catch {
+    images = [];
+  }
+}
+const heroImage = images[0] ?? "";
+
+const priceMap = new Map(
+  prices.results.map((p) => [p.currency, p.amount / 100]),
+);
+const cnyPrice = priceMap.get("CNY");
+// Wave 33 Phase 2.2 fix: siteUrl + siteName defined in page frontmatter (Layout scoped vars not accessible here)
+const siteUrl = Astro.url.origin || "https://cnamber.ccwu.cc";
+const siteSettings = Astro.locals.siteSettings;
+const siteName =
+  siteSettings?.siteName?.[locale] ??
+  siteSettings?.siteName?.["zh-Hans"] ??
+  t("common.site_name");
+
+// Wave 33 Phase 2.2: Product JSON-LD (per-product structured data)
+const productJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Product",
+  name: tr.name,
+  description: (tr.short_description ?? tr.description ?? "").slice(0, 500),
+  image:
+    images.length > 0
+      ? images.map((u) => (u.startsWith("http") ? u : `${siteUrl}${u}`))
+      : undefined,
+  brand: { "@type": "Brand", name: siteName ?? t("common.site_name") },
+  sku: variants.results[0]?.sku ?? product.id,
+  offers: {
+    "@type": "Offer",
+    priceCurrency: "CNY",
+    price: cnyPrice ?? undefined,
+    availability: "https://schema.org/PreOrder",
+    url: `${siteUrl}${Astro.url.pathname}`,
+  },
+};
+
+// Wave 33 Phase 2.3: BreadcrumbList
+const breadcrumbItems = [
+  { name: t("nav.home"), url: "/" },
+  { name: t("nav.products"), url: "/products" },
+  { name: tr.name, url: Astro.url.pathname },
+];
+
+const pageTitle = `${tr.name} — ${t("common.site_name")}`;
+void locale;
+---
+
+<Layout
+  title={pageTitle}
+  description={tr.short_description ?? tr.description.slice(0, 160)}
+  ogImage={heroImage || undefined}
+  ogType="product"
+>
+  <Fragment slot="head">
+    <script
+      type="application/ld+json"
+      set:html={JSON.stringify(productJsonLd)}
+    />
+    <BreadcrumbSchema items={breadcrumbItems} />
+    <FaqSchema items={productFaqs} />
+  </Fragment>
+  <!-- 1. Hero image — full-width 60vh cinematic still-life -->
+  <section
+    data-pd-hero
+    class="relative h-[60vh] min-h-[420px] overflow-hidden bg-forest-800"
+  >
+    {
+      heroImage ? (
+        <img
+          id="pd-main"
+          decoding="sync"
+          src={heroImage}
+          alt={tr.name}
+          class="w-full h-full object-cover cinematic"
+          loading="eager"
+          fetchpriority="high"
+        />
+      ) : (
+        <div class="w-full h-full flex items-center justify-center bg-forest-100">
+          <span class="text-forest-700 font-serif text-6xl font-light">
+            No image
+          </span>
+        </div>
+      )
+    }
+    <div
+      class="pointer-events-none absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-forest-900/40"
+    >
+    </div>
+
+    <div
+      data-pd-back
+      class="absolute bottom-8 left-0 right-0 px-6 max-w-6xl mx-auto"
+    >
+      <a
+        href={localizedPath(locale, "/products")}
+        class="inline-block text-xs uppercase tracking-[0.4em] text-cream-100/80 hover:text-cream-50 transition-colors font-sans border-b border-cream-100/30 pb-0.5"
+      >
+        ← Back to all
+      </a>
+    </div>
+  </section>
+
+  <!-- 7.2 點主圖開全螢幕檢視（完整顯示，不裁切） -->
+  {
+    heroImage && (
+      <dialog data-pd-lightbox aria-label={tr.name} class="pd-lb">
+        <button
+          type="button"
+          data-pd-lb-close
+          aria-label="Close"
+          class="pd-lb-close"
+        >
+          ×
+        </button>
+        <img data-pd-lb-img src="" alt={tr.name} />
+        <button
+          type="button"
+          data-pd-lb-prev
+          aria-label="Previous"
+          class="pd-lb-nav pd-lb-prev"
+          hidden
+        >
+          ‹
+        </button>
+        <button
+          type="button"
+          data-pd-lb-next
+          aria-label="Next"
+          class="pd-lb-nav pd-lb-next"
+          hidden
+        >
+          ›
+        </button>
+        <p data-pd-lb-count class="pd-lb-count" hidden />
+      </dialog>
+    )
+  }
+
+  <!-- 縮圖列：點選的圖在上方放大 -->
+  {
+    images.length > 1 && (
+      <div
+        data-pd-thumbs
+        class="max-w-6xl mx-auto px-6 mt-4 flex gap-2 overflow-x-auto"
+      >
+        {images.map((u, i) => (
+          <button
+            type="button"
+            data-pd-thumb
+            data-src={u}
+            aria-label={`${tr.name} ${i + 1}`}
+            aria-current={i === 0 ? "true" : "false"}
+            class="shrink-0 w-20 h-20 overflow-hidden border-2 border-transparent opacity-60 transition aria-[current=true]:border-forest-700 aria-[current=true]:opacity-100 hover:opacity-100"
+          >
+            <img
+              src={u}
+              alt=""
+              loading="lazy"
+              decoding="async"
+              class="w-full h-full object-cover"
+            />
+          </button>
+        ))}
+      </div>
+    )
+  }
+
+  <!-- 2. Asymmetric 8/4 split: large image left + compact info right -->
+  <section data-pd-info class="py-20 relative">
+    <div class="relative max-w-6xl mx-auto px-6">
+      <div class="grid grid-cols-12 gap-8 md:gap-12">
+        <!-- 4 cols: info column -->
+        <div class="col-span-12 md:col-span-6 md:col-start-4">
+          <p
+            class="text-[10px] uppercase tracking-[0.4em] text-forest-600 mb-3 font-sans"
+          >
+            {product.category === "jewelry" ? t("nav.amber") : t("nav.incense")}
+          </p>
+          <h1
+            class="text-3xl md:text-4xl font-serif font-light text-forest-800 mb-4 leading-tight"
+          >
+            {tr.name}
+          </h1>
+
+          {
+            tr.short_description && (
+              <p class="text-forest-600 leading-relaxed mb-6 text-sm font-light">
+                {tr.short_description}
+              </p>
+            )
+          }
+
+          {
+            cnyPrice !== undefined && (
+              <p
+                data-pd-price
+                class="font-serif text-3xl font-semibold text-terra-500 mb-8"
+              >
+                {formatPrice(Math.round(cnyPrice * 100), "CNY", locale)}
+              </p>
+            )
+          }
+
+          {
+            showDesc && (
+              <div
+                data-pd-desc
+                class="mb-8 space-y-3 text-sm font-light leading-relaxed text-forest-700"
+              >
+                {descParas.map((line) => (
+                  <p>{line}</p>
+                ))}
+              </div>
+            )
+          }
+
+          <form
+            data-pd-form
+            method="POST"
+            action="/api/cart/add"
+            class="space-y-4"
+          >
+            <input type="hidden" name="slug" value={product.slug} />
+            <input
+              type="hidden"
+              name="sku"
+              value={variants.results[0]?.sku ?? ""}
+            />
+            {
+              variants.results[0] && (
+                <p
+                  data-pd-stock
+                  class="text-xs uppercase tracking-[0.4em] text-forest-600 font-sans"
+                >
+                  {t("common.stock")}
+                  <span class="ml-2 font-mono text-sm tracking-normal text-forest-800">
+                    {variants.results[0].stock}
+                  </span>
+                </p>
+              )
+            }
+            <div data-pd-qty class="flex items-center gap-3">
+              <label
+                for="qty-input"
+                class="text-xs uppercase tracking-[0.4em] text-forest-600 font-sans"
+              >
+                {t("common.quantity")}
+              </label>
+              <button
+                type="button"
+                class="pd-qty-btn"
+                data-qty-dec
+                aria-label={t("common.quantity") + " -"}>−</button
+              >
+              <input
+                id="qty-input"
+                type="number"
+                name="qty"
+                min="1"
+                max={variants.results[0]?.stock ?? 999}
+                value="1"
+                class="w-24 px-3 py-2 border border-forest-200 rounded-sm text-center font-mono text-forest-800 focus:outline-none focus:border-forest-700"
+              />
+              <button
+                type="button"
+                class="pd-qty-btn"
+                data-qty-inc
+                aria-label={t("common.quantity") + " +"}>+</button
+              >
+            </div>
+            <div data-pd-bar class="flex flex-col gap-3">
+              <button
+                type="submit"
+                name="next"
+                value={`${Astro.url.pathname}?added=1`}
+                class="pd-bar-add w-full px-7 py-3.5 border border-forest-700 text-forest-700 text-sm tracking-wide rounded-sm hover:bg-forest-50 transition-all duration-500"
+              >
+                {t("common.add_to_cart")}
+              </button>
+              <button
+                type="submit"
+                class="w-full px-7 py-3.5 bg-forest-700 text-cream-50 text-sm tracking-wide rounded-sm hover:bg-forest-800 transition-all duration-500"
+              >
+                {t("common.reserve")} →
+              </button>
+            </div>
+            <a
+              href={localizedPath(locale, "/contact")}
+              class="block text-center text-xs text-forest-700 hover:text-forest-700 transition-colors tracking-wide font-sans border-b border-forest-200 pb-0.5"
+            >
+              {t("nav.contact")} →
+            </a>
+          </form>
+
+          {
+            tr.story && (
+              <details data-acc data-acc-story open class="mt-10">
+                <summary class="text-[10px] uppercase tracking-[0.4em] text-forest-600 font-sans">
+                  {t("product.story_title")}
+                </summary>
+                <p class="mt-3 md:mt-0 text-sm text-forest-700 italic leading-relaxed font-light border-l-2 border-terra-300 pl-4">
+                  {tr.story}
+                </p>
+              </details>
+            )
+          }
+        </div>
+      </div>
+    </div>
+  </section>
+  <section
+    data-pd-faq
+    class="max-w-3xl mx-auto px-6 py-section border-t border-forest-100"
+  >
+    <RevealOnScroll>
+      <p
+        class="text-[10px] uppercase tracking-[0.4em] text-forest-600 font-sans mb-4"
+      >
+        {t("product.faq_kicker")}
+      </p>
+      <h2
+        class="text-display-sm md:text-display-md font-serif text-text-primary mb-12 leading-[1.08]"
+      >
+        {t("product.faq_heading")}
+      </h2>
+      <div data-pd-faq-list class="space-y-8">
+        {
+          productFaqs.map((f, i) => (
+            <details data-acc open class="border-l-2 border-terra-500 pl-6">
+              <summary>
+                <h3 class="text-xl font-serif text-forest-700 mb-2 italic">
+                  Q{i + 1}. {f.q}
+                </h3>
+              </summary>
+              <p class="text-text-secondary leading-relaxed font-sans text-base">
+                {f.a}
+              </p>
+            </details>
+          ))
+        }
+      </div>
+    </RevealOnScroll>
+  </section>
+
+  <script>
+    // 數量 −／＋（手機版顯示）；沿用上方 script 對 qty.max 的 stock 限制
+    const qtyInput = document.getElementById(
+      "qty-input",
+    ) as HTMLInputElement | null;
+    const clampQty = (n: number) => {
+      const min = parseInt(qtyInput?.min || "1", 10);
+      const max = parseInt(qtyInput?.max || "999", 10);
+      return Math.min(Math.max(n, min), max);
+    };
+    const stepQty = (d: number) => {
+      if (!qtyInput) return;
+      const cur = parseInt(qtyInput.value || "1", 10) || 1;
+      qtyInput.value = String(clampQty(cur + d));
+    };
+    document
+      .querySelector("[data-qty-dec]")
+      ?.addEventListener("click", () => stepQty(-1));
+    document
+      .querySelector("[data-qty-inc]")
+      ?.addEventListener("click", () => stepQty(1));
+  </script>
+  <script is:inline>
+    (function () {
+      var mq = window.matchMedia("(max-width: 767.98px)");
+      var accs = document.querySelectorAll("details[data-acc]");
+      function sync() {
+        accs.forEach(function (d) {
+          d.open = !mq.matches;
+        });
+      }
+      sync();
+      if (mq.addEventListener) mq.addEventListener("change", sync);
+      accs.forEach(function (d) {
+        var s = d.querySelector("summary");
+        if (!s) return;
+        s.addEventListener("click", function (e) {
+          if (!mq.matches) e.preventDefault();
+        });
+      });
+    })();
+  </script>
+  <script is:inline>
+    (function () {
+      var main = document.getElementById("pd-main");
+      var thumbs = Array.prototype.slice.call(
+        document.querySelectorAll("[data-pd-thumb]"),
+      );
+      if (!main || thumbs.length < 2) return;
+      var cur = 0;
+      function show(i) {
+        cur = (i + thumbs.length) % thumbs.length;
+        main.src = thumbs[cur].getAttribute("data-src");
+        thumbs.forEach(function (t, k) {
+          t.setAttribute("aria-current", k === cur ? "true" : "false");
+        });
+        thumbs[cur].scrollIntoView({ block: "nearest", inline: "nearest" });
+      }
+      thumbs.forEach(function (t, k) {
+        t.addEventListener("click", function () {
+          show(k);
+        });
+      });
+      var x0 = null;
+      main.addEventListener(
+        "touchstart",
+        function (e) {
+          x0 = e.touches[0].clientX;
+        },
+        { passive: true },
+      );
+      main.addEventListener(
+        "touchend",
+        function (e) {
+          if (x0 === null) return;
+          var dx = e.changedTouches[0].clientX - x0;
+          x0 = null;
+          if (Math.abs(dx) > 40) show(cur + (dx < 0 ? 1 : -1));
+        },
+        { passive: true },
+      );
+    })();
+  </script>
+  <script is:inline>
+    (function () {
+      var main = document.getElementById("pd-main");
+      var dlg = document.querySelector("[data-pd-lightbox]");
+      if (!main || !dlg || typeof dlg.showModal !== "function") return;
+      var img = dlg.querySelector("[data-pd-lb-img]");
+      var closeBtn = dlg.querySelector("[data-pd-lb-close]");
+      var prevBtn = dlg.querySelector("[data-pd-lb-prev]");
+      var nextBtn = dlg.querySelector("[data-pd-lb-next]");
+      var count = dlg.querySelector("[data-pd-lb-count]");
+      var thumbs = Array.prototype.slice.call(
+        document.querySelectorAll("[data-pd-thumb]"),
+      );
+      var MAX = 5;
+      var list = [];
+      var start = 0;
+      var cur = 0;
+      var s = 1;
+      var tx = 0;
+      var ty = 0;
+      // 放大前（s = 1）圖片的中心位置與尺寸，用來計算縮放與拖曳邊界
+      var cx0 = 0;
+      var cy0 = 0;
+      var w0 = 0;
+      var h0 = 0;
+      var pinch = null;
+      var drag = null;
+
+      main.style.cursor = "zoom-in";
+
+      function apply() {
+        img.style.transform =
+          s === 1
+            ? ""
+            : "translate(" + tx + "px," + ty + "px) scale(" + s + ")";
+        img.style.cursor = s === 1 ? "zoom-in" : drag ? "grabbing" : "grab";
+      }
+      function reset() {
+        s = 1;
+        tx = 0;
+        ty = 0;
+        pinch = null;
+        drag = null;
+        apply();
+      }
+      function measure() {
+        var r = img.getBoundingClientRect();
+        w0 = r.width;
+        h0 = r.height;
+        cx0 = r.left + r.width / 2;
+        cy0 = r.top + r.height / 2;
+      }
+      // 單一軸向：圖比視窗大 → 夾在「邊緣貼齊」範圍內；圖比視窗小 → 固定置中
+      function clampAxis(t, c0, size, lo, hi) {
+        if (size <= hi - lo) return (lo + hi) / 2 - c0;
+        var half = size / 2;
+        return Math.min(lo - c0 + half, Math.max(hi - c0 - half, t));
+      }
+      function clampPan() {
+        var d = dlg.getBoundingClientRect();
+        tx = clampAxis(tx, cx0, w0 * s, d.left, d.right);
+        ty = clampAxis(ty, cy0, h0 * s, d.top, d.bottom);
+      }
+      // 以螢幕座標 (px, py) 為不動點，把倍率改成 ns
+      function zoomAt(ns, px, py) {
+        if (s === 1) measure();
+        ns = Math.min(MAX, Math.max(1, ns));
+        var ux = (px - cx0 - tx) / s;
+        var uy = (py - cy0 - ty) / s;
+        s = ns;
+        if (s <= 1.001) {
+          reset();
+          return;
+        }
+        tx = px - cx0 - ux * s;
+        ty = py - cy0 - uy * s;
+        clampPan();
+        apply();
+      }
+      function zoomCenter(f) {
+        var d = dlg.getBoundingClientRect();
+        zoomAt(s * f, (d.left + d.right) / 2, (d.top + d.bottom) / 2);
+      }
+      function toggleZoom(clientX, clientY) {
+        if (s > 1) reset();
+        else zoomAt(2.5, clientX, clientY);
+      }
+      function render() {
+        reset();
+        img.src = list[cur];
+        var multi = list.length > 1;
+        prevBtn.hidden = !multi;
+        nextBtn.hidden = !multi;
+        count.hidden = !multi;
+        count.textContent = cur + 1 + " / " + list.length;
+      }
+      function go(n) {
+        if (list.length < 2) return;
+        cur = (cur + n + list.length) % list.length;
+        render();
+      }
+      function close() {
+        if (dlg.open) dlg.close();
+      }
+
+      main.addEventListener("click", function () {
+        var src = main.getAttribute("src") || main.src;
+        list =
+          thumbs.length > 1
+            ? thumbs.map(function (t) {
+                return t.getAttribute("data-src");
+              })
+            : [src];
+        cur = Math.max(0, list.indexOf(src));
+        start = cur;
+        render();
+        dlg.showModal();
+        document.documentElement.style.overflow = "hidden";
+      });
+
+      dlg.addEventListener("close", function () {
+        document.documentElement.style.overflow = "";
+        img.removeAttribute("src");
+        reset();
+        // 縮圖與主圖同步到最後看的那張
+        if (thumbs.length > 1 && cur !== start && thumbs[cur])
+          thumbs[cur].click();
+      });
+      dlg.addEventListener("click", function (e) {
+        if (e.target === dlg) close();
+      });
+      closeBtn.addEventListener("click", close);
+      prevBtn.addEventListener("click", function () {
+        go(-1);
+      });
+      nextBtn.addEventListener("click", function () {
+        go(1);
+      });
+      dlg.addEventListener("keydown", function (e) {
+        if (e.key === "ArrowLeft") go(-1);
+        else if (e.key === "ArrowRight") go(1);
+        else if (e.key === "+" || e.key === "=") zoomCenter(1.5);
+        else if (e.key === "-" || e.key === "_") zoomCenter(1 / 1.5);
+        else if (e.key === "0") reset();
+      });
+      // 視窗大小或手機轉向後，原本記下的邊界失效 → 還原為未放大
+      window.addEventListener("resize", function () {
+        if (dlg.open && s > 1) reset();
+      });
+      img.addEventListener("dblclick", function (e) {
+        toggleZoom(e.clientX, e.clientY);
+      });
+
+      // 桌面：滾輪（或觸控板雙指）縮放、放大後按住滑鼠拖曳
+      dlg.addEventListener(
+        "wheel",
+        function (e) {
+          e.preventDefault();
+          var k = e.deltaMode === 1 ? 16 : 1;
+          var f = Math.exp(-e.deltaY * k * (e.ctrlKey ? 0.01 : 0.002));
+          zoomAt(s * f, e.clientX, e.clientY);
+        },
+        { passive: false },
+      );
+      img.addEventListener("pointerdown", function (e) {
+        if (e.pointerType !== "mouse" || e.button !== 0 || s <= 1) return;
+        drag = { x: e.clientX, y: e.clientY, bx: tx, by: ty };
+        img.setPointerCapture(e.pointerId);
+        apply();
+      });
+      img.addEventListener("pointermove", function (e) {
+        if (!drag) return;
+        tx = drag.bx + e.clientX - drag.x;
+        ty = drag.by + e.clientY - drag.y;
+        clampPan();
+        apply();
+      });
+      function endDrag() {
+        if (!drag) return;
+        drag = null;
+        apply();
+      }
+      img.addEventListener("pointerup", endDrag);
+      img.addEventListener("pointercancel", endDrag);
+
+      // 觸控：單指左右滑切換（未放大時）、放大後單指拖曳、雙指縮放、快速點兩下放大
+      var t0 = null;
+      var bx = 0;
+      var by = 0;
+      var moved = false;
+      var lastTap = 0;
+      function mid(e) {
+        var a = e.touches[0];
+        var b = e.touches[1];
+        return {
+          x: (a.clientX + b.clientX) / 2,
+          y: (a.clientY + b.clientY) / 2,
+          d: Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY) || 1,
+        };
+      }
+      function pinchStart(e) {
+        if (s === 1) measure();
+        var m = mid(e);
+        pinch = {
+          d0: m.d,
+          s0: s,
+          ux: (m.x - cx0 - tx) / s,
+          uy: (m.y - cy0 - ty) / s,
+        };
+        t0 = null;
+        lastTap = 0;
+      }
+      img.addEventListener(
+        "touchstart",
+        function (e) {
+          if (e.touches.length === 2) {
+            pinchStart(e);
+            return;
+          }
+          pinch = null;
+          if (e.touches.length !== 1) {
+            t0 = null;
+            return;
+          }
+          t0 = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+          bx = tx;
+          by = ty;
+          moved = false;
+        },
+        { passive: true },
+      );
+      img.addEventListener(
+        "touchmove",
+        function (e) {
+          if (pinch && e.touches.length === 2) {
+            e.preventDefault();
+            var m = mid(e);
+            s = Math.min(MAX, Math.max(1, (pinch.s0 * m.d) / pinch.d0));
+            tx = m.x - cx0 - pinch.ux * s;
+            ty = m.y - cy0 - pinch.uy * s;
+            clampPan();
+            apply();
+            return;
+          }
+          if (!t0 || e.touches.length !== 1) return;
+          var dx = e.touches[0].clientX - t0.x;
+          var dy = e.touches[0].clientY - t0.y;
+          if (Math.abs(dx) + Math.abs(dy) > 8) moved = true;
+          if (s > 1) {
+            e.preventDefault();
+            tx = bx + dx;
+            ty = by + dy;
+            clampPan();
+            apply();
+          }
+        },
+        { passive: false },
+      );
+      img.addEventListener(
+        "touchend",
+        function (e) {
+          if (pinch) {
+            if (e.touches.length < 2) {
+              pinch = null;
+              lastTap = 0;
+              if (s < 1.05) {
+                reset();
+                t0 = null;
+              } else if (e.touches.length === 1) {
+                // 剩一指：接著用單指拖曳
+                t0 = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+                bx = tx;
+                by = ty;
+                moved = true;
+              } else {
+                t0 = null;
+              }
+            }
+            return;
+          }
+          if (!t0) return;
+          var t = e.changedTouches[0];
+          var dx = t.clientX - t0.x;
+          var dy = t.clientY - t0.y;
+          t0 = null;
+          if (moved) {
+            if (
+              s === 1 &&
+              Math.abs(dx) > 50 &&
+              Math.abs(dx) > 1.5 * Math.abs(dy)
+            )
+              go(dx < 0 ? 1 : -1);
+            return;
+          }
+          var now = Date.now();
+          if (now - lastTap < 300) {
+            e.preventDefault();
+            lastTap = 0;
+            toggleZoom(t.clientX, t.clientY);
+          } else {
+            lastTap = now;
+          }
+        },
+        { passive: false },
+      );
+      img.addEventListener("touchcancel", function () {
+        t0 = null;
+        pinch = null;
+      });
+    })();
+  </script>
+  <style is:global>
+    dialog.pd-lb {
+      width: 100vw;
+      max-width: 100vw;
+      height: 100vh;
+      height: 100dvh;
+      max-height: none;
+      margin: 0;
+      padding: 0;
+      border: 0;
+      background: rgba(0, 0, 0, 0.95);
+      overflow: hidden;
+    }
+    dialog.pd-lb[open] {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    dialog.pd-lb::backdrop {
+      background: rgba(0, 0, 0, 0.95);
+    }
+    dialog.pd-lb img {
+      width: auto;
+      height: auto;
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+      border-radius: 0;
+      cursor: zoom-out;
+    }
+    dialog.pd-lb img {
+      touch-action: none;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-user-drag: none;
+      cursor: zoom-in;
+    }
+    dialog.pd-lb .pd-lb-nav {
+      position: absolute;
+      top: 50%;
+      z-index: 1;
+      display: none;
+      place-items: center;
+      width: 44px;
+      height: 44px;
+      min-height: 0;
+      padding: 0 0 4px;
+      border: 0;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.18);
+      color: #fff;
+      font-size: 30px;
+      line-height: 1;
+      transform: translateY(-50%);
+    }
+    dialog.pd-lb .pd-lb-nav:not([hidden]) {
+      display: grid;
+    }
+    dialog.pd-lb .pd-lb-prev {
+      left: 12px;
+    }
+    dialog.pd-lb .pd-lb-next {
+      right: 12px;
+    }
+    /* 手機：靠滑動切換，不顯示箭頭 */
+    @media (max-width: 767.98px) {
+      dialog.pd-lb .pd-lb-nav {
+        display: none !important;
+      }
+    }
+    dialog.pd-lb .pd-lb-count {
+      position: absolute;
+      bottom: calc(env(safe-area-inset-bottom, 0px) + 16px);
+      left: 50%;
+      z-index: 1;
+      margin: 0;
+      transform: translateX(-50%);
+      color: rgba(255, 255, 255, 0.85);
+      font-size: 14px;
+      letter-spacing: 0.08em;
+    }
+    dialog.pd-lb .pd-lb-count[hidden] {
+      display: none;
+    }
+    dialog.pd-lb .pd-lb-close {
+      position: absolute;
+      top: calc(env(safe-area-inset-top, 0px) + 12px);
+      right: 12px;
+      z-index: 1;
+      display: grid;
+      place-items: center;
+      width: 44px;
+      height: 44px;
+      min-height: 0;
+      padding: 0;
+      border: 0;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.18);
+      color: #fff;
+      font-size: 28px;
+      line-height: 1;
+    }
+  </style>
+  {
+    added && (
+      <div data-pd-toast role="status" class="pd-toast">
+        {t("common.added_to_cart")}
+      </div>
+    )
+  }
+  <script is:inline>
+    if (location.search.indexOf("added=1") > -1)
+      history.replaceState(null, "", location.pathname);
+  </script>
+</Layout>

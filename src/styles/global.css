@@ -1,0 +1,460 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* === Cinematic + Eastern Zen motion === */
+@keyframes breathe {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.03);
+  }
+}
+.animate-breathe {
+  animation: breathe 16s ease-in-out infinite;
+  will-change: transform;
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(28px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.animate-fade-up {
+  animation: fade-up 1.1s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.reveal-on-scroll {
+  transition:
+    opacity 1.1s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 1.1s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
+}
+.reveal-on-scroll.reveal-pending {
+  opacity: 0;
+  transform: translateY(28px);
+}
+.reveal-on-scroll.revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* === Textures === */
+
+.cinematic {
+  filter: saturate(0.85) brightness(0.92) contrast(1.05);
+}
+
+/* === Glassmorphism (Eastern Zen / 通透感) === */
+.glass {
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(20px) saturate(115%);
+  -webkit-backdrop-filter: blur(20px) saturate(115%);
+  border: 1px solid rgba(115, 112, 77, 0.12);
+}
+.glass-dark {
+  background: rgba(31, 38, 21, 0.45);
+  backdrop-filter: blur(20px) saturate(110%);
+  -webkit-backdrop-filter: blur(20px) saturate(110%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* === Light theme CSS vars (取代舊 primary) === */
+:root {
+  /* Forest 主色 */
+  --color-primary-900: #161a0f;
+  --color-primary-700: #2d3520;
+  --color-primary-500: #4f5c36;
+  --color-primary-300: #9a9175;
+
+  /* Cream 背景(取代舊 bg-base) */
+  --color-bg-base: #ffffff;
+  --color-bg-card: #ffffff;
+  --color-bg-elevated: #ffffff;
+
+  /* 文字 */
+  --color-text-primary: #1f2615;
+  --color-text-secondary: #4a4538;
+  --color-text-muted: #5a5246;
+
+  /* Accent(Terra) */
+  --color-accent-700: #5f3220;
+  --color-accent-500: #a45e3d;
+  --color-accent-300: #d29e7b;
+
+  /* 狀態 */
+  --color-success: #4f7a38;
+  --color-warning: #a45e3d;
+  --color-error: #834630;
+}
+
+html,
+body {
+  background-color: var(--color-bg-base);
+  color: var(--color-text-primary);
+  font-family: Inter, "Noto Sans SC", system-ui, sans-serif;
+  line-height: 1.85; /* 東方禪意寬鬆行高 */
+  -webkit-font-smoothing: antialiased;
+  font-feature-settings:
+    "kern" 1,
+    "liga" 1;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: "Cormorant Garamond", "Noto Serif SC", Georgia, serif;
+  font-weight: 400;
+  line-height: 1.2;
+  color: var(--color-text-primary);
+  letter-spacing: -0.005em;
+}
+
+/* === Awwwards-tier utilities === */
+
+/* Text balance — better headline wrapping */
+.text-balance {
+  text-wrap: balance;
+}
+.text-pretty {
+  text-wrap: pretty;
+}
+
+/* Floating-label form fields (contact.astro) */
+.form-field {
+  position: relative;
+}
+.form-input {
+  width: 100%;
+  padding: 1.3rem 0.875rem 0.5rem;
+  background: var(--color-bg-base);
+  border: 1px solid rgba(31, 38, 21, 0.18);
+  border-radius: 4px;
+  font-size: 1rem;
+  color: var(--color-text-primary);
+  font-family: inherit;
+  transition:
+    border-color 320ms cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 320ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.form-input:focus {
+  outline: none;
+  border-color: var(--color-accent-500);
+  box-shadow: 0 0 0 3px rgba(164, 94, 61, 0.14);
+}
+.form-textarea {
+  resize: vertical;
+  min-height: 7.5rem;
+  line-height: 1.6;
+}
+.form-label {
+  position: absolute;
+  left: 0.875rem;
+  top: 1.05rem;
+  font-size: 0.95rem;
+  color: var(--color-text-muted);
+  font-family: inherit;
+  pointer-events: none;
+  transform-origin: left top;
+  transition:
+    transform 320ms cubic-bezier(0.16, 1, 0.3, 1),
+    color 320ms cubic-bezier(0.16, 1, 0.3, 1),
+    letter-spacing 320ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.form-input:focus ~ .form-label,
+.form-input:not(:placeholder-shown) ~ .form-label {
+  transform: translateY(-0.7rem) scale(0.78);
+  color: var(--color-accent-700);
+  letter-spacing: 0.04em;
+}
+
+/* Animated underline (left-to-right reveal) */
+.link-underline {
+  position: relative;
+  display: inline-block;
+}
+.link-underline::after {
+  content: "";
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 480ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.link-underline:hover::after,
+.link-underline:focus-visible::after {
+  transform: scaleX(1);
+}
+
+/* Hover lift — subtle 3D feel */
+.hover-lift {
+  transition:
+    transform 520ms cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 520ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.hover-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 14px 44px rgba(31, 38, 21, 0.12);
+}
+
+/* Magnetic — gentle scale on hover */
+.magnetic {
+  transition:
+    transform 480ms cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 480ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.magnetic:hover {
+  transform: scale(1.02);
+}
+
+/* Hero slide dots */
+.hero-dot {
+  width: 24px;
+  height: 2px;
+  background: rgba(250, 247, 238, 0.35);
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  transition:
+    background 600ms ease,
+    width 600ms ease;
+}
+.hero-dot-active {
+  background: rgba(250, 247, 238, 0.95);
+  width: 40px;
+}
+
+/* Hero Ken Burns zoom */
+@keyframes hero-zoom {
+  0% {
+    transform: scale(1.02);
+  }
+  100% {
+    transform: scale(1.08);
+  }
+}
+.hero-slide-active {
+  animation: hero-zoom 14s ease-out forwards;
+}
+
+/* Hero text stagger reveal on load */
+.hero-text > * {
+  opacity: 0;
+  transform: translateY(24px);
+  animation: hero-rise 1.1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+.hero-text > *:nth-child(1) {
+  animation-delay: 220ms;
+}
+.hero-text > *:nth-child(2) {
+  animation-delay: 380ms;
+}
+.hero-text > *:nth-child(3) {
+  animation-delay: 540ms;
+}
+.hero-text > *:nth-child(4) {
+  animation-delay: 700ms;
+}
+@keyframes hero-rise {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Scroll indicator bounce */
+@keyframes scroll-bounce {
+  0%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.55;
+  }
+  50% {
+    transform: translateY(8px);
+    opacity: 1;
+  }
+}
+.scroll-indicator {
+  animation: scroll-bounce 2.4s ease-in-out infinite;
+}
+
+/* Reduced motion respect — disable everything for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+  /* WCAG 2.3.3 + Awwwards-tier a11y: kill all motion for users who request it.
+     Tailwind inline duration-[1400ms] utilities + custom @keyframes both caught here. */
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .hero-text > *,
+  .hero-slide-active,
+  .scroll-indicator,
+  .reveal-on-scroll,
+  .animate-breathe,
+  .animate-fade-up,
+  .hero-slide,
+  .hero-dot,
+  .magnetic,
+  .hover-lift,
+  .form-input,
+  .form-label,
+  .link-underline {
+    animation: none !important;
+    transition: none !important;
+  }
+  .hero-text > * {
+    opacity: 1;
+    transform: none;
+  }
+  .reveal-on-scroll.reveal-pending,
+  .reveal-on-scroll {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  /* Hero auto-rotation JS only swaps .hero-slide-active; without transition,
+     user still sees the change but no crossfade. Show only the first slide
+     (stable final state, no flicker). */
+  .hero-slide {
+    opacity: 0;
+  }
+  .hero-slide.hero-slide-active,
+  .hero-slide-active {
+    opacity: 0.6 !important;
+  }
+}
+
+/* === Wave 8 polish: hero text-shadow + focus-visible global === */
+
+/* Hero h1/p legibility over mid-tone forest photography:
+   subtle dark glow separates cream text from busy backgrounds. */
+.hero-text h1,
+.hero-text p {
+  text-shadow: 0 2px 24px rgba(22, 26, 15, 0.45);
+}
+
+/* Focus-visible global: WCAG 2.4.7 baseline for ALL interactive
+   elements. Override `focus:outline-none` (used in many CTAs to keep
+   the design clean) with a forest-700/50 ring at 2px + 2px offset. */
+@layer base {
+  a:focus-visible,
+  button:focus-visible,
+  input:focus-visible,
+  select:focus-visible,
+  textarea:focus-visible {
+    outline: 2px solid rgba(34, 60, 35, 0.55);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+}
+
+/* === Wave 12: scroll progress indicator (Awwwards-tier) === */
+
+/* Thin gradient bar pinned at top of viewport; fills as user scrolls.
+   JS sets transform: scaleX(t) via rAF; CSS only handles visuals.
+   z-60 sits above mobile menu (z-50) so always visible. */
+.scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  z-index: 60;
+  pointer-events: none;
+  background: transparent;
+}
+.scroll-progress-bar {
+  height: 100%;
+  width: 100%;
+  background: linear-gradient(
+    to right,
+    rgba(95, 50, 32, 0.9),
+    rgba(154, 119, 90, 0.95)
+  );
+  transform-origin: left center;
+  transform: scaleX(0);
+  will-change: transform;
+}
+
+/* Wave 13: hint to compositor that hero parallax transforms frequently.
+   Safe because [data-hero-slide] only exists on home page; no global cost. */
+.hero-slide {
+  will-change: transform;
+}
+@media (prefers-reduced-motion: reduce) {
+  .scroll-progress {
+    display: none;
+  }
+}
+
+/* === Wave 14: page fade-in (Awwwards-tier perceived quality) === */
+
+/* Body fades + subtly rises on every page load. Wave 11's * blanket
+   rule (animation-duration: 0.01ms !important inside reduce-motion
+   media block) makes this instant for users who request it. */
+body {
+  animation: page-fade-in 0.45s cubic-bezier(0.2, 0.7, 0.3, 1);
+}
+@keyframes page-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* === Wave 15: sticky header elevation on scroll === */
+
+/* 1px sentinel above the header. When it leaves view, IntersectionObserver
+   sets header[data-scrolled="true"]; CSS below intensifies the bar. */
+.header-sentinel {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 1px;
+  width: 1px;
+  pointer-events: none;
+}
+.transition-header {
+  transition:
+    background 280ms ease-out,
+    border-bottom-color 280ms ease-out,
+    box-shadow 280ms ease-out;
+}
+header[data-scrolled="true"].glass {
+  background: rgba(255, 255, 255, 0.96);
+  border-bottom-color: rgba(34, 60, 35, 0.08);
+  box-shadow: 0 2px 16px rgba(22, 26, 15, 0.06);
+}
+
+/* fix-mobile-bottom-overlap */
+html {
+  scroll-padding-bottom: 180px;
+}
+body {
+  padding-bottom: calc(170px + env(safe-area-inset-bottom, 0px)) !important;
+}

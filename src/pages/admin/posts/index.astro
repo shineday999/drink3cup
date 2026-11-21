@@ -1,0 +1,170 @@
+---
+import AdminLayout from "../../../layouts/AdminLayout.astro";
+import { env } from "cloudflare:workers";
+import { createT, tEnum } from "../../../i18n/t";
+import { defaultLocale, type Locale } from "../../../i18n/config";
+import zhHansMessages from "../../../i18n/messages/zh-Hans.json";
+
+const locale = (Astro.locals.locale ?? defaultLocale) as Locale;
+const messages = zhHansMessages as Record<string, unknown>;
+const t = createT(messages);
+void locale;
+
+interface PostRow {
+  id: string;
+  slug: string;
+  status: string;
+  category: string | null;
+  published_at: number | null;
+  updated_at: number;
+  locale: string | null;
+  title: string | null;
+}
+
+const STATUSES = ["draft", "published", "archived"];
+const requested = Astro.url.searchParams.get("status") ?? "";
+const filter = STATUSES.includes(requested) ? requested : "";
+
+const sql = `SELECT p.id, p.slug, p.status, p.category, p.published_at, p.updated_at,
+                pt.locale, pt.title
+         FROM posts p
+         LEFT JOIN post_translations pt ON pt.post_id = p.id AND pt.locale = ?
+         ${filter ? "WHERE p.status = ?" : ""}
+         ORDER BY p.updated_at DESC LIMIT 100`;
+
+let posts: { results: PostRow[] } = { results: [] };
+const counts: Record<string, number> = {};
+let totalCount = 0;
+
+if (env?.DB) {
+  const stmt = env.DB.prepare(sql);
+  posts = await (
+    filter
+      ? stmt.bind(Astro.locals.locale, filter)
+      : stmt.bind(Astro.locals.locale)
+  ).all<PostRow>();
+
+  const countRows = await env.DB.prepare(
+    "SELECT status, COUNT(*) AS c FROM posts GROUP BY status",
+  ).all<{ status: string; c: number }>();
+  for (const r of countRows.results ?? []) {
+    counts[r.status] = r.c;
+    totalCount += r.c;
+  }
+}
+
+const chips = [
+  { value: "", label: "全部", n: totalCount },
+  ...STATUSES.map((s) => ({
+    value: s,
+    label: tEnum(t, "status", s),
+    n: counts[s] ?? 0,
+  })),
+];
+const th =
+  "px-3 py-2 text-left text-xs font-medium tracking-wide text-text-secondary";
+
+function statusColor(s: string) {
+  return s === "published"
+    ? "bg-success/20 text-success"
+    : s === "archived"
+      ? "bg-error/20 text-error"
+      : "bg-warning/20 text-warning";
+}
+---
+
+<AdminLayout title={t("admin.posts_list.title")} active="blog">
+  <a
+    slot="actions"
+    href="/admin/posts/new"
+    class="rounded-md bg-forest-700 px-3 py-1.5 text-sm text-bg-base transition-colors hover:bg-forest-900"
+    >{t("admin.posts_list.new_post")}</a
+  >
+
+  <nav class="mb-3 flex gap-2 overflow-x-auto pb-1" aria-label="文章状态筛选">
+    {
+      chips.map((c) => (
+        <a
+          href={c.value ? `/admin/posts?status=${c.value}` : "/admin/posts"}
+          aria-current={filter === c.value ? "page" : undefined}
+          class={`shrink-0 rounded-full border px-3 py-1 text-sm transition-colors ${
+            filter === c.value
+              ? "border-forest-700 bg-forest-700 text-bg-base"
+              : "border-text-muted/30 text-text-secondary hover:border-forest-700"
+          }`}
+        >
+          {c.label}
+          <span class="ml-1 tabular-nums opacity-70">{c.n}</span>
+        </a>
+      ))
+    }
+  </nav>
+
+  <div
+    class="overflow-x-auto rounded-card border border-text-muted/20 bg-bg-card"
+  >
+    <table class="w-full text-sm leading-normal">
+      <thead class="bg-forest-100">
+        <tr>
+          <th class={th}>{t("admin.posts_list.col_title")}</th>
+          <th class={th}>{t("admin.posts_list.col_category")}</th>
+          <th class={th}>{t("admin.posts_list.col_status")}</th>
+          <th class={th}>{t("admin.posts_list.col_updated")}</th>
+          <th class={`${th} text-right`}>
+            {t("admin.posts_list.col_actions")}
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        {
+          posts.results.length === 0 && (
+            <tr>
+              <td colspan="5" class="px-3 py-8 text-center text-text-muted">
+                {t("admin.posts_list.empty")}
+              </td>
+            </tr>
+          )
+        }
+        {
+          posts.results.map((p) => (
+            <tr class="border-t border-text-muted/10 transition-colors hover:bg-forest-50">
+              <td class="px-3 py-2">
+                <div class="font-medium">
+                  {p.title ?? t("admin.posts_list.untitled")}
+                </div>
+                <div class="font-mono text-xs text-text-muted">{p.slug}</div>
+              </td>
+              <td class="px-3 py-2 text-text-secondary">
+                {p.category ? tEnum(t, "post_category", p.category) : "—"}
+              </td>
+              <td class="px-3 py-2">
+                <span
+                  class={`rounded px-2 py-0.5 text-xs ${statusColor(p.status)}`}
+                >
+                  {tEnum(t, "status", p.status)}
+                </span>
+              </td>
+              <td class="whitespace-nowrap px-3 py-2 font-mono text-xs text-text-muted">
+                {new Date(p.updated_at * 1000).toISOString().slice(0, 10)}
+              </td>
+              <td class="whitespace-nowrap px-3 py-2 text-right">
+                <a
+                  href={`/admin/posts/${p.id}`}
+                  class="text-accent-700 hover:underline"
+                >
+                  {t("admin.posts_list.link_edit")}
+                </a>
+                <a
+                  href={`/blog/${p.slug}`}
+                  class="ml-3 text-text-secondary hover:underline"
+                >
+                  {t("admin.posts_list.link_view")}
+                </a>
+              </td>
+            </tr>
+          ))
+        }
+      </tbody>
+    </table>
+  </div>
+</AdminLayout>

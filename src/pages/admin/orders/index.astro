@@ -1,0 +1,158 @@
+---
+import AdminLayout from "../../../layouts/AdminLayout.astro";
+import { env } from "cloudflare:workers";
+import { createT, tEnum } from "../../../i18n/t";
+import { defaultLocale, type Locale } from "../../../i18n/config";
+import zhHansMessages from "../../../i18n/messages/zh-Hans.json";
+import { formatPrice } from "../../../lib/format";
+
+const locale = (Astro.locals.locale ?? defaultLocale) as Locale;
+const messages = zhHansMessages as Record<string, unknown>;
+const t = createT(messages);
+
+const STATUSES = ["pending", "confirmed", "shipped", "delivered", "cancelled"];
+const requested = Astro.url.searchParams.get("status") ?? "";
+const filter = STATUSES.includes(requested) ? requested : "";
+
+const orders = env?.DB
+  ? filter
+    ? await env.DB.prepare(
+        "SELECT id, customer_email, customer_name, total, currency, status, payment_status, created_at FROM orders WHERE status = ? ORDER BY created_at DESC LIMIT 100",
+      )
+        .bind(filter)
+        .all()
+    : await env.DB.prepare(
+        "SELECT id, customer_email, customer_name, total, currency, status, payment_status, created_at FROM orders ORDER BY created_at DESC LIMIT 100",
+      ).all()
+  : { results: [] as Array<Record<string, unknown>> };
+
+// 各狀態的訂單數（顯示在篩選鈕上）
+const countRows = env?.DB
+  ? await env.DB.prepare(
+      "SELECT status, COUNT(*) AS c FROM orders GROUP BY status",
+    ).all<{ status: string; c: number }>()
+  : { results: [] as Array<{ status: string; c: number }> };
+const counts: Record<string, number> = {};
+let totalCount = 0;
+for (const r of countRows.results ?? []) {
+  counts[r.status] = r.c;
+  totalCount += r.c;
+}
+
+function statusColor(s: string) {
+  return s === "pending"
+    ? "bg-warning/20 text-warning"
+    : s === "confirmed" || s === "shipped"
+      ? "bg-forest-100 text-forest-700"
+      : s === "delivered"
+        ? "bg-success/20 text-success"
+        : "bg-error/20 text-error";
+}
+
+const chips = [
+  { value: "", label: "全部", n: totalCount },
+  ...STATUSES.map((s) => ({
+    value: s,
+    label: tEnum(t, "status", s),
+    n: counts[s] ?? 0,
+  })),
+];
+const th =
+  "px-3 py-2 text-left text-xs font-medium tracking-wide text-text-secondary";
+---
+
+<AdminLayout title={t("admin.orders_list.title")} active="orders">
+  <nav class="mb-3 flex gap-2 overflow-x-auto pb-1" aria-label="订单状态筛选">
+    {
+      chips.map((c) => (
+        <a
+          href={c.value ? `/admin/orders?status=${c.value}` : "/admin/orders"}
+          aria-current={filter === c.value ? "page" : undefined}
+          class={`shrink-0 rounded-full border px-3 py-1 text-sm transition-colors ${
+            filter === c.value
+              ? "border-forest-700 bg-forest-700 text-bg-base"
+              : "border-text-muted/30 text-text-secondary hover:border-forest-700"
+          }`}
+        >
+          {c.label}
+          <span class="ml-1 tabular-nums opacity-70">{c.n}</span>
+        </a>
+      ))
+    }
+  </nav>
+
+  <div
+    class="overflow-x-auto rounded-card border border-text-muted/20 bg-bg-card"
+  >
+    <table class="w-full text-sm leading-normal">
+      <thead class="bg-forest-100">
+        <tr>
+          <th class={th}>{t("admin.orders_list.col_order_id")}</th>
+          <th class={th}>{t("admin.orders_list.col_customer")}</th>
+          <th class={`${th} text-right`}>{t("admin.orders_list.col_total")}</th>
+          <th class={th}>{t("admin.orders_list.col_status")}</th>
+          <th class={th}>{t("admin.orders_list.col_payment")}</th>
+          <th class={th}>{t("admin.orders_list.col_created")}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {
+          orders.results.length === 0 && (
+            <tr>
+              <td colspan="6" class="px-3 py-8 text-center text-text-muted">
+                {t("admin.orders_list.empty")}
+              </td>
+            </tr>
+          )
+        }
+        {
+          orders.results.map((o) => (
+            <tr class="border-t border-text-muted/10 transition-colors hover:bg-forest-50">
+              <td class="px-3 py-2 font-mono text-xs">
+                <a
+                  href={`/admin/orders/${o.id as string}`}
+                  class="text-accent-700 underline transition-colors hover:text-accent-900"
+                >
+                  {o.id as string}
+                </a>
+              </td>
+              <td class="px-3 py-2">
+                <div class="font-medium leading-tight">
+                  {o.customer_name as string}
+                </div>
+                <div class="text-xs text-text-muted">
+                  {o.customer_email as string}
+                </div>
+              </td>
+              <td class="px-3 py-2 text-right font-mono">
+                {formatPrice(o.total as number, o.currency as string, locale)}
+              </td>
+              <td class="px-3 py-2">
+                <span
+                  class={`rounded px-2 py-0.5 text-xs ${statusColor(o.status as string)}`}
+                >
+                  {tEnum(t, "status", o.status as string)}
+                </span>
+              </td>
+              <td class="px-3 py-2">
+                <span
+                  class={`rounded px-2 py-0.5 text-xs ${statusColor(o.payment_status as string)}`}
+                >
+                  {tEnum(t, "payment", o.payment_status as string)}
+                </span>
+              </td>
+              <td class="px-3 py-2 font-mono text-xs text-text-muted">
+                {new Date((o.created_at as number) * 1000)
+                  .toISOString()
+                  .slice(0, 16)}
+              </td>
+            </tr>
+          ))
+        }
+      </tbody>
+    </table>
+  </div>
+  <p class="mt-2 text-xs text-text-muted">
+    {t("admin.orders_list.subtitle", { n: orders.results.length })}
+  </p>
+</AdminLayout>

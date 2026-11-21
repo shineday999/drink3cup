@@ -1,0 +1,559 @@
+---
+import MobileNav from "../components/MobileNav.astro";
+import "../styles/mobile.css";
+// Layout — 全站共用 layout (2026-10-01: Awwwards-tier header with main nav)
+import "../styles/global.css";
+import LocaleSwitcher from "@components/LocaleSwitcher.astro";
+import Footer from "@components/Footer.astro";
+import { createT } from "../i18n/t";
+import {
+  defaultLocale,
+  locales,
+  localeHreflang,
+  type Locale,
+  localizedPath,
+} from "../i18n/config";
+
+interface Props {
+  title: string;
+  description?: string;
+  ogImage?: string | undefined;
+  ogType?: string | undefined;
+}
+
+const {
+  title,
+  description = "",
+  ogImage = "/images/banners/slide-1.jpg",
+  ogType = "website",
+} = Astro.props;
+const currentLocale = (Astro.locals.locale ?? defaultLocale) as Locale;
+const siteUrl = Astro.url.origin || "https://cnamber.ccwu.cc";
+const cleanPath =
+  currentLocale === defaultLocale
+    ? Astro.url.pathname
+    : Astro.url.pathname.replace(new RegExp(`^/${currentLocale}`), "") || "/";
+
+// Wave 28.7: site_name + theme + sub_theme from D1 site_settings via middleware.
+
+const hreflangUrls = locales.map((l) => ({
+  lang: localeHreflang[l],
+  href: `${siteUrl}${localizedPath(l, cleanPath)}`,
+}));
+
+const messages = (Astro.locals.messages ?? {}) as Record<string, unknown>;
+const t = createT(messages);
+const homePath = localizedPath(currentLocale, "/");
+// Wave 28.7: site_name 從 D1 site_settings 讀 (admin 編輯即時生效) → i18n fallback
+const siteSettings = Astro.locals.siteSettings;
+const siteName =
+  siteSettings?.siteName?.[currentLocale] ??
+  siteSettings?.siteName?.["zh-Hans"] ??
+  t("common.site_name");
+const themeLabel =
+  siteSettings?.theme?.[currentLocale] ??
+  siteSettings?.theme?.["zh-Hans"] ??
+  "";
+const subThemeLabel =
+  siteSettings?.subTheme?.[currentLocale] ??
+  siteSettings?.subTheme?.["zh-Hans"] ??
+  "";
+
+// Main nav (locale-aware)
+const nav = [
+  { label: t("nav.products"), href: localizedPath(currentLocale, "/products") },
+  { label: t("nav.story"), href: localizedPath(currentLocale, "/story") },
+  { label: t("nav.quiz"), href: localizedPath(currentLocale, "/quiz") },
+  { label: t("nav.contact"), href: localizedPath(currentLocale, "/contact") },
+  { label: t("nav.about"), href: localizedPath(currentLocale, "/about") },
+];
+---
+
+<!doctype html>
+<html lang={currentLocale}>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={description} />
+    <meta name="generator" content={Astro.generator} />
+
+    {
+      hreflangUrls.map(({ lang, href }) => (
+        <link rel="alternate" hreflang={lang} href={href} />
+      ))
+    }
+    <link
+      rel="alternate"
+      hreflang="x-default"
+      href={`${siteUrl}${localizedPath(defaultLocale, cleanPath)}`}
+    />
+
+    <!-- Wave 32 SEO: self-referential canonical (x-default hreflang points to default-locale version) -->
+    <link rel="canonical" href={`${siteUrl}${Astro.url.pathname}`} />
+
+    <!-- Wave 32.2 Phase 2.1: JSON-LD structured data (Organization + WebSite) for AI / SEO / rich results -->
+    <script
+      type="application/ld+json"
+      set:html={JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        name: siteName,
+        url: siteUrl,
+        logo: `${siteUrl}/favicon.svg`,
+        description: t("common.tagline"),
+      })}
+    />
+    <script
+      type="application/ld+json"
+      set:html={JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        name: siteName,
+        url: siteUrl,
+        inLanguage: ["zh-Hans", "en", "ms-MY", "id-ID"],
+      })}
+    />
+
+    <meta property="og:type" content={ogType} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta
+      property="og:image"
+      content={ogImage.startsWith("http") ? ogImage : `${siteUrl}${ogImage}`}
+    />
+    <meta property="og:url" content={`${siteUrl}${Astro.url.pathname}`} />
+    <meta
+      property="og:locale"
+      content={localeHreflang[currentLocale].replace("-", "_")}
+    />
+    {
+      locales
+        .filter((l) => l !== currentLocale)
+        .map((l) => (
+          <meta
+            property="og:locale:alternate"
+            content={localeHreflang[l].replace("-", "_")}
+          />
+        ))
+    }
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta
+      name="twitter:image"
+      content={ogImage.startsWith("http") ? ogImage : `${siteUrl}${ogImage}`}
+    />
+
+    <link
+      rel="preconnect"
+      href="https://cnamber-store-images.r2.dev"
+      crossorigin
+    />
+    <link rel="dns-prefetch" href="https://cnamber-store-images.r2.dev" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- 6.4: 字型 CSS 不阻塞首次繪製(media=print 技巧),無 JS 時由 noscript 載入 -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,700;1,400;1,500&family=Noto+Serif+SC:wght@300;400;500;700&family=Inter:wght@300;400;500;600&display=swap"
+      rel="stylesheet"
+      media="print"
+      onload="this.media='all'"
+    />
+    <noscript>
+      <link
+        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,700;1,400;1,500&family=Noto+Serif+SC:wght@300;400;500;700&family=Inter:wght@300;400;500;600&display=swap"
+        rel="stylesheet"
+      />
+    </noscript>
+
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="牛马得饰" />
+    <meta name="theme-color" content="#ffffff" media="(max-width: 767.98px)" />
+    <meta name="theme-color" content="#2d4a3e" media="(min-width: 768px)" />
+
+    <!-- Google tag (gtag.js) -->
+    <script is:inline>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
+      gtag("config", "G-YRRTG60R89");
+      // 6.4: gtag.js 等頁面載入完、瀏覽器閒置後才下載,不與首屏搶頻寬
+      window.addEventListener("load", function () {
+        var load = function () {
+          var s = document.createElement("script");
+          s.async = true;
+          s.src = "https://www.googletagmanager.com/gtag/js?id=G-YRRTG60R89";
+          document.head.appendChild(s);
+        };
+        if ("requestIdleCallback" in window)
+          requestIdleCallback(load, { timeout: 3000 });
+        else setTimeout(load, 1500);
+      });
+    </script>
+
+    <!-- 6.6: PWA service worker（僅 https / localhost；失敗不影響頁面） -->
+    <script is:inline>
+      if (
+        "serviceWorker" in navigator &&
+        (location.protocol === "https:" || location.hostname === "localhost")
+      ) {
+        window.addEventListener("load", function () {
+          navigator.serviceWorker
+            .register("/sw.js", { scope: "/" })
+            .catch(function () {});
+        });
+      }
+    </script>
+
+    <title>{title}</title>
+    <style is:inline data-critical-shell>
+      /* app-shell 6.4e：導覽列在 mobile.css 載入前也不佔文件流，避免樣式到達時整頁位移 */
+      @media (max-width: 767.98px) {
+        .m-header,
+        .m-tabbar {
+          position: fixed;
+          left: 0;
+          right: 0;
+        }
+        .m-header {
+          top: 0;
+        }
+        .m-tabbar {
+          left: 16px;
+          right: 16px;
+          bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+          /* 最終尺寸一次給齊（與 mobile.css 6.8 一致），樣式分批到達時膠囊不會變高/變位 */
+          display: grid;
+          grid-template-columns: repeat(5, 1fr);
+          height: 60px;
+          z-index: 60;
+        }
+        body > nav:not(.m-tabbar),
+        #mobile-menu,
+        [data-mobile-menu] {
+          display: none !important;
+        }
+      }
+      @media (min-width: 768px) {
+        .m-header,
+        .m-tabbar {
+          display: none !important;
+        }
+      }
+    </style>
+  </head>
+  <body class="bg-white text-text-primary">
+    <MobileNav title={title} />
+    <a
+      href="#main-content"
+      class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-accent-700 focus:text-bg-base focus:rounded"
+    >
+      跳至主要内容
+    </a>
+    <!-- Wave 12: Awwwards-tier scroll progress indicator (z-60 above mobile menu z-50; aria-hidden; JS-only state) -->
+    <div class="scroll-progress" aria-hidden="true">
+      <div class="scroll-progress-bar"></div>
+    </div>
+    <script is:inline>
+      // Scroll progress: rAF-throttled scroll/resize handler updates
+      // transform: scaleX(t) on the inner bar. CSS handles visuals only;
+      // prefers-reduced-motion hides the whole element (CSS rule).
+      (function () {
+        let rafId = null;
+        function update() {
+          if (rafId) return;
+          rafId = window.requestAnimationFrame(function () {
+            rafId = null;
+            var bar = document.querySelector(".scroll-progress-bar");
+            if (!bar) return;
+            var doc =
+              document.documentElement.scrollHeight - window.innerHeight;
+            var p = doc > 0 ? window.scrollY / doc : 0;
+            if (p < 0) p = 0;
+            if (p > 1) p = 1;
+            bar.style.transform = "scaleX(" + p + ")";
+          });
+        }
+        window.addEventListener("scroll", update, { passive: true });
+        window.addEventListener("resize", update, { passive: true });
+        update();
+      })();
+    </script>
+
+    <!-- Wave 33 Phase 2.2 + 2.3: per-page JSON-LD slot (Product / BreadcrumbList) -->
+    <meta name="theme-color" content="#2d4a3e" />
+    <meta name="format-detection" content="telephone=no" />
+    <slot name="head" />
+    <script is:inline>
+      // Wave 13: hero parallax — rAF-thrustly translate3d(0, scrollY*0.35, 0)
+      // on [data-hero-slide]. Skip when no slides (non-home pages) or
+      // when prefers-reduced-motion is set (Wave 11 a11y contract).
+      (function () {
+        var slides = document.querySelectorAll("[data-hero-slide]");
+        if (slides.length === 0) return;
+        if (window.matchMedia("(prefers-reduced-motion: reduce)").matches)
+          return;
+
+        var rafId = null;
+        function update() {
+          if (rafId) return;
+          rafId = window.requestAnimationFrame(function () {
+            rafId = null;
+            var y = window.scrollY * 0.35;
+            for (var i = 0; i < slides.length; i++) {
+              slides[i].style.transform = "translate3d(0," + y + "px,0)";
+            }
+          });
+        }
+        window.addEventListener("scroll", update, { passive: true });
+        window.addEventListener("resize", update, { passive: true });
+        update();
+      })();
+    </script>
+    <!-- Wave 15: 1px sentinel above header for sticky elevation observer -->
+    <div class="header-sentinel" aria-hidden="true"></div>
+    <script is:inline>
+      // Sticky header elevation: IntersectionObserver on the sentinel
+      // flips [data-scrolled] when the sentinel leaves the viewport.
+      // CSS handles the visual change. Reduced-motion safe (pure boolean toggle).
+      (function () {
+        var header = document.querySelector("[data-header]");
+        var sentinel = document.querySelector(".header-sentinel");
+        if (!header || !sentinel) return;
+        if (typeof IntersectionObserver === "undefined") return;
+        var obs = new IntersectionObserver(
+          function (entries) {
+            var e = entries[0];
+            if (e.isIntersecting) {
+              header.removeAttribute("data-scrolled");
+            } else {
+              header.setAttribute("data-scrolled", "true");
+            }
+          },
+          { rootMargin: "0px" },
+        );
+        obs.observe(sentinel);
+      })();
+    </script>
+    <header
+      data-header
+      class="sticky top-0 z-40 w-full glass border-b border-forest-900/5 transition-header"
+    >
+      <div
+        class="max-w-6xl mx-auto px-6 py-3 flex items-center justify-between gap-4"
+      >
+        <a
+          href={homePath}
+          aria-label={`${siteName} — ${t("nav.home")}`}
+          class="flex items-center gap-2.5 group focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-500/40 rounded-md shrink-0"
+        >
+          <svg
+            viewBox="0 0 32 32"
+            class="w-8 h-8 transition-transform group-hover:scale-105"
+            aria-hidden="true"
+          >
+            <path
+              d="M16 6 A10 10 0 1 1 8.5 11.5"
+              fill="none"
+              stroke="#2D3520"
+              stroke-width="2"
+              stroke-linecap="round"></path>
+            <circle cx="16" cy="16" r="3.75" fill="#A45E3D"></circle>
+          </svg>
+          <span
+            class="font-serif text-lg font-light text-forest-800 tracking-wide group-hover:text-forest-600 transition-colors"
+          >
+            {siteName}
+          </span>
+        </a>
+
+        <nav
+          class="hidden md:flex items-center gap-7 text-base font-sans"
+          aria-label={t("header.aria_main")}
+        >
+          {
+            nav.map((item) => {
+              const itemPath = item.href.startsWith(`/${currentLocale}`)
+                ? item.href.slice(`/${currentLocale}`.length) || "/"
+                : item.href;
+              const isActive = cleanPath === itemPath;
+              return (
+                <a
+                  href={item.href}
+                  aria-current={isActive ? "page" : undefined}
+                  class={
+                    isActive
+                      ? "text-forest-700 font-medium transition-colors duration-300 link-underline"
+                      : "text-text-secondary hover:text-forest-700 transition-colors duration-300 link-underline"
+                  }
+                >
+                  {item.label}
+                </a>
+              );
+            })
+          }
+        </nav>
+
+        <div class="flex items-center gap-3 shrink-0">
+          <button
+            type="button"
+            class="md:hidden p-2 -mr-2 text-forest-800 hover:opacity-70 transition-opacity focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-500/40 rounded"
+            aria-label={t("header.aria_open_menu")}
+            aria-controls="mobile-menu"
+            aria-expanded="false"
+            data-mobile-menu-trigger
+          >
+            <svg
+              class="w-6 h-6"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.5"
+              stroke-linecap="round"
+              aria-hidden="true"
+            >
+              <line x1="4" y1="8" x2="20" y2="8"></line>
+              <line x1="4" y1="16" x2="20" y2="16"></line>
+            </svg>
+          </button>
+          <LocaleSwitcher />
+        </div>
+      </div>
+    </header>
+
+    <!-- Mobile menu overlay (md:hidden, fixed full-screen) -->
+    <div
+      id="mobile-menu"
+      class="fixed inset-0 z-50 bg-forest-900 text-bg-base md:hidden flex flex-col opacity-0 pointer-events-none transition-opacity duration-500 ease-out"
+      data-mobile-menu
+      aria-hidden="true"
+      aria-modal="true"
+      role="dialog"
+      aria-label={t("header.aria_main_menu")}
+    >
+      <div
+        class="flex items-center justify-between p-6 border-b border-forest-700/40"
+      >
+        <span class="font-serif text-lg font-light tracking-wide text-bg-base">
+          {siteName}
+        </span>
+        <button
+          type="button"
+          class="p-2 -mr-2 text-bg-base hover:opacity-70 transition-opacity focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-300/40 rounded"
+          aria-label={t("header.aria_close_menu")}
+          data-mobile-menu-close
+        >
+          <svg
+            class="w-6 h-6"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.5"
+            stroke-linecap="round"
+            aria-hidden="true"
+          >
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <nav
+        class="flex-1 flex flex-col items-center justify-center px-8 gap-8"
+        aria-label={t("header.aria_mobile_nav")}
+      >
+        {
+          nav.map((item) => {
+            const itemPath = item.href.startsWith(`/${currentLocale}`)
+              ? item.href.slice(`/${currentLocale}`.length) || "/"
+              : item.href;
+            const isActive = cleanPath === itemPath;
+            return (
+              <a
+                href={item.href}
+                aria-current={isActive ? "page" : undefined}
+                class={
+                  isActive
+                    ? "font-serif text-4xl text-bg-base font-medium transition-opacity duration-300"
+                    : "font-serif text-4xl text-bg-base hover:opacity-70 transition-opacity duration-300"
+                }
+                data-mobile-menu-link
+              >
+                {item.label}
+              </a>
+            );
+          })
+        }
+      </nav>
+
+      <div class="p-6 flex justify-center border-t border-forest-700/40">
+        <LocaleSwitcher />
+      </div>
+    </div>
+
+    <main id="main-content" tabindex="-1">
+      <slot />
+    </main>
+    <Footer
+      siteName={siteName}
+      themeLabel={themeLabel}
+      subThemeLabel={subThemeLabel}
+    />
+
+    <script is:inline>
+      (function () {
+        const trigger = document.querySelector("[data-mobile-menu-trigger]");
+        const menu = document.querySelector("[data-mobile-menu]");
+        if (!trigger || !menu) return;
+
+        const closeBtn = menu.querySelector("[data-mobile-menu-close]");
+        const links = menu.querySelectorAll("[data-mobile-menu-link]");
+
+        const open = () => {
+          menu.dataset.open = "true";
+          menu.setAttribute("aria-hidden", "false");
+          trigger.setAttribute("aria-expanded", "true");
+          document.body.style.overflow = "hidden";
+          requestAnimationFrame(() => closeBtn?.focus());
+        };
+        const close = () => {
+          delete menu.dataset.open;
+          menu.setAttribute("aria-hidden", "true");
+          trigger.setAttribute("aria-expanded", "false");
+          document.body.style.overflow = "";
+          trigger.focus();
+        };
+
+        trigger.addEventListener("click", open);
+        closeBtn?.addEventListener("click", close);
+        links.forEach((link) => link.addEventListener("click", close));
+        document.addEventListener("keydown", (e) => {
+          if (e.key === "Escape" && menu.dataset.open === "true") close();
+        });
+      })();
+    </script>
+
+    <style>
+      [data-mobile-menu][data-open="true"] {
+        opacity: 1;
+        pointer-events: auto;
+      }
+      @media (prefers-reduced-motion: reduce) {
+        [data-mobile-menu] {
+          transition: none;
+        }
+      }
+      /* Mobile hero title: scale 72px (default) down to 48px below 768px.
+         !important beats the inline style on <html> that admin can tune
+         via /admin/settings -> Hero Style. Desktop unchanged. */
+    </style>
+  </body>
+</html>

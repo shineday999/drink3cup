@@ -1,0 +1,197 @@
+---
+// 後台「自動翻譯」浮動按鈕：頁面上有「简体中文 + 其他语言」成組的欄位時才會出現。
+// 按下後把简体中文翻成英文 / 马来文 / 印尼文並填入（預設只填空白欄位；勾選「覆盖」才會蓋掉已填的）。
+// 欄位用 id / name 命名規則自動偵測，不需要逐頁設定。
+---
+
+<div
+  id="tr-fab"
+  hidden
+  class="fixed bottom-4 right-4 z-50 w-64 rounded-lg border border-text-muted/30 bg-white p-3 text-sm shadow-lg"
+>
+  <button
+    type="button"
+    id="tr-run"
+    class="w-full rounded-md bg-forest-700 px-4 py-2 text-bg-base transition-colors hover:bg-forest-900 disabled:opacity-50"
+  >
+    自动翻译其他语言
+  </button>
+  <label class="mt-2 flex items-center gap-2 text-xs text-text-muted">
+    <input type="checkbox" id="tr-overwrite" />
+    覆盖已填写的栏位
+  </label>
+  <p id="tr-status" aria-live="polite" class="mt-2 text-xs text-text-muted"></p>
+</div>
+
+<script is:inline>
+  (function () {
+    var fab = document.getElementById("tr-fab");
+    if (!fab) return;
+    var runBtn = document.getElementById("tr-run");
+    var overwriteEl = document.getElementById("tr-overwrite");
+    var statusEl = document.getElementById("tr-status");
+    var LOCS = ["zh-Hans", "en", "ms-MY", "id-ID"];
+    var SHORT = { zh: "zh-Hans", en: "en", ms: "ms-MY", id: "id-ID" };
+    var SKIP =
+      /slug|sku|url|code|price|email|phone|link|href|path|password|token/i;
+    var running = false;
+
+    function setStatus(text, isError) {
+      statusEl.textContent = text;
+      statusEl.style.color = isError ? "#b42318" : "";
+    }
+
+    // 回傳 { g: 群組名稱, l: 語言 }；不是多語欄位就回傳 null
+    function detect(el) {
+      var m;
+      if (el.hasAttribute("data-ci-title") && el.getAttribute("data-loc")) {
+        return {
+          g: "ci-t:" + el.getAttribute("data-ci-title"),
+          l: el.getAttribute("data-loc"),
+        };
+      }
+      if (el.hasAttribute("data-ci-desc") && el.getAttribute("data-loc")) {
+        return {
+          g: "ci-d:" + el.getAttribute("data-ci-desc"),
+          l: el.getAttribute("data-loc"),
+        };
+      }
+      var id = el.id || "";
+      var name = el.getAttribute("name") || "";
+      var r = null;
+      if ((m = name.match(/^translations\[([^\]]+)\]\[([^\]]+)\]$/))) {
+        r = { g: "t:" + m[2], l: m[1] };
+      } else if ((m = name.match(/^(.+)__(zh-Hans|en|ms-MY|id-ID)$/))) {
+        r = { g: "k:" + m[1], l: m[2] };
+      } else if ((m = name.match(/^(.+?)_(zh-Hans|en|ms-MY|id-ID)_(.+)$/))) {
+        r = { g: "f:" + m[1] + ":" + m[3], l: m[2] };
+      } else if ((m = id.match(/^(.*?)-(zh-Hans|en|ms-MY|id-ID)(-.*)?$/))) {
+        r = { g: "i:" + m[1] + (m[3] || ""), l: m[2] };
+      } else if ((m = name.match(/^(.+)_(zh|en|ms|id)$/))) {
+        r = { g: "s:" + m[1], l: SHORT[m[2]] };
+      }
+      if (!r || LOCS.indexOf(r.l) < 0 || SKIP.test(r.g)) return null;
+      return r;
+    }
+
+    function collect() {
+      var groups = {};
+      document.querySelectorAll("input, textarea").forEach(function (el) {
+        if (el.disabled || el.readOnly) return;
+        if (el.tagName === "INPUT") {
+          var type = (el.getAttribute("type") || "text").toLowerCase();
+          if (type !== "text") return;
+        }
+        var d = detect(el);
+        if (!d) return;
+        (groups[d.g] = groups[d.g] || {})[d.l] = el;
+      });
+      return groups;
+    }
+
+    function refresh() {
+      var groups = collect();
+      var any = Object.keys(groups).some(function (k) {
+        return groups[k]["zh-Hans"] && Object.keys(groups[k]).length > 1;
+      });
+      fab.hidden = !any;
+    }
+
+    function translate(text, to) {
+      return fetch("/api/admin/translate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "same-origin",
+        body: JSON.stringify({ text: text, from: "zh-Hans", to: to }),
+      }).then(function (res) {
+        return res
+          .json()
+          .catch(function () {
+            return {};
+          })
+          .then(function (j) {
+            if (!res.ok) throw new Error(j.error || "HTTP " + res.status);
+            return j.text;
+          });
+      });
+    }
+
+    runBtn.addEventListener("click", function () {
+      if (running) return;
+      var overwrite = overwriteEl.checked;
+      var groups = collect();
+      var jobs = [];
+      Object.keys(groups).forEach(function (k) {
+        var g = groups[k];
+        var src = g["zh-Hans"];
+        if (!src) return;
+        var text = src.value.trim();
+        if (!text) return;
+        var en = g["en"];
+        ["en", "ms-MY", "id-ID"].forEach(function (loc) {
+          var el = g[loc];
+          if (!el) return;
+          var cur = el.value.trim();
+          // 空白、或「马来文 / 印尼文只是复制了英文」的栏位才填；勾选覆盖则全部重翻
+          var fillable =
+            overwrite ||
+            cur === "" ||
+            (loc !== "en" && en && cur === en.value.trim());
+          if (fillable) jobs.push({ el: el, text: text, to: loc });
+        });
+      });
+      if (!jobs.length) {
+        setStatus(
+          "没有需要翻译的栏位（请先填好简体中文；已填写的栏位不会被覆盖）",
+          false,
+        );
+        return;
+      }
+
+      running = true;
+      runBtn.disabled = true;
+      var done = 0;
+      var failed = null;
+      var next = 0;
+      setStatus("翻译中 0/" + jobs.length + " …", false);
+
+      function worker() {
+        if (failed || next >= jobs.length) return Promise.resolve();
+        var job = jobs[next++];
+        return translate(job.text, job.to)
+          .then(function (out) {
+            job.el.value = out;
+            job.el.dispatchEvent(new Event("input", { bubbles: true }));
+            job.el.dispatchEvent(new Event("change", { bubbles: true }));
+            done++;
+            setStatus("翻译中 " + done + "/" + jobs.length + " …", false);
+          })
+          .catch(function (err) {
+            failed = err;
+          })
+          .then(worker);
+      }
+
+      Promise.all([worker(), worker(), worker()]).then(function () {
+        running = false;
+        runBtn.disabled = false;
+        if (failed) {
+          setStatus(
+            (failed.message || "翻译失败") +
+              (done ? "（已填入 " + done + " 个栏位）" : ""),
+            true,
+          );
+        } else {
+          setStatus("已填入 " + done + " 个栏位，请检查后按「保存」。", false);
+        }
+      });
+    });
+
+    var timer = null;
+    new MutationObserver(function () {
+      clearTimeout(timer);
+      timer = setTimeout(refresh, 300);
+    }).observe(document.body, { childList: true, subtree: true });
+    refresh();
+  })();
+</script>

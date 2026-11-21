@@ -1,0 +1,122 @@
+---
+// 問答「一題一畫面」（手機版）。放在 <form data-quiz data-qw-pending> 內。
+// 漸進增強：沒有 JS 或桌面寬度時，維持原本一次攤開的完整表單。
+import { createT } from "../i18n/t";
+
+const t = createT((Astro.locals.messages ?? {}) as Record<string, unknown>);
+---
+
+<div class="qw-progress" aria-hidden="true">
+  <div class="qw-fill" data-qw-fill></div>
+</div>
+<p class="qw-count" data-qw-count></p>
+
+<div class="qw-bar" data-qw-bar>
+  <button
+    type="button"
+    class="qw-prev"
+    data-qw-prev
+    hidden
+    aria-label={t("common.back")}
+  >
+    <svg
+      viewBox="0 0 24 24"
+      width="22"
+      height="22"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M15 5l-7 7 7 7"></path>
+    </svg>
+  </button>
+  <button
+    type="button"
+    class="qw-next"
+    data-qw-next
+    data-label={t("quiz.next")}
+  >
+    {t("quiz.next")}
+  </button>
+</div>
+
+<noscript>
+  <style is:inline>
+    form[data-qw-pending] fieldset {
+      display: block !important;
+    }
+  </style>
+</noscript>
+
+<script>
+  const form = document.querySelector<HTMLFormElement>("form[data-quiz]");
+  const mobile = window.matchMedia("(max-width: 767.98px)").matches;
+
+  if (form && mobile) {
+    const steps = Array.from(form.querySelectorAll<HTMLElement>("fieldset"));
+    const prev = form.querySelector<HTMLButtonElement>("[data-qw-prev]");
+    const next = form.querySelector<HTMLButtonElement>("[data-qw-next]");
+    const fill = form.querySelector<HTMLElement>("[data-qw-fill]");
+    const count = form.querySelector<HTMLElement>("[data-qw-count]");
+    const submitBtn = form.querySelector<HTMLButtonElement>(
+      ':scope > button[type="submit"]',
+    );
+
+    if (steps.length >= 2 && prev && next) {
+      const nextLabel = next.dataset.label || next.textContent?.trim() || "";
+      const submitLabel = submitBtn?.textContent?.trim() || nextLabel;
+      let i = 0;
+      let timer: number | undefined;
+
+      // 必填題尚未作答
+      const needsAnswer = (fs: HTMLElement) =>
+        !!fs.querySelector('input[type="radio"][required]') &&
+        !fs.querySelector('input[type="radio"]:checked');
+
+      const render = (scroll: boolean) => {
+        steps.forEach((fs, k) => fs.classList.toggle("qw-current", k === i));
+        const last = i === steps.length - 1;
+        prev.hidden = i === 0;
+        next.type = last ? "submit" : "button";
+        next.textContent = last ? submitLabel : nextLabel;
+        next.disabled = needsAnswer(steps[i]!);
+        if (fill) fill.style.width = `${((i + 1) / steps.length) * 100}%`;
+        if (count) count.textContent = `${i + 1} / ${steps.length}`;
+        if (scroll) window.scrollTo({ top: 0 });
+      };
+
+      const go = (d: number) => {
+        i = Math.min(Math.max(i + d, 0), steps.length - 1);
+        render(true);
+      };
+
+      delete form.dataset.qwPending;
+      form.dataset.qwOn = "1";
+      render(false);
+
+      prev.addEventListener("click", () => go(-1));
+      next.addEventListener("click", () => {
+        if (next.type === "button") go(1); // 最後一題是 submit，交給表單送出
+      });
+
+      // 選了答案：更新「下一步」狀態；非最後一題 0.22 秒後自動進下一題
+      form.addEventListener("change", (e) => {
+        const el = e.target as HTMLInputElement;
+        if (el.type !== "radio") return;
+        render(false);
+        if (i < steps.length - 1) {
+          window.clearTimeout(timer);
+          timer = window.setTimeout(() => go(1), 220);
+        }
+      });
+
+      // 避免在中間題按 Enter 就整份送出
+      form.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" && next.type === "button") e.preventDefault();
+      });
+    }
+  }
+</script>

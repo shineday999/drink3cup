@@ -1,0 +1,50 @@
+---
+// src/components/ContinueReading.astro
+// Wave 32.1 — internal cross-link section for content pages
+// (story / vision / craft / materials / amber / incense).
+// Renders a section heading + 2-3 link cards in the established card style.
+
+export interface LinkItem {
+  href: string;
+  label: string;
+  desc: string;
+}
+
+export interface Props {
+  heading: string;
+  links: LinkItem[];
+}
+
+const { heading, links } = Astro.props;
+---
+
+<section data-continue>
+  <p
+    class="text-[10px] uppercase tracking-[0.4em] text-forest-600 font-sans mb-8 text-center"
+  >
+    {heading}
+  </p>
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+    {
+      links.map((link) => (
+        <a
+          href={link.href}
+          class="block p-6 md:p-7 bg-bg-card border border-forest-100 hover:border-forest-300 rounded-card transition-all duration-500 hover:shadow-soft group h-full"
+        >
+          <h3 class="font-serif text-xl md:text-2xl font-light text-forest-800 mb-3 leading-tight group-hover:text-forest-900 transition-colors">
+            {link.label}
+            <span
+              aria-hidden="true"
+              class="inline-block ml-2 text-forest-500 group-hover:translate-x-1 transition-transform"
+            >
+              →
+            </span>
+          </h3>
+          <p class="text-sm text-text-secondary leading-relaxed font-sans">
+            {link.desc}
+          </p>
+        </a>
+      ))
+    }
+  </div>
+</section>

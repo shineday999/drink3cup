@@ -1,0 +1,1146 @@
+---
+import AdminLayout from "../../../layouts/AdminLayout.astro";
+import { env } from "cloudflare:workers";
+import Tabs from "../../../components/Tabs.astro";
+import { createT, tEnum } from "../../../i18n/t";
+import { defaultLocale, type Locale } from "../../../i18n/config";
+import zhHansMessages from "../../../i18n/messages/zh-Hans.json";
+import { formatPrice } from "../../../lib/format";
+import { PRODUCT_SHEET_EDIT_URL } from "../../../lib/sheet-sync";
+import {
+  CATEGORIES,
+  SUBCATEGORIES,
+  TAG_GROUPS,
+  MAX_IMAGES,
+  allowedTags,
+  checkReadiness,
+  isCategory,
+  splitTags,
+} from "../../../lib/admin-products";
+
+const id = Astro.params.id;
+const locale = (Astro.locals.locale ?? defaultLocale) as Locale;
+const messages = zhHansMessages as Record<string, unknown>;
+const t = createT(messages);
+void locale;
+
+const product = env?.DB
+  ? await env.DB.prepare("SELECT * FROM products WHERE id = ?").bind(id).first<{
+      id: string;
+      category: string;
+      subcategory: string | null;
+      slug: string;
+      status: string;
+      image_url: string | null;
+      created_at: number;
+      tags: string | null;
+    }>()
+  : null;
+
+const translations = env?.DB
+  ? await env.DB.prepare(
+      "SELECT * FROM product_translations WHERE product_id = ?",
+    )
+      .bind(id)
+      .all<{
+        locale: string;
+        name: string;
+        description: string;
+        short_description: string | null;
+        story: string | null;
+      }>()
+  : { results: [] };
+
+const variants = env?.DB
+  ? await env.DB.prepare("SELECT * FROM product_variants WHERE product_id = ?")
+      .bind(id)
+      .all<{
+        id: string;
+        sku: string;
+        attributes: string;
+        stock: number;
+        price_base: string;
+      }>()
+  : { results: [] };
+
+const LOCALES = ["zh-Hans", "en", "ms-MY", "id-ID"] as const;
+
+if (!product) {
+  return Astro.redirect("/admin/products");
+}
+
+const trByLocale = (locale: string) =>
+  translations.results.find((t) => t.locale === locale);
+
+// ---- 翻譯分頁（多語言單表單） ----
+const TR_NAMES: Record<string, string> = {
+  "zh-Hans": "简体中文",
+  en: "English",
+  "ms-MY": "Bahasa Melayu",
+  "id-ID": "Bahasa Indonesia",
+};
+const TR_AUTO: string[] = ["ms-MY", "id-ID"];
+const TR_FIELDS = [
+  {
+    key: "name",
+    label: "admin.products_detail.label_name",
+    rows: 0,
+    max: 200,
+    required: true,
+  },
+  {
+    key: "short_description",
+    label: "admin.products_detail.label_short_desc",
+    rows: 0,
+    max: 500,
+    required: false,
+  },
+  {
+    key: "description",
+    label: "admin.products_detail.label_description",
+    rows: 4,
+    max: 10000,
+    required: true,
+  },
+  {
+    key: "story",
+    label: "admin.products_detail.label_story",
+    rows: 3,
+    max: 20000,
+    required: false,
+  },
+] as const;
+const trQuery = Astro.url.searchParams;
+const trErrorRaw = trQuery.get("error");
+const trLocRaw = trQuery.get("loc") ?? "";
+const trFlash = {
+  saved: trQuery.get("saved") === "1",
+  error:
+    trErrorRaw === "incomplete" ||
+    trErrorRaw === "too_long" ||
+    trErrorRaw === "empty"
+      ? trErrorRaw
+      : null,
+  loc: (LOCALES as readonly string[]).includes(trLocRaw) ? trLocRaw : null,
+};
+const trInit = trFlash.loc ?? "zh-Hans";
+
+// ---- 規格、圖片、上架檢查、標籤 ----
+const variantRow = env?.DB
+  ? await env.DB.prepare(
+      "SELECT id, sku, stock, weight_grams, image_urls FROM product_variants WHERE product_id = ? ORDER BY sku LIMIT 1",
+    )
+      .bind(product.id)
+      .first<{
+        id: string;
+        sku: string;
+        stock: number;
+        weight_grams: number | null;
+        image_urls: string;
+      }>()
+  : null;
+const priceRow =
+  variantRow && env?.DB
+    ? await env.DB.prepare(
+        "SELECT amount FROM product_prices WHERE variant_id = ? AND currency = 'CNY'",
+      )
+        .bind(variantRow.id)
+        .first<{ amount: number }>()
+    : null;
+let variantImages: string[] = [];
+try {
+  const parsed: unknown = variantRow ? JSON.parse(variantRow.image_urls) : [];
+  if (Array.isArray(parsed)) {
+    variantImages = parsed.filter((u): u is string => typeof u === "string");
+  }
+} catch {
+  variantImages = [];
+}
+// 舊資料：只有 products.image_url 的，先當作目前圖片，儲存規格時會一併帶入規格
+if (variantImages.length === 0 && product.image_url) {
+  variantImages = [product.image_url];
+}
+const cnyFen = priceRow?.amount ?? null;
+// 後台以人民幣輸入與顯示（資料庫也以人民幣記錄，單位：分）
+const priceValue =
+  cnyFen === null
+    ? ""
+    : cnyFen % 100 === 0
+      ? String(cnyFen / 100)
+      : (cnyFen / 100).toFixed(2);
+// 有多個規格時提示「這裡只編輯第一個」
+const extraVariantCount = Math.max(0, variants.results.length - 1);
+const missing = env?.DB ? await checkReadiness(env.DB, product.id) : [];
+const notice = {
+  created: Astro.url.searchParams.get("created"),
+  blocked: Astro.url.searchParams.get("blocked"),
+  saved: Astro.url.searchParams.get("saved"),
+  error: Astro.url.searchParams.get("error"),
+};
+const productCategory = isCategory(product.category)
+  ? product.category
+  : "jewelry";
+const currentTags = splitTags(product.tags ?? "");
+const presetTags = new Set(CATEGORIES.flatMap((c) => [...allowedTags(c)]));
+const extraTags = currentTags.filter((tk) => !presetTags.has(tk));
+const knownSub = CATEGORIES.some((c) =>
+  SUBCATEGORIES[c].includes(product.subcategory ?? ""),
+);
+const inputField =
+  "w-full px-3 py-2 border border-text-muted/30 rounded-md bg-bg-base";
+---
+
+<AdminLayout
+  title={`${t("admin.products_detail.title_prefix")}${trByLocale("zh-Hans")?.name || product.slug}`}
+  active="products"
+>
+  <span slot="actions" class="flex items-center gap-4 text-sm">
+    <a
+      href={`/products/${product.slug}`}
+      class="text-text-secondary hover:underline">查看前台</a
+    >
+    <a href="/admin/products" class="text-text-secondary hover:underline"
+      >返回列表</a
+    >
+  </span>
+  {
+    notice.created && (
+      <div class="mb-4 max-w-3xl rounded-card border border-forest-700/30 bg-forest-50 p-4 text-sm">
+        {notice.created === "active" ? "已创建并上架。" : "已创建为草稿。"}
+        {notice.blocked
+          ? `想上架但还缺：${notice.blocked}，请到「规格」页签补齐。`
+          : ""}
+      </div>
+    )
+  }
+  {
+    notice.saved && !notice.created && (
+      <div class="mb-4 max-w-3xl rounded-card border border-forest-700/30 bg-forest-50 p-4 text-sm">
+        已保存。
+      </div>
+    )
+  }
+  {
+    notice.error && (
+      <div
+        role="alert"
+        class="mb-4 max-w-3xl rounded-card border border-error/40 bg-error/10 p-4 text-sm text-error"
+      >
+        {notice.error}
+      </div>
+    )
+  }
+  {
+    product.status === "draft" && (
+      <div class="mb-4 max-w-3xl rounded-card border border-text-muted/20 bg-bg-card p-4">
+        <p class="font-medium mb-2">上架前检查</p>
+        {missing.length === 0 ? (
+          <>
+            <p class="text-sm text-forest-700 mb-3">✓ 资料都齐了，可以上架。</p>
+            <form method="POST" action={`/api/admin/products/${id}/status`}>
+              <button
+                type="submit"
+                class="px-4 py-2 bg-forest-700 text-bg-base rounded-md hover:bg-forest-900 transition-colors"
+              >
+                立即上架
+              </button>
+            </form>
+          </>
+        ) : (
+          <>
+            <ul class="mb-3 space-y-1 text-sm">
+              {missing.map((m) => (
+                <li class="text-error">✗ 还缺：{m}</li>
+              ))}
+            </ul>
+            <a
+              href={`/admin/products/${id}?tab=variants`}
+              class="text-sm underline text-accent-700"
+            >
+              去补齐 →
+            </a>
+          </>
+        )}
+      </div>
+    )
+  }
+  <Tabs
+    tabs={[
+      { id: "core", label: t("admin.products_detail.tab_core") },
+      {
+        id: "translations",
+        label: t("admin.products_detail.tab_translations"),
+      },
+      { id: "variants", label: t("admin.products_detail.tab_variants") },
+    ]}
+    defaultTab="core"
+  >
+    <div slot="core">
+      <p class="mb-3 max-w-2xl text-sm text-text-muted">
+        图片、售价、库存都在「规格」页签里管理。
+      </p>
+      <form
+        method="POST"
+        action={`/api/admin/products/${id}`}
+        class="bg-bg-card border border-text-muted/20 rounded-card p-4 space-y-3 max-w-2xl"
+      >
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-sm font-medium mb-1" for="category"
+              >{t("admin.products_detail.label_category")}</label
+            >
+            <select
+              id="category"
+              name="category"
+              class="w-full px-3 py-2 border border-text-muted/30 rounded-md bg-bg-base"
+            >
+              <option value="jewelry" selected={product.category === "jewelry"}
+                >{t("admin.products_detail.option_jewelry")}</option
+              >
+              <option value="incense" selected={product.category === "incense"}
+                >{t("admin.products_detail.option_incense")}</option
+              >
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-medium mb-1" for="status"
+              >{t("admin.products_detail.label_status")}</label
+            >
+            <select
+              id="status"
+              name="status"
+              class="w-full px-3 py-2 border border-text-muted/30 rounded-md bg-bg-base"
+            >
+              {
+                ["draft", "active", "archived"].map((s) => (
+                  <option value={s} selected={product.status === s}>
+                    {tEnum(t, "status", s)}
+                  </option>
+                ))
+              }
+            </select>
+          </div>
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-1" for="subcategory"
+            >{t("admin.products_detail.label_subcategory")}</label
+          >
+          <select id="subcategory" name="subcategory" class={inputField}>
+            <option value="">—</option>
+            {
+              CATEGORIES.map((c) =>
+                SUBCATEGORIES[c].map((s) => (
+                  <option
+                    value={s}
+                    data-cat={c}
+                    selected={product.subcategory === s}
+                  >
+                    {tEnum(t, "subcategory", s)}
+                  </option>
+                )),
+              )
+            }
+            {
+              product.subcategory && !knownSub && (
+                <option value={product.subcategory} selected>
+                  {product.subcategory}
+                </option>
+              )
+            }
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-1" for="slug"
+            >{t("admin.products_detail.label_slug")}</label
+          >
+          <input
+            id="slug"
+            name="slug"
+            value={product.slug}
+            readonly
+            class="w-full px-3 py-2 border border-text-muted/30 rounded-md bg-bg-base font-mono text-text-secondary"
+          />
+          <p class="text-xs text-text-muted mt-1">
+            编号由系统自动生成，前台网址会用到它，所以不能修改。
+          </p>
+        </div>
+        <div>
+          <p class="block text-sm font-medium mb-1">
+            {t("admin.products_form.tags")}
+          </p>
+          <p class="text-xs text-text-muted mb-3">
+            「为我推荐」测验会拿客人的答案来比对这些标签。
+          </p>
+          <input type="hidden" name="tags_extra" value={extraTags.join(",")} />
+          {
+            CATEGORIES.map((c) => (
+              <div
+                data-tag-cat={c}
+                hidden={productCategory !== c}
+                class="space-y-3"
+              >
+                {TAG_GROUPS[c].map((g) => (
+                  <fieldset>
+                    <legend class="text-sm font-medium mb-2">
+                      {t(g.titleKey)}
+                    </legend>
+                    <div class="flex flex-wrap gap-2">
+                      {g.options.map((o) => (
+                        <label class="cursor-pointer rounded-full border border-text-muted/30 px-3 py-1.5 text-sm transition-colors has-[:checked]:border-forest-700 has-[:checked]:bg-forest-700 has-[:checked]:text-bg-base has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-accent-500/40">
+                          <input
+                            type="checkbox"
+                            name="tag"
+                            value={o.value}
+                            checked={currentTags.includes(o.value)}
+                            disabled={productCategory !== c}
+                            class="sr-only"
+                          />
+                          {t(o.labelKey)}
+                        </label>
+                      ))}
+                    </div>
+                  </fieldset>
+                ))}
+              </div>
+            ))
+          }
+          {
+            extraTags.length > 0 && (
+              <p class="text-xs text-text-muted mt-3">
+                其他沿用的标签：{extraTags.join("、")}（保存时保留）
+              </p>
+            )
+          }
+        </div>
+        <div
+          class="sticky bottom-0 z-10 -mx-4 -mb-4 flex gap-2 border-t border-text-muted/20 bg-bg-card px-4 py-3"
+        >
+          <button
+            type="submit"
+            class="px-4 py-2 bg-forest-700 text-bg-base rounded-md hover:bg-forest-900 transition-colors"
+            >{t("admin.products_detail.save")}</button
+          >
+          <button
+            type="submit"
+            formaction={`/api/admin/products/${id}/status`}
+            formmethod="POST"
+            class="px-4 py-2 border border-text-muted/30 rounded-md hover:bg-bg-base transition-colors"
+            >{
+              product.status === "draft"
+                ? t("admin.products_detail.toggle_to_active")
+                : product.status === "active"
+                  ? t("admin.products_detail.toggle_to_archived")
+                  : t("admin.products_detail.toggle_to_draft")
+            }</button
+          >
+          <button
+            type="button"
+            class="px-4 py-2 ml-auto border border-error/40 text-error rounded-md hover:bg-error/10 transition-colors"
+            onclick={`if (!confirm('确定删除该商品？所有规格、翻译、评论都会一并删除。')) return false; const f = document.createElement('form'); f.method='POST'; f.action='/api/admin/products/${id}'; const i=document.createElement('input'); i.type='hidden'; i.name='_action'; i.value='delete'; f.appendChild(i); document.body.appendChild(f); f.submit();`}
+          >
+            {t("admin.products_detail.delete")}
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <div slot="translations">
+      <form
+        id="tr-form"
+        method="POST"
+        action={`/api/admin/products/${id}/translations`}
+        novalidate
+        class="max-w-3xl space-y-3"
+        data-init={trInit}
+        data-m-unsaved={t("admin.products_detail.tr_unsaved")}
+        data-m-saving={t("admin.products_detail.tr_saving")}
+        data-m-copy-confirm={t("admin.products_detail.tr_copy_confirm")}
+        data-m-err-incomplete={t("admin.products_detail.tr_err_incomplete")}
+        data-m-err-empty={t("admin.products_detail.tr_err_empty")}
+      >
+        {
+          trFlash.saved && (
+            <div
+              role="status"
+              class="tr-banner-ok px-4 py-3 rounded-md text-sm"
+            >
+              {t("admin.products_detail.tr_saved")}
+            </div>
+          )
+        }
+        {
+          trFlash.error && (
+            <div
+              role="alert"
+              class="tr-banner-err px-4 py-3 rounded-md text-sm"
+            >
+              {trFlash.error === "incomplete"
+                ? t("admin.products_detail.tr_err_incomplete")
+                : trFlash.error === "too_long"
+                  ? t("admin.products_detail.tr_err_too_long")
+                  : t("admin.products_detail.tr_err_empty")}
+              {trFlash.loc && trFlash.error !== "empty"
+                ? ` ${TR_NAMES[trFlash.loc]}`
+                : ""}
+            </div>
+          )
+        }
+
+        <div>
+          <h2 class="font-serif text-lg">
+            {t("admin.products_detail.tr_title")}
+          </h2>
+          <p class="text-sm text-text-muted mt-1">
+            {t("admin.products_detail.tr_hint")}
+          </p>
+          <div class="mt-3 flex flex-wrap items-center gap-3">
+            <button
+              type="button"
+              data-sheet-sync
+              data-product-id={id}
+              class="rounded-md border border-forest-700 px-3 py-1.5 text-sm text-forest-700 transition-colors hover:bg-forest-50 disabled:opacity-50"
+            >
+              从 Google 表格读取描述
+            </button>
+            <a
+              href={PRODUCT_SHEET_EDIT_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="text-sm text-accent-700 hover:underline">打开表格 ↗</a
+            >
+            <span
+              data-sheet-status
+              aria-live="polite"
+              class="text-sm text-text-muted"></span>
+          </div>
+          <p class="mt-1 text-xs text-text-muted">
+            读取后只会填进栏位，检查没问题再点「保存全部」；表格里空白的格子不会覆盖现有内容。
+          </p>
+        </div>
+
+        <div
+          role="tablist"
+          data-tr-tabs
+          class="flex flex-wrap gap-1 border-b border-text-muted/20"
+        >
+          {
+            LOCALES.map((loc) => (
+              <button
+                type="button"
+                role="tab"
+                id={`tr-tab-${loc}`}
+                aria-controls={`tr-panel-${loc}`}
+                aria-selected={loc === trInit ? "true" : "false"}
+                data-tr-tab={loc}
+                class="px-4 py-2 text-sm text-text-muted flex items-center gap-2 -mb-px border-b-2 border-transparent hover:text-forest-700"
+              >
+                <span class="tr-tabname">{TR_NAMES[loc]}</span>
+                <span data-tr-dot={loc} data-state="empty" />
+              </button>
+            ))
+          }
+        </div>
+
+        {
+          LOCALES.map((loc) => {
+            const tr = trByLocale(loc);
+            const isAuto = TR_AUTO.includes(loc);
+            return (
+              <section
+                role="tabpanel"
+                id={`tr-panel-${loc}`}
+                aria-labelledby={`tr-tab-${loc}`}
+                data-tr-panel={loc}
+                hidden={loc !== trInit}
+                class="bg-bg-card border border-text-muted/20 rounded-card p-4 space-y-3"
+              >
+                <div class="flex items-center justify-between gap-3">
+                  <h3 class="font-serif text-lg">
+                    {TR_NAMES[loc]}
+                    <span class="text-xs text-text-muted font-sans ml-1">
+                      {loc}
+                    </span>
+                  </h3>
+                  {isAuto && (
+                    <button
+                      type="button"
+                      data-tr-copy={loc}
+                      class="text-xs text-forest-700 underline underline-offset-2 hover:text-forest-900"
+                    >
+                      {t("admin.products_detail.tr_copy_en")}
+                    </button>
+                  )}
+                </div>
+                {isAuto && (
+                  <p data-tr-note={loc} hidden class="tr-note text-xs">
+                    {t("admin.products_detail.tr_auto_note")}
+                  </p>
+                )}
+                {TR_FIELDS.map((f) => {
+                  const value = tr?.[f.key] ?? "";
+                  return (
+                    <div>
+                      <label
+                        class="block text-sm font-medium mb-1"
+                        for={`${f.key}-${loc}`}
+                      >
+                        {t(f.label)}
+                        {f.required && <span class="tr-err"> *</span>}
+                      </label>
+                      {f.rows === 0 ? (
+                        <input
+                          id={`${f.key}-${loc}`}
+                          name={`${f.key}__${loc}`}
+                          value={value}
+                          maxlength={f.max}
+                          data-tr-field={f.key}
+                          data-tr-loc={loc}
+                          class="w-full px-3 py-2 border border-text-muted/30 rounded-md bg-bg-base"
+                        />
+                      ) : (
+                        <textarea
+                          id={`${f.key}-${loc}`}
+                          name={`${f.key}__${loc}`}
+                          rows={f.rows}
+                          maxlength={f.max}
+                          data-tr-field={f.key}
+                          data-tr-loc={loc}
+                          class="w-full px-3 py-2 border border-text-muted/30 rounded-md bg-bg-base"
+                        >
+                          {value}
+                        </textarea>
+                      )}
+                    </div>
+                  );
+                })}
+              </section>
+            );
+          })
+        }
+
+        <div
+          class="sticky bottom-0 z-10 py-3 bg-bg-base border-t border-text-muted/20 flex items-center justify-between gap-3"
+        >
+          <span
+            id="tr-status"
+            aria-live="polite"
+            class="text-sm text-text-muted"></span>
+          <button
+            type="submit"
+            id="tr-save"
+            class="px-6 py-2 bg-forest-700 text-bg-base rounded-md hover:bg-forest-900 transition-colors text-sm disabled:opacity-50"
+          >
+            {t("admin.products_detail.tr_save_all")}
+          </button>
+        </div>
+      </form>
+
+      <style is:global>
+        .tr-auto {
+          background-color: #fff8e6 !important;
+          border-color: #e0b84a !important;
+        }
+        .tr-err {
+          color: #b42318;
+        }
+        .tr-note {
+          color: #8a6100;
+        }
+        .tr-banner-ok {
+          background: #e7f1ea;
+          color: #2f5a40;
+        }
+        .tr-banner-err {
+          background: #fdeceb;
+          color: #b42318;
+        }
+        [data-tr-tab][aria-selected="true"] {
+          border-bottom-color: #3f6b4f;
+          color: #1f2a24;
+          font-weight: 600;
+        }
+        [data-tr-dot] {
+          display: inline-block;
+          width: 8px;
+          height: 8px;
+          border-radius: 50%;
+          background: #c9c9c9;
+        }
+        [data-tr-dot][data-state="ok"] {
+          background: #3f6b4f;
+        }
+        [data-tr-dot][data-state="auto"] {
+          background: #e0a82e;
+        }
+        [data-tr-dot][data-state="warn"] {
+          background: #b42318;
+        }
+      </style>
+
+      <script is:inline>
+        (function () {
+          var form = document.getElementById("tr-form");
+          if (!form) return;
+          var LOCALES = ["zh-Hans", "en", "ms-MY", "id-ID"];
+          var AUTO = ["ms-MY", "id-ID"];
+          var FIELDS = ["name", "short_description", "description", "story"];
+          var statusEl = document.getElementById("tr-status");
+          var saveBtn = document.getElementById("tr-save");
+          var saveLabel = saveBtn.textContent;
+          var userEdited = false;
+          var submitting = false;
+
+          function field(f, l) {
+            return form.querySelector(
+              '[data-tr-field="' + f + '"][data-tr-loc="' + l + '"]',
+            );
+          }
+          function msg(k) {
+            return form.getAttribute("data-m-" + k) || "";
+          }
+          function setStatus(text, isError) {
+            statusEl.textContent = text;
+            statusEl.className =
+              "text-sm " + (isError ? "tr-err" : "text-text-muted");
+          }
+          function markDirty() {
+            setStatus(msg("unsaved"), false);
+          }
+          function applyAuto(el, on) {
+            el.setAttribute("data-tr-auto", on ? "1" : "0");
+            el.classList.toggle("tr-auto", on && el.value.trim() !== "");
+          }
+          function refreshLocale(loc) {
+            var name = field("name", loc).value.trim();
+            var desc = field("description", loc).value.trim();
+            var anyFilled = FIELDS.some(function (f) {
+              return field(f, loc).value.trim() !== "";
+            });
+            var anyAuto = FIELDS.some(function (f) {
+              return field(f, loc).classList.contains("tr-auto");
+            });
+            var state = "ok";
+            if (!anyFilled) state = "empty";
+            else if (!name || !desc) state = "warn";
+            else if (anyAuto) state = "auto";
+            var dot = form.querySelector('[data-tr-dot="' + loc + '"]');
+            if (dot) dot.setAttribute("data-state", state);
+            var note = form.querySelector('[data-tr-note="' + loc + '"]');
+            if (note) note.hidden = !anyAuto;
+          }
+          function showTab(loc) {
+            LOCALES.forEach(function (l) {
+              var p = form.querySelector('[data-tr-panel="' + l + '"]');
+              var b = form.querySelector('[data-tr-tab="' + l + '"]');
+              if (p) p.hidden = l !== loc;
+              if (b)
+                b.setAttribute("aria-selected", l === loc ? "true" : "false");
+            });
+          }
+
+          // 開頁時：ms-MY / id-ID 的空欄位帶入英文（已有內容的不動）
+          var prefilled = false;
+          AUTO.forEach(function (loc) {
+            FIELDS.forEach(function (f) {
+              var target = field(f, loc);
+              var src = field(f, "en");
+              if (!target || !src) return;
+              if (target.value.trim() === "") {
+                if (src.value.trim() !== "") {
+                  target.value = src.value;
+                  prefilled = true;
+                }
+                applyAuto(target, true);
+              } else {
+                applyAuto(target, false);
+              }
+            });
+          });
+          LOCALES.forEach(refreshLocale);
+          showTab(form.getAttribute("data-init") || "zh-Hans");
+          if (prefilled) markDirty();
+
+          form.addEventListener("input", function (e) {
+            var el = e.target;
+            if (!el || !el.getAttribute) return;
+            var f = el.getAttribute("data-tr-field");
+            var loc = el.getAttribute("data-tr-loc");
+            if (!f || !loc) return;
+            userEdited = true;
+            markDirty();
+            if (loc === "en") {
+              // 英文改動時，ms-MY / id-ID 尚未被你自己改過的欄位跟著連動
+              AUTO.forEach(function (l) {
+                var t = field(f, l);
+                if (t && t.getAttribute("data-tr-auto") === "1") {
+                  t.value = el.value;
+                  applyAuto(t, true);
+                  refreshLocale(l);
+                }
+              });
+            } else if (AUTO.indexOf(loc) !== -1) {
+              applyAuto(el, false);
+            }
+            refreshLocale(loc);
+          });
+
+          form.addEventListener("click", function (e) {
+            var tabBtn = e.target.closest("[data-tr-tab]");
+            if (tabBtn) {
+              showTab(tabBtn.getAttribute("data-tr-tab"));
+              return;
+            }
+            var copyBtn = e.target.closest("[data-tr-copy]");
+            if (copyBtn) {
+              var loc = copyBtn.getAttribute("data-tr-copy");
+              var hasOwn = FIELDS.some(function (f) {
+                var el = field(f, loc);
+                return (
+                  el.value.trim() !== "" &&
+                  el.getAttribute("data-tr-auto") !== "1"
+                );
+              });
+              if (hasOwn && !window.confirm(msg("copy-confirm"))) return;
+              FIELDS.forEach(function (f) {
+                var t = field(f, loc);
+                var s = field(f, "en");
+                t.value = s.value;
+                applyAuto(t, true);
+              });
+              userEdited = true;
+              markDirty();
+              refreshLocale(loc);
+            }
+          });
+
+          form.addEventListener("submit", function (e) {
+            var complete = 0;
+            for (var i = 0; i < LOCALES.length; i++) {
+              var loc = LOCALES[i];
+              var vals = FIELDS.map(function (f) {
+                return field(f, loc).value.trim();
+              });
+              var any = vals.some(Boolean);
+              var nm = vals[0];
+              var ds = vals[2];
+              if (any && (!nm || !ds)) {
+                e.preventDefault();
+                showTab(loc);
+                field(!nm ? "name" : "description", loc).focus();
+                var label = form.querySelector(
+                  '[data-tr-tab="' + loc + '"] .tr-tabname',
+                );
+                setStatus(
+                  msg("err-incomplete") +
+                    " " +
+                    (label ? label.textContent : loc),
+                  true,
+                );
+                return;
+              }
+              if (nm && ds) complete++;
+            }
+            if (!complete) {
+              e.preventDefault();
+              setStatus(msg("err-empty"), true);
+              return;
+            }
+            submitting = true;
+            saveBtn.disabled = true;
+            saveBtn.textContent = msg("saving");
+          });
+
+          window.addEventListener("beforeunload", function (e) {
+            if (userEdited && !submitting) {
+              e.preventDefault();
+              e.returnValue = "";
+            }
+          });
+          window.addEventListener("pageshow", function () {
+            submitting = false;
+            saveBtn.disabled = false;
+            saveBtn.textContent = saveLabel;
+          });
+        })();
+      </script>
+
+      <script is:inline>
+        (function () {
+          var btn = document.querySelector("[data-sheet-sync]");
+          var form = document.getElementById("tr-form");
+          var out = document.querySelector("[data-sheet-status]");
+          if (!btn || !form || !out) return;
+          var id = btn.getAttribute("data-product-id");
+          var LOCALES = ["zh-Hans", "en", "ms-MY", "id-ID"];
+          var KEYS = ["short_description", "description"];
+          function say(text, bad) {
+            out.textContent = text;
+            out.style.color = bad ? "#b42318" : "";
+          }
+          btn.addEventListener("click", function () {
+            btn.disabled = true;
+            say("读取中…", false);
+            fetch("/api/admin/products/" + encodeURIComponent(id) + "/sheet", {
+              credentials: "same-origin",
+            })
+              .then(function (res) {
+                return res
+                  .json()
+                  .catch(function () {
+                    return {};
+                  })
+                  .then(function (j) {
+                    if (!res.ok)
+                      throw new Error(
+                        j.error || "读取失败（HTTP " + res.status + "）",
+                      );
+                    return j;
+                  });
+              })
+              .then(function (j) {
+                var n = 0;
+                var tooLong = [];
+                // 依序处理 zh-Hans、en、ms-MY、id-ID：先填英文，马来文／印尼文再覆盖
+                LOCALES.forEach(function (loc) {
+                  var f = (j.fills || {})[loc];
+                  if (!f) return;
+                  KEYS.forEach(function (k) {
+                    var v = f[k];
+                    if (!v) return;
+                    var el = form.querySelector(
+                      '[data-tr-field="' + k + '"][data-tr-loc="' + loc + '"]',
+                    );
+                    if (!el) return;
+                    if (el.maxLength > 0 && v.length > el.maxLength) {
+                      tooLong.push(
+                        loc + (k === "description" ? " 描述" : " 简介"),
+                      );
+                      return;
+                    }
+                    el.value = v;
+                    el.dispatchEvent(new Event("input", { bubbles: true }));
+                    n++;
+                  });
+                });
+                var parts = [];
+                if (n === 0) {
+                  parts.push("表格里这个商品的格子都是空的，没有填入任何内容");
+                } else {
+                  parts.push("已读取 " + n + " 个栏位，请检查后点「保存全部」");
+                }
+                if (tooLong.length)
+                  parts.push("太长没填入：" + tooLong.join("、"));
+                if (j.missing && j.missing.length)
+                  parts.push("表格缺少栏位：" + j.missing.join("、"));
+                say(parts.join("；"), n === 0 || tooLong.length > 0);
+              })
+              .catch(function (err) {
+                say((err && err.message) || "读取失败", true);
+              })
+              .then(function () {
+                btn.disabled = false;
+              });
+          });
+        })();
+      </script>
+    </div>
+
+    <div slot="variants" class="max-w-2xl space-y-3">
+      {
+        extraVariantCount > 0 && (
+          <p class="rounded-card border border-text-muted/20 bg-bg-card p-4 text-sm text-text-secondary">
+            这个商品有 {extraVariantCount + 1}{" "}
+            个规格；这里只编辑排序最前的第一个规格。
+          </p>
+        )
+      }
+      {
+        !variantRow && (
+          <p class="rounded-card border border-accent-500/40 bg-accent-500/10 p-4 text-sm">
+            这个商品还没有规格（售价、库存、图片）。填写下面的表单并保存后，才能上架。
+          </p>
+        )
+      }
+      <form
+        method="POST"
+        action={`/api/admin/products/${id}/variant`}
+        enctype="multipart/form-data"
+        class="bg-bg-card border border-text-muted/20 rounded-card p-4 space-y-3"
+      >
+        <input type="hidden" name="variant_id" value={variantRow?.id ?? ""} />
+        {
+          variantRow && (
+            <p class="text-sm text-text-muted">
+              规格编号：
+              <span class="font-mono text-text-secondary">
+                {variantRow.sku}
+              </span>
+            </p>
+          )
+        }
+
+        <div>
+          <label class="block text-sm font-medium mb-1" for="v-price"
+            >售价（人民币 ¥） <span class="text-error">*</span></label
+          >
+          <input
+            id="v-price"
+            name="price"
+            type="text"
+            inputmode="decimal"
+            required
+            value={priceValue}
+            class={inputField}
+          />
+        </div>
+        {
+          cnyFen !== null && (
+            <p class="text-xs text-text-muted -mt-2">
+              前台显示：简体站 {formatPrice(cnyFen, "CNY", "zh-Hans")} ・ 英文站{" "}
+              {formatPrice(cnyFen, "CNY", "en")} ・ 马来站{" "}
+              {formatPrice(cnyFen, "CNY", "ms-MY")} ・ 印尼站{" "}
+              {formatPrice(cnyFen, "CNY", "id-ID")}（依「汇率」页的数值换算）
+            </p>
+          )
+        }
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-sm font-medium mb-1" for="v-stock"
+              >库存 <span class="text-error">*</span></label
+            >
+            <input
+              id="v-stock"
+              name="stock"
+              type="number"
+              min="0"
+              step="1"
+              required
+              value={variantRow?.stock ?? 1}
+              class={inputField}
+            />
+          </div>
+          <div>
+            <label class="block text-sm font-medium mb-1" for="v-weight"
+              >重量（克，选填）</label
+            >
+            <input
+              id="v-weight"
+              name="weight"
+              type="number"
+              min="0"
+              step="1"
+              value={variantRow?.weight_grams ?? ""}
+              class={inputField}
+            />
+          </div>
+        </div>
+
+        <div>
+          <p class="block text-sm font-medium mb-2">图片（第一张是封面）</p>
+          {
+            variantImages.length > 0 ? (
+              <div class="grid grid-cols-3 sm:grid-cols-4 gap-3">
+                {variantImages.map((u, i) => (
+                  <div class="space-y-1">
+                    <img
+                      loading="lazy"
+                      decoding="async"
+                      src={u}
+                      alt=""
+                      class="w-full aspect-square object-cover rounded border border-text-muted/20"
+                    />
+                    <label class="flex items-center gap-1 text-xs">
+                      <input
+                        type="radio"
+                        name="cover"
+                        value={u}
+                        checked={i === 0}
+                        class="accent-forest-700"
+                      />
+                      封面
+                    </label>
+                    <label class="flex items-center gap-1 text-xs text-error">
+                      <input type="checkbox" name="remove" value={u} />
+                      删除
+                    </label>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p class="text-sm text-text-muted">还没有图片。</p>
+            )
+          }
+          <div class="mt-3">
+            <label class="block text-sm font-medium mb-1" for="v-images"
+              >新增图片（可多选）</label
+            >
+            <input
+              id="v-images"
+              name="images"
+              type="file"
+              multiple
+              accept="image/jpeg,image/png,image/webp,image/gif"
+              class="w-full text-sm file:mr-2 file:py-1 file:px-3 file:border-0 file:bg-forest-700 file:text-bg-base file:rounded file:cursor-pointer"
+            />
+            <p class="text-xs text-text-muted mt-1">
+              最多 {MAX_IMAGES} 张（含已有的），每张 5MB 以内。
+            </p>
+          </div>
+        </div>
+
+        <div
+          class="sticky bottom-0 z-10 -mx-4 -mb-4 border-t border-text-muted/20 bg-bg-card px-4 py-3"
+        >
+          <button
+            type="submit"
+            class="rounded-md bg-forest-700 px-4 py-2 text-bg-base transition-colors hover:bg-forest-900"
+            >保存规格</button
+          >
+        </div>
+      </form>
+    </div>
+  </Tabs>
+</AdminLayout>
+
+<script is:inline>
+  (function () {
+    var cat = document.getElementById("category");
+    var sub = document.getElementById("subcategory");
+    if (!cat || !sub) return;
+    function apply() {
+      var c = cat.value;
+      Array.prototype.forEach.call(
+        sub.querySelectorAll("option[data-cat]"),
+        function (o) {
+          var show = o.getAttribute("data-cat") === c;
+          o.hidden = !show;
+          o.disabled = !show;
+        },
+      );
+      var sel = sub.options[sub.selectedIndex];
+      if (
+        sel &&
+        sel.getAttribute("data-cat") &&
+        sel.getAttribute("data-cat") !== c
+      ) {
+        sub.value = "";
+      }
+      Array.prototype.forEach.call(
+        document.querySelectorAll("[data-tag-cat]"),
+        function (g) {
+          var show = g.getAttribute("data-tag-cat") === c;
+          g.hidden = !show;
+          Array.prototype.forEach.call(
+            g.querySelectorAll("input"),
+            function (i) {
+              i.disabled = !show;
+            },
+          );
+        },
+      );
+    }
+    cat.addEventListener("change", apply);
+    apply();
+  })();
+</script>

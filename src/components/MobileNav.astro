@@ -1,0 +1,311 @@
+---
+// 手機版專用導覽 (<768px 才顯示；桌面版 CSS 會隱藏)
+// 語言完全沿用站台機制：Astro.locals.locale / createT / localizedPath
+import {
+  defaultLocale,
+  localeFromPath,
+  localeNames,
+  localizedPath,
+  locales,
+  type Locale,
+} from "../i18n/config";
+import { createT } from "../i18n/t";
+import { readCart } from "../lib/cart";
+
+const locale = (Astro.locals.locale ?? defaultLocale) as Locale;
+interface Props {
+  title?: string;
+}
+const { title = "" } = Astro.props;
+const t = createT(Astro.locals.messages ?? {});
+
+const pathname = Astro.url.pathname;
+const pathLocale = localeFromPath(pathname);
+const cleanPath = pathLocale
+  ? pathname.slice(pathLocale.length + 1) || "/"
+  : pathname;
+
+const siteName =
+  Astro.locals.siteSettings?.siteName?.[locale] ?? t("common.site_name");
+const p = (path: string) => localizedPath(locale, path);
+
+// 子畫面標題：伺服器端直接算出，換頁時不必等 JS
+const titleHead = title.split(/\s[—–|-]\s/)[0]?.trim() ?? "";
+const serverTitle = titleHead && titleHead !== siteName ? titleHead : "";
+
+// 購物車角標：cookie 為 server-readable（見 src/lib/cart.ts）
+let cartCount = 0;
+try {
+  cartCount = readCart(Astro.request.headers.get("cookie")).reduce(
+    (n, i) => n + (Number(i.qty) || 0),
+    0,
+  );
+} catch {
+  cartCount = 0;
+}
+
+// ---- 頂部列狀態：根畫面 / 子畫面 ----
+const normalized =
+  cleanPath.length > 1 ? cleanPath.replace(/\/$/, "") : cleanPath;
+const ROOTS = [
+  "/",
+  "/products",
+  "/quiz",
+  "/cart",
+  "/more",
+  "/checkout/success",
+];
+const isRoot = ROOTS.includes(normalized);
+
+// 直接開啟子畫面（沒有站內上一頁）時，返回鍵退到的「上一層」
+const segs = normalized.split("/").filter(Boolean);
+let parent = "/more";
+if (segs[0] === "checkout") parent = segs.length > 1 ? "/" : "/cart";
+else if (
+  ["products", "blog", "quiz"].includes(segs[0] ?? "") &&
+  segs.length > 1
+)
+  parent = "/" + segs[0];
+else if (["amber", "incense"].includes(segs[0] ?? "")) parent = "/products";
+
+const tabs = [
+  {
+    key: "home",
+    label: t("nav.home"),
+    href: p("/"),
+    active: cleanPath === "/",
+  },
+  {
+    key: "products",
+    label: t("nav.products"),
+    href: p("/products"),
+    active: cleanPath.startsWith("/products"),
+  },
+  {
+    key: "quiz",
+    label: t("nav.quiz"),
+    href: p("/quiz"),
+    active: cleanPath.startsWith("/quiz"),
+  },
+  {
+    key: "cart",
+    label: t("nav.cart"),
+    href: p("/cart"),
+    active: cleanPath.startsWith("/cart") || cleanPath.startsWith("/checkout"),
+  },
+  {
+    key: "more",
+    label: t("nav.more"),
+    href: p("/more"),
+    // 「更多」底下的頁面都算在這個 Tab 內
+    active: [
+      "/more",
+      "/story",
+      "/vision",
+      "/craft",
+      "/materials",
+      "/blog",
+      "/contact",
+      "/about",
+    ].some((x) => cleanPath === x || cleanPath.startsWith(x + "/")),
+  },
+];
+
+const icons: Record<string, string> = {
+  more: '<circle cx="5" cy="12" r="1.4"/><circle cx="12" cy="12" r="1.4"/><circle cx="19" cy="12" r="1.4"/>',
+  home: '<path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/>',
+  products:
+    '<rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/>',
+  quiz: '<path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/><path d="M19 17l.7 1.8L21.5 19.5l-1.8.7L19 22l-.7-1.8-1.8-.7 1.8-.7z"/>',
+  cart: '<path d="M6 7h12l-1 13H7z"/><path d="M9 7a3 3 0 0 1 6 0"/>',
+  story:
+    '<path d="M5 19c0-8 5-14 15-14 0 10-6 15-14 15"/><path d="M5 19c3-5 6-8 10-10"/>',
+};
+---
+
+<header
+  class="m-header"
+  role="banner"
+  data-state={isRoot ? "root" : "sub"}
+  data-parent={p(parent)}
+>
+  <a class="m-back" href={p(parent)} aria-label={t("common.back")}>
+    <svg
+      viewBox="0 0 24 24"
+      width="24"
+      height="24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M15 5l-7 7 7 7"></path>
+    </svg>
+  </a>
+  <a class="m-brand" href={p("/")} aria-label={siteName}>
+    <svg
+      viewBox="0 0 24 24"
+      width="26"
+      height="26"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="1.8"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      aria-hidden="true"
+      set:html={icons.story}
+    />
+    <span class="m-brand-text">{siteName}</span>
+  </a>
+  <p class="m-title" aria-live="polite">{serverTitle}</p>
+  <details class="m-lang">
+    <summary aria-label={t("common.language")}>
+      <svg
+        viewBox="0 0 24 24"
+        width="22"
+        height="22"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.8"
+        stroke-linecap="round"
+        aria-hidden="true"
+      >
+        <circle cx="12" cy="12" r="9"></circle>
+        <path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"></path>
+      </svg>
+    </summary>
+    <ul>
+      {
+        locales.map((l) => (
+          <li>
+            <a
+              href={localizedPath(l, cleanPath)}
+              hreflang={l}
+              data-locale={l}
+              aria-current={l === locale ? "true" : undefined}
+            >
+              {localeNames[l]}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </details>
+</header>
+
+<nav class="m-tabbar" aria-label="Primary">
+  {
+    tabs.map((tab) => (
+      <a
+        href={tab.href}
+        class:list={["m-tab", { "is-active": tab.active }]}
+        data-tab={tab.key}
+        aria-current={tab.active ? "page" : undefined}
+      >
+        <span class="m-ico">
+          <svg
+            viewBox="0 0 24 24"
+            width="24"
+            height="24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+            set:html={icons[tab.key]}
+          />
+          {tab.key === "cart" && (
+            <span
+              class="m-badge"
+              hidden={cartCount <= 0}
+              aria-label={String(cartCount)}
+            >
+              {cartCount > 99 ? "99+" : cartCount}
+            </span>
+          )}
+        </span>
+        <span>{tab.label}</span>
+      </a>
+    ))
+  }
+</nav>
+
+<script>
+  // 1) 點語言連結時寫入 cnamber_locale，否則回到「簡體中文（無前綴）」時 middleware 會讀到舊 cookie
+  document.addEventListener("click", (e) => {
+    const a = (e.target as HTMLElement | null)?.closest<HTMLAnchorElement>(
+      "a[data-locale]",
+    );
+    if (!a) return;
+    const secure = location.protocol === "https:" ? "; secure" : "";
+    document.cookie = `cnamber_locale=${a.dataset.locale}; path=/; max-age=2592000; samesite=lax${secure}`;
+  });
+
+  // 2) 子畫面：填入標題、返回鍵優先用站內上一頁
+  const header = document.querySelector<HTMLElement>(
+    '.m-header[data-state="sub"]',
+  );
+  if (header) {
+    const titleEl = header.querySelector<HTMLElement>(".m-title");
+    const brand =
+      header.querySelector<HTMLElement>(".m-brand-text")?.textContent?.trim() ??
+      "";
+    const fromTitle = document.title.split(/\s[—–|-]\s/)[0]?.trim() ?? "";
+    const fromH1 =
+      document.querySelector("main h1, h1")?.textContent?.trim() ?? "";
+    const text =
+      fromTitle && fromTitle !== brand ? fromTitle : fromH1 || fromTitle;
+    if (titleEl && !titleEl.textContent?.trim() && text)
+      titleEl.textContent = text;
+
+    header
+      .querySelector<HTMLAnchorElement>(".m-back")
+      ?.addEventListener("click", (e) => {
+        let sameOrigin = false;
+        try {
+          sameOrigin =
+            !!document.referrer &&
+            new URL(document.referrer).origin === location.origin;
+        } catch {
+          sameOrigin = false;
+        }
+        if (sameOrigin && history.length > 1) {
+          e.preventDefault();
+          history.back();
+        }
+        // 否則走 <a href> 的預設行為：退到邏輯上一層
+      });
+  }
+
+  // 3) 購物車角標：伺服器已渲染；這裡再用 cookie 同步一次（涵蓋預先渲染頁面與返回/前進快取）
+  const syncCartBadge = () => {
+    const badge = document.querySelector<HTMLElement>(
+      '.m-tab[data-tab="cart"] .m-badge',
+    );
+    if (!badge) return;
+    const raw = document.cookie
+      .split(";")
+      .map((c) => c.trim())
+      .find((c) => c.startsWith("cnamber_cart="));
+    if (!raw) return; // 讀不到（沒有或 HttpOnly）就保留伺服器渲染的值
+    try {
+      const items = JSON.parse(
+        atob(decodeURIComponent(raw.slice("cnamber_cart=".length))),
+      ) as { qty?: number }[];
+      const n = Array.isArray(items)
+        ? items.reduce((sum, i) => sum + (Number(i.qty) || 0), 0)
+        : 0;
+      badge.textContent = n > 99 ? "99+" : String(n);
+      badge.hidden = n <= 0;
+    } catch {
+      /* 解析失敗就保留伺服器渲染的值 */
+    }
+  };
+  syncCartBadge();
+  window.addEventListener("pageshow", (e) => {
+    if ((e as PageTransitionEvent).persisted) syncCartBadge();
+  });
+</script>

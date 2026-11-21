@@ -1,0 +1,139 @@
+---
+import AdminLayout from "../../layouts/AdminLayout.astro";
+import { getDB } from "../../lib/db";
+import { loadRates, saveRates, type RateRow } from "../../lib/rates";
+
+// 汇率设置：基准是人民币，per_cny = 1 人民币可换多少该币别
+if (!Astro.locals.admin) {
+  return new Response("Unauthorized", { status: 401 });
+}
+
+const NAMES: Record<string, string> = {
+  USD: "美元 $（英文站）",
+  MYR: "马来西亚令吉 RM（马来站）",
+  IDR: "印尼盾 Rp（印尼站）",
+  AED: "阿联酋迪拉姆",
+  SAR: "沙特里亚尔",
+  TWD: "新台币",
+};
+
+const db = getDB();
+const errors: string[] = [];
+
+if (Astro.request.method === "POST") {
+  const form = await Astro.request.formData();
+  try {
+    const current = await loadRates(db);
+    const updates: Record<string, number> = {};
+    for (const r of current) {
+      if (r.currency === "CNY") continue;
+      const raw = String(form.get(`rate_${r.currency}`) ?? "")
+        .replace(/,/g, "")
+        .trim();
+      const n = Number(raw);
+      if (!raw || !Number.isFinite(n) || n <= 0 || n > 1_000_000_000) {
+        errors.push(`${r.currency}：请填写大于 0 的数字`);
+        continue;
+      }
+      updates[r.currency] = n;
+    }
+    if (errors.length === 0) {
+      await saveRates(db, updates);
+      return Astro.redirect("/admin/rates?saved=1", 303);
+    }
+  } catch (e) {
+    errors.push(e instanceof Error ? e.message : "保存失败，请稍后重试");
+  }
+}
+
+let rows: RateRow[] = [];
+let loadFailed = false;
+try {
+  rows = (await loadRates(db)).filter((r) => r.currency !== "CNY");
+} catch {
+  loadFailed = true;
+}
+const saved = Astro.url.searchParams.get("saved") === "1";
+const field =
+  "w-40 px-3 py-2 border border-text-muted/30 rounded-md bg-bg-base font-mono";
+---
+
+<AdminLayout title="汇率设置" active="products">
+  <p class="mb-3 max-w-3xl text-sm text-text-secondary">
+    商品售价以人民币记录。各语言前台会依下面的汇率换算成当地货币显示（简体站
+    ¥、英文站 $、马来站 RM、印尼站 Rp）。修改后约 1 分钟内全站生效。
+  </p>
+
+  {
+    saved && (
+      <div class="mb-4 max-w-3xl rounded-card border border-forest-700/30 bg-forest-50 p-4 text-sm">
+        已保存。
+      </div>
+    )
+  }
+  {
+    errors.length > 0 && (
+      <div
+        role="alert"
+        class="mb-4 max-w-3xl rounded-card border border-error/40 bg-error/10 p-4 text-sm text-error"
+      >
+        <ul class="list-disc pl-5 space-y-0.5">
+          {errors.map((m) => (
+            <li>{m}</li>
+          ))}
+        </ul>
+      </div>
+    )
+  }
+  {
+    loadFailed && (
+      <div
+        role="alert"
+        class="mb-4 max-w-3xl rounded-card border border-error/40 bg-error/10 p-4 text-sm text-error"
+      >
+        读不到汇率表。请确认已套用 migration 0018（wrangler d1 migrations
+        apply）。
+      </div>
+    )
+  }
+
+  <form
+    method="POST"
+    class="max-w-3xl bg-bg-card border border-text-muted/20 rounded-card p-4 space-y-3"
+  >
+    <p class="text-sm font-medium">1 人民币 ¥ ＝ ？</p>
+    {
+      rows.map((r) => (
+        <div class="flex flex-wrap items-center gap-3">
+          <label class="w-56 text-sm" for={`rate_${r.currency}`}>
+            {r.currency}
+            <span class="text-text-muted">
+              {NAMES[r.currency] ? ` ・ ${NAMES[r.currency]}` : ""}
+            </span>
+          </label>
+          <input
+            id={`rate_${r.currency}`}
+            name={`rate_${r.currency}`}
+            type="text"
+            inputmode="decimal"
+            required
+            value={String(r.per_cny)}
+            class={field}
+          />
+          <span class="text-xs text-text-muted">
+            1 {r.currency} ≈ ¥{(1 / r.per_cny).toFixed(4)} ・ 更新于{" "}
+            {new Date(r.updated_at * 1000).toLocaleString("zh-CN", {
+              timeZone: "Asia/Taipei",
+            })}
+          </span>
+        </div>
+      ))
+    }
+    <button
+      type="submit"
+      class="px-4 py-2 bg-forest-700 text-bg-base rounded-md hover:bg-forest-900 transition-colors"
+    >
+      保存汇率
+    </button>
+  </form>
+</AdminLayout>

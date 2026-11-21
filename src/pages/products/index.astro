@@ -1,0 +1,275 @@
+---
+import { env } from "cloudflare:workers";
+
+// 前台商品列表頁(SSR)
+import Layout from "@layouts/Layout.astro";
+import ProductCard from "@components/ProductCard.astro";
+import { createT } from "../../i18n/t";
+import { defaultLocale, type Locale } from "../../i18n/config";
+import { formatPrice } from "@lib/format";
+import { parseTextMap } from "../../lib/categories";
+
+const locale = (Astro.locals.locale ?? defaultLocale) as Locale;
+const messages = (Astro.locals.messages ?? {}) as Record<string, unknown>;
+const t = createT(messages);
+void locale;
+
+const url = Astro.url;
+const filter = url.searchParams.get("cat") ?? "all";
+
+// 排序：白名單對應 SQL（不直接拼接使用者輸入）
+const SORTS = {
+  new: "p.created_at DESC",
+  price_asc: "(min_price IS NULL) ASC, min_price ASC, p.created_at DESC",
+  price_desc: "(min_price IS NULL) ASC, min_price DESC, p.created_at DESC",
+} as const;
+type SortKey = keyof typeof SORTS;
+const rawSort = url.searchParams.get("sort") ?? "new";
+const sort: SortKey = Object.prototype.hasOwnProperty.call(SORTS, rawSort)
+  ? (rawSort as SortKey)
+  : "new";
+const sortOptions = (
+  [
+    ["new", t("products.sort_new")],
+    ["price_asc", t("products.sort_price_asc")],
+    ["price_desc", t("products.sort_price_desc")],
+  ] as const
+).map(([key, label]) => {
+  const u = new URL(Astro.url);
+  if (key === "new") u.searchParams.delete("sort");
+  else u.searchParams.set("sort", key);
+  return { key, label, href: u.pathname + u.search, current: sort === key };
+});
+
+// 分類標籤與標題：讀後台「分类图片」的分類（含新增的），不再寫死兩個
+const LEGACY_CHIP: Record<string, string> = {
+  jewelry: String(t("products.filter_jewelry")),
+  incense: String(t("products.filter_incense")),
+};
+let siteCats: Array<{ code: string; label: string }> = [];
+try {
+  const res = env?.DB
+    ? await env.DB.prepare(
+        "SELECT code, titles FROM site_categories ORDER BY sort_order ASC, code ASC",
+      ).all<{ code: string; titles: string }>()
+    : null;
+  siteCats = (res?.results ?? []).map((r) => {
+    const titles = parseTextMap(r.titles);
+    return {
+      code: r.code,
+      label:
+        titles[locale] || titles["zh-Hans"] || LEGACY_CHIP[r.code] || r.code,
+    };
+  });
+} catch {
+  siteCats = [];
+}
+if (siteCats.length === 0) {
+  siteCats = [
+    { code: "jewelry", label: LEGACY_CHIP.jewelry ?? "jewelry" },
+    { code: "incense", label: LEGACY_CHIP.incense ?? "incense" },
+  ];
+}
+const headingText = siteCats.map((c) => c.label).join(" · ");
+const pageTitle = `${headingText} — ${t("common.site_name")}`;
+
+const products = env?.DB
+  ? await env.DB.prepare(
+      `SELECT p.id, p.slug, p.category,
+              pt.locale, pt.name, pt.short_description,
+              MIN(pp.amount) AS min_price, pp.currency AS min_currency,
+              (SELECT pv.image_urls FROM product_variants pv WHERE pv.product_id = p.id LIMIT 1) AS image_urls
+       FROM products p
+       LEFT JOIN product_translations pt ON pt.product_id = p.id AND pt.locale = ?
+       LEFT JOIN product_variants pv ON pv.product_id = p.id
+       LEFT JOIN product_prices pp ON pp.variant_id = pv.id AND pp.currency = 'CNY'
+       WHERE p.status = 'active' ${filter !== "all" ? "AND p.category = ?" : ""}
+       GROUP BY p.id
+       ORDER BY ${SORTS[sort]} LIMIT 60`,
+    )
+      .bind(
+        filter !== "all" ? locale : locale,
+        ...(filter !== "all" ? [filter] : []),
+      )
+      .all()
+  : { results: [] as Array<Record<string, unknown>> };
+
+function firstImage(json: string | null | undefined): string | undefined {
+  if (!json) return undefined;
+  try {
+    const urls = JSON.parse(json) as string[];
+    return Array.isArray(urls) && urls.length > 0 ? urls[0] : undefined;
+  } catch {
+    return undefined;
+  }
+}
+---
+
+<Layout title={pageTitle} description={t("home.story_p1") ?? ""}>
+  <div class="max-w-6xl mx-auto px-6 py-section">
+    <header data-products-head class="mb-12 text-center">
+      <p
+        class="text-sm uppercase tracking-[0.3em] text-accent-700 font-sans mb-3"
+      >
+        {t("products.kicker")}
+      </p>
+      <h1
+        class="text-display-sm md:text-display-md font-serif text-text-primary mb-3"
+      >
+        {headingText}
+      </h1>
+      <p class="text-text-secondary max-w-2xl mx-auto">{t("home.story_p1")}</p>
+    </header>
+
+    <nav data-products-chips class="flex justify-center gap-2 mb-10">
+      <div data-products-chips-scroll class="flex justify-center gap-2">
+        {
+          [
+            { code: "all", label: String(t("products.filter_all")) },
+            ...siteCats,
+          ].map(({ code: cat, label }) => {
+            const isActive = filter === cat;
+            const next = new URL(Astro.url);
+            if (cat === "all") next.searchParams.delete("cat");
+            else next.searchParams.set("cat", cat);
+            return (
+              <a
+                href={next.pathname + next.search}
+                aria-current={isActive ? "page" : undefined}
+                class={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                  isActive
+                    ? "bg-forest-700 text-bg-base"
+                    : "bg-bg-card border border-text-muted/20 text-text-primary hover:border-accent-500"
+                }`}
+              >
+                {label}
+              </a>
+            );
+          })
+        }
+      </div>
+      <button
+        type="button"
+        class="m-sort-btn"
+        data-sort-open
+        data-active={sort !== "new" ? "" : undefined}
+        aria-haspopup="dialog"
+      >
+        <svg
+          viewBox="0 0 24 24"
+          width="18"
+          height="18"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M7 4v16M7 20l-3-3M7 20l3-3M17 20V4M17 4l-3 3M17 4l3 3"
+          ></path>
+        </svg>
+        <span>{t("products.sort_label")}</span>
+      </button>
+    </nav>
+
+    <dialog class="m-sheet" data-sort-sheet aria-labelledby="m-sort-title">
+      <div class="m-sheet-head">
+        <p class="m-sheet-title" id="m-sort-title">
+          {t("products.sort_label")}
+        </p>
+        <button
+          type="button"
+          class="m-sheet-close"
+          data-sort-close
+          aria-label={t("common.close")}
+        >
+          <svg
+            viewBox="0 0 24 24"
+            width="22"
+            height="22"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            aria-hidden="true"
+          >
+            <path d="M6 6l12 12M18 6L6 18"></path>
+          </svg>
+        </button>
+      </div>
+      <ul class="m-sheet-list">
+        {
+          sortOptions.map((o) => (
+            <li>
+              <a href={o.href} aria-current={o.current ? "true" : undefined}>
+                <span>{o.label}</span>
+                {o.current && (
+                  <svg
+                    viewBox="0 0 24 24"
+                    width="20"
+                    height="20"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2.2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    aria-hidden="true"
+                  >
+                    <path d="M5 12.5l4.5 4.5L19 7.5" />
+                  </svg>
+                )}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </dialog>
+
+    {
+      products.results.length === 0 ? (
+        <div class="text-center py-section text-text-muted">
+          <p class="text-lg mb-2">{t("products.empty_title")}</p>
+          <p class="text-sm">{t("products.empty_desc")}</p>
+        </div>
+      ) : (
+        <div
+          data-products-grid
+          class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+        >
+          {products.results.map((p) => (
+            <ProductCard
+              slug={p.slug as string}
+              name={(p.name as string) ?? (p.slug as string)}
+              shortDescription={(p.short_description as string) ?? undefined}
+              category={p.category as string}
+              imageUrl={firstImage(p.image_urls as string)}
+              priceFrom={
+                (p.min_price as number)
+                  ? formatPrice(
+                      p.min_price as number,
+                      p.min_currency as string,
+                      locale,
+                    )
+                  : undefined
+              }
+            />
+          ))}
+        </div>
+      )
+    }
+  </div>
+
+  <script>
+    const dlg = document.querySelector<HTMLDialogElement>("[data-sort-sheet]");
+    document
+      .querySelector("[data-sort-open]")
+      ?.addEventListener("click", () => dlg?.showModal());
+    dlg?.addEventListener("click", (e) => {
+      if (e.target === dlg) dlg.close(); // 點背景關閉
+    });
+    dlg
+      ?.querySelectorAll("[data-sort-close]")
+      .forEach((b) => b.addEventListener("click", () => dlg.close()));
+  </script>
+</Layout>

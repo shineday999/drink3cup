@@ -1,0 +1,2463 @@
+/* ===== Mobile-First App-like layer (<768px) ===== */
+:root {
+  --m-bg: #f3f1ea;
+  --m-card: #ffffff;
+  --m-ink: #1f2a24;
+  --m-muted: #5f6f64;
+  --m-accent: #3f6b4f;
+  --m-header-h: 56px;
+  --m-tab-h: 64px;
+}
+
+/* 桌面版隱藏手機專用元件 */
+.m-header,
+.m-tabbar {
+  display: none;
+}
+
+@media (max-width: 767.98px) {
+  /* ---- 1. 基礎：禁止水平捲軸 ---- */
+  html {
+    -webkit-text-size-adjust: 100%;
+    scroll-padding-top: calc(var(--m-header-h) + 16px);
+  }
+  html,
+  body {
+    max-width: 100%;
+    overflow-x: clip;
+  }
+  body {
+    background: var(--m-bg);
+    padding-top: calc(var(--m-header-h) + env(safe-area-inset-top, 0px));
+    padding-bottom: calc(
+      var(--m-tab-h) + env(safe-area-inset-bottom, 0px) + 16px
+    );
+    -webkit-tap-highlight-color: transparent;
+  }
+  img,
+  video,
+  svg,
+  canvas,
+  iframe {
+    max-width: 100%;
+  }
+  main {
+    overflow-x: clip;
+  }
+  main :where(pre, table) {
+    max-width: 100%;
+    overflow-x: auto;
+  }
+
+  /* ---- 2. 導覽列：隱藏桌面 header，改用 Fixed Header + Bottom Tab Bar ---- */
+  header:not(.m-header):not(main header):not(article header):not(
+      section header
+    ),
+  #site-header,
+  .site-header,
+  [data-site-header],
+  body > nav:not(.m-tabbar),
+  #mobile-menu,
+  [data-mobile-menu] {
+    display: none !important;
+  }
+
+  .m-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 60;
+    height: calc(var(--m-header-h) + env(safe-area-inset-top, 0px));
+    padding: env(safe-area-inset-top, 0px) 16px 0;
+    background: rgba(255, 255, 255, 0.92);
+    -webkit-backdrop-filter: blur(14px);
+    backdrop-filter: blur(14px);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+    color: var(--m-ink);
+  }
+  .m-brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 44px;
+    color: var(--m-accent);
+    text-decoration: none;
+  }
+  .m-brand-text {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--m-ink);
+    letter-spacing: 0.02em;
+  }
+
+  .m-lang {
+    position: relative;
+  }
+  .m-lang summary {
+    list-style: none;
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 999px;
+    cursor: pointer;
+  }
+  .m-lang summary::-webkit-details-marker {
+    display: none;
+  }
+  .m-lang ul {
+    position: absolute;
+    right: 0;
+    top: 48px;
+    min-width: 190px;
+    margin: 0;
+    padding: 6px;
+    list-style: none;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.16);
+  }
+  .m-lang li a {
+    display: flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 0 14px;
+    border-radius: 12px;
+    font-size: 16px;
+    color: var(--m-ink);
+    text-decoration: none;
+  }
+  .m-lang li a[aria-current="true"] {
+    background: #eef3ee;
+    font-weight: 600;
+    color: var(--m-accent);
+  }
+
+  .m-tabbar {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 60;
+    height: calc(var(--m-tab-h) + env(safe-area-inset-bottom, 0px));
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    background: rgba(255, 255, 255, 0.95);
+    -webkit-backdrop-filter: blur(14px);
+    backdrop-filter: blur(14px);
+    border-top: 1px solid rgba(0, 0, 0, 0.07);
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.05);
+  }
+  .m-tab {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    min-height: 48px;
+    color: var(--m-muted);
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 500;
+    transition: color 0.15s;
+  }
+  .m-tab:active {
+    transform: scale(0.94);
+  }
+  .m-tab.is-active {
+    color: var(--m-accent);
+    font-weight: 700;
+  }
+
+  /* ---- 3. 卡片式區塊 & 網格重排 ---- */
+  main > section:not(:first-child) {
+    padding: 28px 16px;
+  }
+
+  /* 預設單欄；3 個以上子項 → 2x2 雙欄 */
+  main .grid {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
+  main .grid:has(> :nth-child(3)) {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+  main .grid:has(> :nth-child(3)) > :last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+  }
+
+  /* 圓角卡片 */
+  main .grid > * {
+    border-radius: 16px;
+    overflow: hidden;
+    min-height: 44px;
+    background: var(--m-card);
+    box-shadow:
+      0 1px 3px rgba(0, 0, 0, 0.06),
+      0 4px 14px rgba(31, 42, 36, 0.05);
+  }
+  main .grid > a,
+  main .grid > article {
+    padding: 0;
+  }
+  main .grid img {
+    width: 100%;
+    object-fit: cover;
+  }
+
+  footer {
+    margin: 16px 12px 0;
+    border-radius: 16px;
+    overflow: hidden;
+  }
+  footer .grid {
+    grid-template-columns: 1fr !important;
+  }
+  footer .grid > * {
+    box-shadow: none;
+    background: transparent;
+    border-radius: 0;
+  }
+  footer a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
+
+  /* ---- 4. 字體 & 按鈕 ---- */
+  main h1 {
+    font-size: 28px !important;
+    line-height: 1.25 !important;
+    font-weight: 700 !important;
+  }
+  main h2 {
+    font-size: 24px !important;
+    line-height: 1.3 !important;
+    font-weight: 700 !important;
+  }
+  main h3 {
+    font-size: 18px !important;
+    line-height: 1.4 !important;
+    font-weight: 600 !important;
+  }
+  main p,
+  main li,
+  main dd {
+    font-size: 16px;
+    line-height: 1.7;
+  }
+  .text-xs,
+  .text-sm {
+    font-size: 14px !important;
+  }
+
+  /* CTA：膠囊狀、加高 */
+  main
+    :is(
+      button,
+      [role="button"],
+      input[type="submit"],
+      a.btn,
+      a[class*="btn"],
+      a[class*="button"],
+      a[class*="cta"]
+    ),
+  main section:first-child a:not(p a):not(li a) {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-height: 48px;
+    padding: 0 24px;
+    border-radius: 999px;
+    font-size: 16px;
+    font-weight: 600;
+    text-decoration: none;
+  }
+  main :is(.flex, [class*="flex-wrap"]):has(> :is(a, button)) {
+    gap: 12px;
+  }
+
+  /* 表單：16px 避免 iOS 自動放大 */
+  input,
+  select,
+  textarea {
+    font-size: 16px !important;
+    min-height: 48px;
+    border-radius: 14px;
+    max-width: 100%;
+  }
+  textarea {
+    min-height: 120px;
+  }
+}
+
+/* 平板以上完全不影響 */
+@media (min-width: 768px) {
+  .m-header,
+  .m-tabbar {
+    display: none !important;
+  }
+}
+
+/* ===== app-shell 1.1：Hero 首屏不套用卡片樣式（避免白字白底） ===== */
+@media (max-width: 767.98px) {
+  main > section:first-child .grid > *,
+  main > section:first-child .grid > *:last-child:nth-child(odd) {
+    background: transparent;
+    box-shadow: none;
+    border-radius: 0;
+    overflow: visible;
+    min-height: 0;
+  }
+  main > section:first-child .grid {
+    display: block;
+  }
+}
+
+/* ===== app-shell 1.1b：版面用格線（grid-cols-12）不是卡片列表，不套卡片樣式 ===== */
+@media (max-width: 767.98px) {
+  main .grid[class*="grid-cols-12"] {
+    display: block !important;
+    grid-template-columns: none !important;
+  }
+  main .grid[class*="grid-cols-12"] > *,
+  main .hero-text {
+    background: transparent !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    overflow: visible !important;
+    min-height: 0;
+    grid-column: auto !important;
+  }
+}
+
+/* ===== app-shell 1.4：手機版不顯示頁尾（入口都在「更多」頁） ===== */
+@media (max-width: 767.98px) {
+  footer[data-site-footer] {
+    display: none !important;
+  }
+}
+
+/* ===== app-shell 1.5：頂部列雙狀態（root = Logo；sub = 返回鍵 + 標題） ===== */
+@media (max-width: 767.98px) {
+  .m-back,
+  .m-title {
+    display: none;
+  }
+  .m-header[data-state="sub"] .m-brand {
+    display: none;
+  }
+  .m-header[data-state="sub"] .m-back {
+    display: inline-grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    margin-left: -10px;
+    border-radius: 999px;
+    color: var(--m-ink);
+    text-decoration: none;
+  }
+  .m-header[data-state="sub"] .m-back:active {
+    background: rgba(0, 0, 0, 0.06);
+  }
+  .m-header[data-state="sub"] .m-title {
+    display: block;
+    flex: 1;
+    min-width: 0;
+    margin: 0 4px;
+    font-size: 17px;
+    font-weight: 700;
+    line-height: 1.2;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: var(--m-ink);
+  }
+}
+
+/* ===== app-shell 1.6：購物車 Tab 數量角標 ===== */
+@media (max-width: 767.98px) {
+  .m-ico {
+    position: relative;
+    display: inline-flex;
+  }
+  .m-badge {
+    position: absolute;
+    top: -6px;
+    right: -11px;
+    box-sizing: border-box;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    border-radius: 999px;
+    background: #a65f3d;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 18px;
+    text-align: center;
+    box-shadow: 0 0 0 2px #fff;
+  }
+  .m-badge[hidden] {
+    display: none;
+  }
+}
+
+/* ===== app-shell 1.7：頁面轉場（原生 View Transitions，MPA） =====
+   支援：Chrome/Edge 126+、Safari 18.2+；不支援的瀏覽器維持一般換頁。 */
+@media (max-width: 767.98px) and (prefers-reduced-motion: no-preference) {
+  @view-transition {
+    navigation: auto;
+  }
+
+  /* 頂部列、底部 Tab 各自成為獨立圖層：換頁時立即顯示新狀態，不跟著內容淡出入 */
+  .m-header {
+    view-transition-name: m-header;
+  }
+  .m-tabbar {
+    view-transition-name: m-tabbar;
+  }
+  ::view-transition-old(m-header),
+  ::view-transition-old(m-tabbar) {
+    display: none;
+  }
+  ::view-transition-new(m-header),
+  ::view-transition-new(m-tabbar) {
+    animation: none;
+  }
+
+  /* 內容：舊頁快速淡出，新頁從右側輕輕滑入 */
+  @keyframes m-vt-out {
+    to {
+      opacity: 0;
+    }
+  }
+  @keyframes m-vt-in {
+    from {
+      opacity: 0;
+      transform: translateX(14px);
+    }
+  }
+  ::view-transition-old(root) {
+    animation: m-vt-out 140ms ease-in both;
+  }
+  ::view-transition-new(root) {
+    animation: m-vt-in 240ms ease-out both;
+  }
+}
+
+/* ===== app-shell 2.1：首頁 Hero（手機版壓縮 + 修正通用規則造成的回歸） ===== */
+@media (max-width: 767.98px) {
+  /* 高度：約 60% 螢幕，底部圓角，下方露出下一區塊提示可往下 */
+  main [data-home-hero] {
+    height: 60vh;
+    height: 60dvh;
+    min-height: 420px;
+    max-height: 560px;
+    border-radius: 0 0 24px 24px;
+  }
+
+  /* 1.1b 把 grid-cols-12 改成區塊後內容貼頂：Hero 內容區改用 flex 垂直置中 */
+  main [data-home-hero] > .z-10.grid {
+    display: flex !important;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+  }
+  main [data-home-hero] .hero-text {
+    width: 100%;
+  }
+
+  /* 文字階層 */
+  main [data-home-hero] .hero-text > p:first-child {
+    margin-bottom: 12px;
+    font-size: 12px;
+    letter-spacing: 0.35em;
+  }
+  main [data-home-hero] h1 {
+    margin-bottom: 10px;
+    font-size: 32px !important;
+    line-height: 1.15 !important;
+  }
+  main [data-home-hero] .hero-text > p:nth-of-type(2) {
+    margin-bottom: 20px;
+    font-size: 17px;
+    line-height: 1.45;
+  }
+
+  /* 兩個 CTA 並排、同寬、48px 高 */
+  main [data-home-hero] .hero-text > div {
+    flex-direction: row;
+    gap: 10px;
+  }
+  main [data-home-hero] .hero-text > div > a {
+    flex: 1 1 0;
+    min-width: 0;
+    min-height: 48px;
+    padding: 8px 12px;
+    font-size: 15px;
+    line-height: 1.2;
+    text-align: center;
+  }
+
+  /* 回歸修正：SCROLL 連結在手機版不顯示（通用連結規則曾蓋掉 hidden） */
+  main [data-home-hero] a[href="#below-hero"] {
+    display: none !important;
+  }
+
+  /* 回歸修正：輪播圓點恢復小圓點，但保留 44px 以上的觸控範圍 */
+  main [data-home-hero] .hero-dot {
+    position: relative;
+    display: block;
+    min-width: 0;
+    min-height: 0;
+    padding: 0;
+    font-size: 0;
+  }
+  main [data-home-hero] .hero-dot::after {
+    content: "";
+    position: absolute;
+    inset: -18px -8px;
+  }
+  main [data-home-hero] > .bottom-0 {
+    padding-bottom: 14px;
+  }
+}
+
+/* ===== app-shell 2.2：首頁「兩條手作路線」→ 2 欄磚塊 ===== */
+@media (max-width: 767.98px) {
+  main [data-home-paths] {
+    padding-top: 28px;
+    padding-bottom: 28px;
+  }
+
+  /* 區塊標題：縮小間距 */
+  main [data-home-paths] .mb-12 {
+    margin-bottom: 16px;
+  }
+  main [data-home-paths] .mb-12 > p {
+    font-size: 12px;
+  }
+
+  /* 5/7 不對稱格線 → 手機版 2 欄等寬（覆蓋 1.1b 的 display:block） */
+  main [data-home-paths] .grid[class*="grid-cols-12"] {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 12px !important;
+    align-items: stretch;
+  }
+
+  /* 磚塊：3:4、16px 圓角 */
+  main [data-home-paths] .grid[class*="grid-cols-12"] a {
+    aspect-ratio: 3 / 4;
+    min-height: 0;
+    border-radius: 16px;
+  }
+
+  /* 磚塊內文字：只留小標 + 標題 + 了解更多，說明文字手機版隱藏 */
+  main [data-home-paths] .grid[class*="grid-cols-12"] a > .p-7 {
+    padding: 12px;
+  }
+  main
+    [data-home-paths]
+    .grid[class*="grid-cols-12"]
+    a
+    > .p-7
+    > p:first-of-type {
+    margin-bottom: 4px;
+    font-size: 11px;
+    letter-spacing: 0.25em;
+  }
+  main [data-home-paths] .grid[class*="grid-cols-12"] a > .p-7 > h3 {
+    margin-bottom: 0;
+    line-height: 1.2;
+  }
+  main
+    [data-home-paths]
+    .grid[class*="grid-cols-12"]
+    a
+    > .p-7
+    > p:nth-of-type(2) {
+    display: none;
+  }
+  main [data-home-paths] .grid[class*="grid-cols-12"] a > .p-7 > span {
+    display: inline-block;
+    margin-top: 6px;
+    font-size: 12px;
+  }
+}
+
+/* ===== app-shell 2.3：首頁「最近亮點」→ 橫向滑動列（scroll-snap） ===== */
+@media (max-width: 767.98px) {
+  main [data-home-featured] {
+    padding-top: 20px;
+    padding-bottom: 28px;
+  }
+
+  /* 標題列：左標題、右「查看全部 →」 */
+  main [data-home-featured] .mb-8 {
+    flex-direction: row;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+  main [data-home-featured] .mb-8 p {
+    font-size: 12px;
+  }
+  main [data-home-featured] .mb-8 > a {
+    display: inline-flex;
+    align-items: center;
+    align-self: flex-end;
+    min-height: 44px;
+    white-space: nowrap;
+  }
+
+  /* 商品列：橫向滑動，滿版（抵銷容器 24px 左右內距），右側露出下一張 */
+  main [data-home-featured] .grid {
+    display: flex !important;
+    gap: 12px !important;
+    margin-inline: -24px;
+    padding: 2px 24px 8px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: 24px;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  main [data-home-featured] .grid::-webkit-scrollbar {
+    display: none;
+  }
+  main [data-home-featured] .grid > * {
+    flex: 0 0 64vw;
+    max-width: 260px;
+    scroll-snap-align: start;
+    /* 卡片本身已有樣式，外層包裝不再疊一層卡片 */
+    background: transparent;
+    box-shadow: none;
+    border-radius: 0;
+    overflow: visible;
+  }
+  /* 橫向捲動容器內不依賴進場動畫，避免卡片停在透明狀態 */
+  main [data-home-featured] .grid .reveal-on-scroll,
+  main [data-home-featured] .grid .reveal-pending {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
+/* ===== app-shell 2.4：首頁「选一件」問答入口 → 橫幅卡 ===== */
+@media (max-width: 767.98px) {
+  /* 區塊間距 */
+  main [data-home-paths] .mt-20 {
+    margin-top: 24px;
+  }
+  main [data-home-paths] .pt-12 {
+    padding-top: 20px;
+  }
+
+  /* 標題：靠左、縮小、說明段落隱藏 */
+  main [data-home-paths] .mt-20 .text-center {
+    margin-inline: 0;
+    margin-bottom: 14px;
+    text-align: left;
+  }
+  main [data-home-paths] .mt-20 .text-center > p:first-of-type {
+    margin-bottom: 6px;
+    font-size: 12px;
+  }
+  main [data-home-paths] .mt-20 .text-center > h2 {
+    margin-bottom: 0;
+  }
+  main [data-home-paths] .mt-20 .text-center > p:nth-of-type(2) {
+    display: none;
+  }
+
+  /* 兩張卡直排、間距小；外層包裝不再疊一層白卡 */
+  main [data-home-paths] .grid[class*="md:grid-cols-2"] {
+    gap: 10px !important;
+  }
+  main [data-home-paths] .grid[class*="md:grid-cols-2"] > * {
+    background: transparent;
+    box-shadow: none;
+    border-radius: 0;
+    overflow: visible;
+  }
+
+  /* 橫幅卡本體 */
+  main [data-home-paths] a[href*="/quiz/"] {
+    position: relative;
+    min-height: 72px;
+    padding: 14px 48px 14px 16px;
+    border-radius: 16px;
+  }
+  main [data-home-paths] a[href*="/quiz/"]::after {
+    content: "→";
+    position: absolute;
+    top: 50%;
+    right: 16px;
+    transform: translateY(-50%);
+    font-size: 20px;
+    line-height: 1;
+    color: #a65f3d;
+  }
+  main [data-home-paths] a[href*="/quiz/"] > .flex {
+    margin-bottom: 6px;
+  }
+  main [data-home-paths] a[href*="/quiz/"] > h3 {
+    margin-bottom: 2px;
+    line-height: 1.25;
+  }
+  /* 說明段落與按鈕文字隱藏；保留一行補充說明 */
+  main [data-home-paths] a[href*="/quiz/"] > p:nth-of-type(1) {
+    display: none;
+  }
+  main [data-home-paths] a[href*="/quiz/"] > p:nth-of-type(2) {
+    margin-bottom: 0;
+  }
+  main [data-home-paths] a[href*="/quiz/"] > span {
+    display: none;
+  }
+}
+
+/* ===== app-shell 2.5：產品列表 分類 chips（橫滑、固定在頂部列下方） ===== */
+@media (max-width: 767.98px) {
+  /* 標題區：縮小、靠左、說明段落隱藏 */
+  main div:has(> [data-products-head]) {
+    padding-top: 12px;
+    padding-bottom: 24px;
+  }
+  main [data-products-head] {
+    margin-bottom: 8px;
+    text-align: left;
+  }
+  main [data-products-head] > p:first-child {
+    margin-bottom: 4px;
+    font-size: 12px !important;
+  }
+  main [data-products-head] > h1 {
+    margin-bottom: 0;
+  }
+  main [data-products-head] > p:nth-of-type(2) {
+    display: none;
+  }
+
+  /* chips 列：黏在頂部列下方、滿版。外層不捲動，左邊分類 chips（可橫滑）＋右邊固定的排序按鈕並排，互不重疊 */
+  main [data-products-chips] {
+    position: sticky;
+    top: calc(var(--m-header-h) + env(safe-area-inset-top, 0px));
+    z-index: 40;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 8px;
+    margin: 0 -24px 14px;
+    padding: 10px 24px;
+    background: rgba(255, 255, 255, 0.92);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  }
+  main [data-products-chips] > [data-products-chips-scroll] {
+    flex: 1 1 auto;
+    min-width: 0;
+    justify-content: flex-start;
+    gap: 8px;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  main [data-products-chips] > [data-products-chips-scroll]::-webkit-scrollbar {
+    display: none;
+  }
+  main [data-products-chips-scroll] > a {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    min-height: 44px;
+    padding: 0 18px;
+    white-space: nowrap;
+  }
+}
+
+/* ===== app-shell 2.6：產品列表 2 欄緊湊卡片 ===== */
+@media (max-width: 767.98px) {
+  /* 永遠 2 欄（含只有 1~2 件商品時）；落單的最後一張不拉成整排 */
+  main [data-products-grid] {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 12px !important;
+  }
+  main [data-products-grid] > :last-child:nth-child(odd) {
+    grid-column: auto !important;
+  }
+
+  /* 卡片：圓角由通用規則提供；移除原本的細邊框，按下有回饋 */
+  main [data-products-grid] > a {
+    border: 0;
+    transition: transform 0.15s ease;
+  }
+  main [data-products-grid] > a:active {
+    transform: scale(0.98);
+  }
+
+  /* 卡片內文：縮小內距與字級，隱藏說明段落 */
+  main [data-products-grid] > a > div:last-child {
+    padding: 12px;
+  }
+  main [data-products-grid] > a > div:last-child > p:first-child {
+    margin-bottom: 4px;
+    font-size: 10px;
+    letter-spacing: 0.25em;
+  }
+  main [data-products-grid] > a h3 {
+    margin-bottom: 4px;
+    font-size: 16px !important;
+    line-height: 1.25 !important;
+  }
+  main [data-products-grid] > a p.line-clamp-2 {
+    display: none;
+  }
+  main [data-products-grid] > a > div:last-child > p:last-child {
+    font-size: 13px !important;
+    line-height: 1.35;
+  }
+}
+
+/* ===== app-shell 2.8：產品列表 排序底部彈出層 ===== */
+.m-sort-btn {
+  display: none;
+}
+
+@media (max-width: 767.98px) {
+  /* chips 列右側的排序按鈕（固定在列的右緣，不蓋住分類 chips） */
+  main [data-products-chips] > .m-sort-btn {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    gap: 6px;
+    min-height: 44px;
+    padding: 0 14px;
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    border-radius: 999px;
+    background: #fff;
+    color: var(--m-ink);
+    font-size: 15px;
+    font-weight: 500;
+  }
+  main [data-products-chips] > .m-sort-btn[data-active] {
+    border-color: var(--m-accent);
+    color: var(--m-accent);
+  }
+
+  /* 底部彈出層（原生 <dialog>） */
+  body:has(dialog.m-sheet[open]) {
+    overflow: hidden;
+  }
+  .m-sheet {
+    width: 100%;
+    max-width: 100%;
+    max-height: 80dvh;
+    margin: auto 0 0;
+    padding: 0;
+    border: 0;
+    border-radius: 20px 20px 0 0;
+    background: #fff;
+    color: var(--m-ink);
+    overflow-y: auto;
+  }
+  .m-sheet::backdrop {
+    background: rgba(0, 0, 0, 0.45);
+  }
+  .m-sheet[open] {
+    animation: m-sheet-up 0.22s ease-out;
+  }
+  @keyframes m-sheet-up {
+    from {
+      transform: translateY(100%);
+    }
+  }
+  .m-sheet .m-sheet-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 8px 0 20px;
+  }
+  .m-sheet .m-sheet-title {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1.3;
+  }
+  main .m-sheet .m-sheet-close {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    min-height: 44px;
+    height: 44px;
+    padding: 0;
+    border: 0;
+    border-radius: 999px;
+    background: transparent;
+    color: var(--m-ink);
+  }
+  .m-sheet .m-sheet-list {
+    margin: 0;
+    padding: 4px 8px calc(16px + env(safe-area-inset-bottom, 0px));
+    list-style: none;
+  }
+  .m-sheet .m-sheet-list a {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 52px;
+    padding: 0 12px;
+    border-radius: 12px;
+    color: inherit;
+    font-size: 16px;
+    text-decoration: none;
+  }
+  .m-sheet .m-sheet-list a:active {
+    background: rgba(0, 0, 0, 0.05);
+  }
+  .m-sheet .m-sheet-list a[aria-current="true"] {
+    background: #eef3ee;
+    color: var(--m-accent);
+    font-weight: 600;
+  }
+}
+
+/* ===== app-shell 3.1：商品詳情 頭圖壓縮 ===== */
+@media (max-width: 767.98px) {
+  /* 頭圖：約 42% 螢幕高，底部圓角 */
+  main [data-pd-hero] {
+    height: 42vh;
+    height: 42dvh;
+    min-height: 260px;
+    max-height: 400px;
+    border-radius: 0 0 24px 24px;
+  }
+  /* 頂部列已有返回鍵（1.5），不再顯示圖上寫死英文的「Back to all」 */
+  main [data-pd-back] {
+    display: none;
+  }
+  /* 下方重複的第二張圖手機版不顯示 */
+  main [data-pd-gallery2] {
+    display: none;
+  }
+  /* 資訊區上下間距 */
+  main [data-pd-info] {
+    padding-top: 20px;
+    padding-bottom: 24px;
+  }
+}
+
+/* ===== app-shell 3.2 / 3.3：商品詳情 規格、數量步進器、底部固定操作列 ===== */
+/* 桌面版：新元素預設隱藏，版面不變 */
+.pd-qty-btn,
+.pd-bar-price {
+  display: none;
+}
+
+@media (max-width: 767.98px) {
+  /* ---- 3.2 規格：大按鈕列 ---- */
+  main [data-pd-form] fieldset label {
+    min-height: 56px;
+    padding: 0 14px;
+    border-width: 1.5px;
+    border-radius: 14px;
+  }
+  /* 通用規則曾讓所有 input ≥48px 高；單選鈕縮回正常大小 */
+  main [data-pd-form] input[type="radio"] {
+    flex: none;
+    width: 22px;
+    height: 22px;
+    min-height: 0;
+    margin: 0;
+    border-radius: 50%;
+  }
+  main [data-pd-form] fieldset label .font-mono {
+    font-size: 14px;
+  }
+
+  /* ---- 3.2 數量：label 靠左，− [n] ＋ 靠右 ---- */
+  main [data-pd-qty] {
+    display: grid;
+    grid-template-columns: 1fr auto auto auto;
+    align-items: center;
+    gap: 8px;
+  }
+  main [data-pd-qty] .pd-qty-btn {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    min-height: 44px;
+    height: 44px;
+    padding: 0;
+    border: 1.5px solid rgba(0, 0, 0, 0.15);
+    border-radius: 50%;
+    background: #fff;
+    color: var(--m-ink);
+    font-size: 24px;
+    font-weight: 500;
+    line-height: 1;
+  }
+  main [data-pd-qty] .pd-qty-btn:active {
+    background: rgba(0, 0, 0, 0.06);
+  }
+  main [data-pd-qty] #qty-input {
+    width: 56px;
+    min-height: 44px;
+    padding: 0;
+    text-align: center;
+    -moz-appearance: textfield;
+    appearance: textfield;
+  }
+  main [data-pd-qty] #qty-input::-webkit-outer-spin-button,
+  main [data-pd-qty] #qty-input::-webkit-inner-spin-button {
+    margin: 0;
+    -webkit-appearance: none;
+  }
+
+  /* 「聯絡」連結：點擊範圍 ≥44px */
+  main [data-pd-form] > a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+  }
+
+  /* ---- 3.3 底部固定操作列：疊在 Tab 列正上方 ---- */
+  main [data-pd-bar] {
+    position: fixed;
+    right: 0;
+    bottom: calc(var(--m-tab-h) + env(safe-area-inset-bottom, 0px));
+    left: 0;
+    z-index: 55;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 10px 16px;
+    border-top: 1px solid rgba(0, 0, 0, 0.07);
+    background: rgba(255, 255, 255, 0.96);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+  }
+  main [data-pd-bar] .pd-bar-price {
+    display: block;
+    margin: 0;
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1.2;
+    white-space: nowrap;
+  }
+  main [data-pd-bar] button[type="submit"] {
+    flex: 1;
+    min-height: 48px;
+    padding: 0 20px;
+    border-radius: 999px;
+    font-size: 16px;
+    font-weight: 600;
+  }
+  /* 頁面底部多留操作列的高度，內容不被遮住 */
+  main [data-pd-info] {
+    padding-bottom: 96px;
+  }
+}
+
+/* ===== app-shell 2.4b：首頁整頁高度再壓縮（實測 2.3 → 目標 ≤ 2.0） ===== */
+@media (max-width: 767.98px) {
+  /* 區塊上下留白 */
+  main [data-home-paths] {
+    padding-top: 20px;
+    padding-bottom: 20px;
+  }
+  main [data-home-featured] {
+    padding-top: 16px;
+    padding-bottom: 20px;
+  }
+
+  /* 路線磚：3:4 → 方形 */
+  main [data-home-paths] .grid[class*="grid-cols-12"] a {
+    aspect-ratio: 1 / 1;
+  }
+
+  /* 問答區塊：間距、標題、橫幅卡內距 */
+  main [data-home-paths] .mt-20 {
+    margin-top: 16px;
+  }
+  main [data-home-paths] .pt-12 {
+    padding-top: 16px;
+  }
+  main [data-home-paths] .mt-20 .text-center {
+    margin-bottom: 10px;
+  }
+  main [data-home-paths] .mt-20 .text-center > h2 {
+    font-size: 22px;
+    line-height: 1.2;
+  }
+  main [data-home-paths] a[href*="/quiz/"] {
+    min-height: 0;
+    padding: 10px 44px 10px 14px;
+  }
+  main [data-home-paths] a[href*="/quiz/"] > .flex {
+    margin-bottom: 2px;
+  }
+  main [data-home-paths] a[href*="/quiz/"] > h3 {
+    margin-bottom: 0;
+  }
+
+  /* 精選橫滑卡：縮窄（約 2.1 張同屏）、方圖、內距縮小、隱藏說明 */
+  main [data-home-featured] .grid > * {
+    flex: 0 0 46vw;
+    max-width: 200px;
+  }
+  main [data-home-featured] .grid a > div:first-child {
+    aspect-ratio: 1 / 1;
+  }
+  main [data-home-featured] .grid a > div:last-child {
+    padding: 10px 12px;
+  }
+  main [data-home-featured] .grid a p.line-clamp-2 {
+    display: none;
+  }
+}
+
+/* ===== app-shell 3.4：商品詳情 故事／常見問題 → 可展開（accordion） ===== */
+/* 桌面版：永遠展開、外觀不變（JS 於桌面版也會阻止收合） */
+[data-acc] > summary {
+  list-style: none;
+  cursor: default;
+}
+[data-acc] > summary::-webkit-details-marker {
+  display: none;
+}
+/* 故事的標題列：桌面版只給螢幕閱讀器，畫面與改版前相同 */
+[data-acc-story] > summary {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+@media (max-width: 767.98px) {
+  /* 標題列：整列可點、右側 +／− */
+  main [data-acc] > summary {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: auto;
+    height: auto;
+    min-height: 52px;
+    margin: 0;
+    padding-right: 32px;
+    overflow: visible;
+    clip: auto;
+    white-space: normal;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  main [data-acc] > summary::after {
+    content: "+";
+    position: absolute;
+    top: 50%;
+    right: 4px;
+    transform: translateY(-50%);
+    font-size: 22px;
+    line-height: 1;
+    color: #a65f3d;
+  }
+  main [data-acc][open] > summary::after {
+    content: "−";
+  }
+  main [data-acc] > p {
+    margin-bottom: 16px;
+  }
+
+  /* 故事：上下細線分隔 */
+  main [data-acc-story] {
+    margin-top: 20px;
+    border-top: 1px solid rgba(0, 0, 0, 0.08);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  }
+  main [data-acc-story] > summary {
+    font-size: 12px;
+  }
+
+  /* 常見問題：每題一列、細線分隔 */
+  main [data-pd-faq-list] > * {
+    margin-top: 0 !important;
+  }
+  main [data-pd-faq-list] > details {
+    padding-left: 0;
+    border-left: 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  }
+  main [data-pd-faq-list] summary h3 {
+    margin: 0;
+    font-size: 16px;
+    line-height: 1.4;
+  }
+
+  /* FAQ 區塊：縮小留白；底部留給固定操作列（3.3）與 Tab */
+  main [data-pd-faq] {
+    padding: 8px 24px 96px;
+  }
+  main [data-pd-faq] h2 {
+    margin-bottom: 8px;
+    font-size: 22px;
+    line-height: 1.2;
+  }
+  /* 3.3 的底部留白改由 FAQ 區塊負責 */
+  main [data-pd-info] {
+    padding-bottom: 24px;
+  }
+}
+
+/* ===== app-shell 3.5：購物車（± 數量、左滑移除、底部固定合計） ===== */
+/* 桌面版：新元素預設隱藏，版面不變 */
+[data-cart-stepper],
+[data-cart-del] {
+  display: none;
+}
+
+@media (max-width: 767.98px) {
+  main [data-cart-page] {
+    padding-top: 16px;
+    padding-bottom: 96px;
+  }
+  main [data-cart-page] h1 {
+    margin-bottom: 16px;
+  }
+
+  /* 列：橫向 scroll-snap，往左滑露出右側「移除」 */
+  main [data-cart-row] {
+    display: flex;
+    overflow-x: auto;
+    border-radius: 16px;
+    scroll-snap-type: x mandatory;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  main [data-cart-row]::-webkit-scrollbar {
+    display: none;
+  }
+  main [data-cart-card] {
+    flex: 0 0 100%;
+    scroll-snap-align: start;
+    align-items: flex-start;
+  }
+  main [data-cart-del] {
+    display: flex;
+    flex: 0 0 88px;
+    margin: 0;
+    scroll-snap-align: end;
+  }
+  main [data-cart-del] button {
+    width: 100%;
+    min-height: 0;
+    border: 0;
+    border-radius: 0 16px 16px 0;
+    background: #c0392b;
+    color: #fff;
+    font-size: 15px;
+    font-weight: 600;
+  }
+
+  /* 桌面版的文字數量與行內移除，手機版改用步進器與左滑 */
+  main [data-cart-qtytext],
+  main [data-cart-remove-inline] {
+    display: none;
+  }
+
+  /* − n ＋ 步進器 */
+  main [data-cart-stepper] {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 10px;
+  }
+  main [data-cart-stepper] form {
+    margin: 0;
+  }
+  main [data-cart-stepper] button {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    min-height: 44px;
+    height: 44px;
+    padding: 0;
+    border: 1.5px solid rgba(0, 0, 0, 0.15);
+    border-radius: 50%;
+    background: #fff;
+    color: var(--m-ink);
+    font-size: 22px;
+    line-height: 1;
+  }
+  main [data-cart-stepper] button:active:not(:disabled) {
+    background: rgba(0, 0, 0, 0.06);
+  }
+  main [data-cart-stepper] button:disabled {
+    opacity: 0.35;
+  }
+  main [data-cart-stepper] [data-cart-qty] {
+    min-width: 28px;
+    text-align: center;
+    font-weight: 600;
+  }
+
+  /* 底部固定：合計 + 結帳按鈕，疊在 Tab 列正上方（與 3.3 相同做法） */
+  main [data-cart-bar] {
+    position: fixed;
+    right: 0;
+    bottom: calc(var(--m-tab-h) + env(safe-area-inset-bottom, 0px));
+    left: 0;
+    z-index: 55;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin: 0 !important;
+    padding: 10px 16px;
+    border-top: 1px solid rgba(0, 0, 0, 0.07);
+    background: rgba(255, 255, 255, 0.96);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+  }
+  main [data-cart-bar] > :first-child {
+    flex: none;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0;
+    margin: 0 !important;
+    padding: 0;
+    border: 0;
+  }
+  main [data-cart-bar] > :first-child > :first-child {
+    font-size: 12px;
+    line-height: 1.2;
+  }
+  main [data-cart-bar] > :first-child > :last-child {
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1.2;
+  }
+  main [data-cart-bar] > :last-child {
+    flex: 1;
+    justify-content: center;
+    width: auto;
+    min-height: 48px;
+    margin: 0 !important;
+    padding: 0 20px;
+    border-radius: 999px;
+    font-size: 16px;
+    font-weight: 600;
+  }
+}
+
+/* ===== app-shell 4.1：問答 一題一畫面 ===== */
+.qw-progress,
+.qw-count,
+.qw-bar {
+  display: none;
+}
+
+@media (max-width: 767.98px) {
+  [data-quiz-page] {
+    padding-top: 16px;
+    padding-bottom: 112px;
+  }
+  /* 頂部列已有返回鍵與標題 → 隱藏頁內的返回連結與大標題 */
+  [data-quiz-page] > a,
+  [data-quiz-page] > header {
+    display: none;
+  }
+
+  /* 啟動前先只顯示第一題，避免整份表單閃一下 */
+  form[data-qw-pending] fieldset:not(:first-of-type) {
+    display: none;
+  }
+  form[data-qw-on] fieldset:not(.qw-current) {
+    display: none;
+  }
+  form[data-qw-on] > button[type="submit"] {
+    display: none;
+  }
+
+  /* 題目：取消卡片外框，標題放大 */
+  main form[data-quiz] fieldset {
+    min-width: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+  }
+  main form[data-quiz] fieldset.qw-current {
+    animation: qw-in 0.2s ease-out;
+  }
+  @keyframes qw-in {
+    from {
+      opacity: 0;
+      transform: translateX(16px);
+    }
+  }
+  main form[data-quiz] legend {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    margin-bottom: 18px;
+    padding: 0;
+  }
+  main form[data-quiz] legend > span:last-child {
+    font-size: 22px;
+    line-height: 1.3;
+  }
+
+  /* 選項：單欄、大磚塊 */
+  main form[data-quiz] fieldset .grid {
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+  }
+  main form[data-quiz] fieldset .grid > label {
+    min-height: 56px;
+    padding: 0 16px;
+    border-width: 1.5px;
+    border-radius: 14px;
+    box-shadow: none;
+  }
+  main form[data-quiz] fieldset .grid > label span {
+    font-size: 16px !important;
+  }
+  main form[data-quiz] input[type="radio"] {
+    flex: none;
+    width: 22px;
+    height: 22px;
+    min-height: 0;
+    margin: 0;
+    border-radius: 50%;
+  }
+
+  /* 進度條（固定在頂部列正下方）與「2 / 5」 */
+  form[data-qw-on] .qw-progress {
+    position: fixed;
+    top: calc(var(--m-header-h) + env(safe-area-inset-top, 0px));
+    right: 0;
+    left: 0;
+    z-index: 55;
+    display: block;
+    height: 4px;
+    background: rgba(0, 0, 0, 0.08);
+  }
+  .qw-fill {
+    width: 0;
+    height: 100%;
+    border-radius: 0 4px 4px 0;
+    background: var(--m-accent);
+    transition: width 0.25s ease;
+  }
+  form[data-qw-on] .qw-count {
+    display: block;
+    margin: 0 0 12px;
+    color: var(--m-muted);
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  /* 底部固定操作列（疊在 Tab 列正上方） */
+  form[data-qw-on] .qw-bar {
+    position: fixed;
+    right: 0;
+    bottom: calc(var(--m-tab-h) + env(safe-area-inset-bottom, 0px));
+    left: 0;
+    z-index: 55;
+    display: flex;
+    gap: 10px;
+    padding: 10px 16px;
+    border-top: 1px solid rgba(0, 0, 0, 0.07);
+    background: rgba(255, 255, 255, 0.96);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+  }
+  main form .qw-prev {
+    display: grid;
+    place-items: center;
+    width: 48px;
+    min-height: 48px;
+    padding: 0;
+    border: 1.5px solid rgba(0, 0, 0, 0.15);
+    border-radius: 50%;
+    background: #fff;
+    color: var(--m-ink);
+  }
+  main form .qw-prev[hidden] {
+    display: none;
+  }
+  main form .qw-next {
+    flex: 1;
+    min-height: 48px;
+    border: 0;
+    border-radius: 999px;
+    background: var(--m-accent);
+    color: #fff;
+    font-size: 16px;
+    font-weight: 600;
+  }
+  main form .qw-next:disabled {
+    opacity: 0.4;
+  }
+}
+
+/* ===== app-shell 4.2：問答結果頁 ===== */
+.qr-bar {
+  display: none;
+}
+
+@media (max-width: 767.98px) {
+  [data-quiz-result-page] {
+    padding-top: 16px;
+    padding-bottom: 112px;
+  }
+
+  /* 標題區：靠左、小標 + 標題，說明隱藏 */
+  [data-quiz-result-page] > header {
+    margin-bottom: 16px;
+    text-align: left;
+  }
+  [data-quiz-result-page] > header > p:first-child {
+    margin-bottom: 4px;
+    font-size: 12px !important;
+  }
+  [data-quiz-result-page] > header > h1 {
+    margin-bottom: 0;
+  }
+  [data-quiz-result-page] > header > p:nth-of-type(2) {
+    display: none;
+  }
+
+  /* 原本頁面底部的「重新測驗」連結由固定操作列取代 */
+  [data-quiz-old-retake] {
+    display: none;
+  }
+
+  /* 結果：單欄橫向列表（覆蓋通用規則的 2 欄） */
+  main [data-quiz-results] {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+    margin-bottom: 0;
+  }
+  main [data-quiz-results] > div > .mb-2 {
+    margin: 0;
+    padding: 12px 12px 0;
+  }
+  main [data-quiz-results] > div > a {
+    display: flex;
+    border: 0;
+    border-radius: 0;
+  }
+  main [data-quiz-results] > div > a > div:first-child {
+    flex: none;
+    width: 104px;
+  }
+  main [data-quiz-results] > div > a > div:last-child {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    justify-content: center;
+    min-width: 0;
+    padding: 12px 14px;
+  }
+  main [data-quiz-results] > div > a h3 {
+    margin-bottom: 4px;
+    font-size: 17px !important;
+    line-height: 1.25 !important;
+  }
+
+  /* 底部固定操作列 */
+  .qr-bar {
+    position: fixed;
+    right: 0;
+    bottom: calc(var(--m-tab-h) + env(safe-area-inset-bottom, 0px));
+    left: 0;
+    z-index: 55;
+    display: flex;
+    gap: 10px;
+    padding: 10px 16px;
+    border-top: 1px solid rgba(0, 0, 0, 0.07);
+    background: rgba(255, 255, 255, 0.96);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+  }
+  main .qr-bar a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 48px;
+    border-radius: 999px;
+    font-size: 16px;
+    font-weight: 600;
+    text-decoration: none;
+  }
+  main .qr-bar .qr-retake {
+    padding: 0 18px;
+    border: 1.5px solid rgba(0, 0, 0, 0.15);
+    background: #fff;
+    color: var(--m-ink);
+  }
+  main .qr-bar .qr-more {
+    flex: 1;
+    background: var(--m-accent);
+    color: #fff;
+  }
+}
+
+/* ===== app-shell 4.3 / 4.4 / 4.5：預訂（結帳）3 步精靈 ===== */
+.co-progress,
+.co-count,
+.co-bar {
+  display: none;
+}
+
+@media (max-width: 767.98px) {
+  [data-co-page] {
+    padding-top: 16px;
+    padding-bottom: 112px;
+  }
+  /* 頂部列已有標題；說明文字縮小，只在第 1 步顯示 */
+  [data-co-page] > h1 {
+    display: none;
+  }
+  [data-co-page]:has(form[data-checkout]) > p {
+    margin-bottom: 12px;
+    font-size: 14px;
+  }
+  [data-co-page]:has(form[data-co-step]:not([data-co-step="1"])) > p {
+    display: none;
+  }
+
+  /* 表單：取消外層卡片，欄位列不再各自變白卡 */
+  main form[data-checkout] {
+    padding: 0;
+    border: 0;
+    background: transparent;
+  }
+  main form[data-checkout] .grid {
+    gap: 16px !important;
+  }
+  main form[data-checkout] .grid > * {
+    min-height: 0;
+    overflow: visible;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+  main form[data-checkout] label {
+    margin-bottom: 6px;
+    font-size: 14px;
+  }
+
+  /* 啟動前先只顯示第 1 步的欄位，避免整份表單閃一下 */
+  form[data-co-pending]
+    > *:not(:has(#name, #email, #phone)):not(.co-progress):not(.co-count):not(
+      .co-bar
+    ) {
+    display: none;
+  }
+  form[data-co-on] > .co-off {
+    display: none;
+  }
+  form[data-co-on] > button[type="submit"] {
+    display: none;
+  }
+
+  /* 進度條與「1 / 3 · 聯絡資料」 */
+  form[data-co-on] .co-progress {
+    position: fixed;
+    top: calc(var(--m-header-h) + env(safe-area-inset-top, 0px));
+    right: 0;
+    left: 0;
+    z-index: 55;
+    display: block;
+    height: 4px;
+    background: rgba(0, 0, 0, 0.08);
+  }
+  .co-fill {
+    width: 0;
+    height: 100%;
+    border-radius: 0 4px 4px 0;
+    background: var(--m-accent);
+    transition: width 0.25s ease;
+  }
+  form[data-co-on] .co-count {
+    display: block;
+    margin: 0 0 14px;
+    color: var(--m-muted);
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  /* 第 3 步：資料回顧 */
+  .co-recap {
+    margin: 0 0 16px;
+    padding: 14px 16px;
+    border-radius: 16px;
+    background: #fff;
+    box-shadow:
+      0 1px 3px rgba(0, 0, 0, 0.06),
+      0 4px 14px rgba(31, 42, 36, 0.05);
+  }
+  .co-recap[hidden] {
+    display: none;
+  }
+  .co-recap dt {
+    color: var(--m-muted);
+    font-size: 13px;
+  }
+  .co-recap dd {
+    margin: 0 0 10px;
+    font-size: 16px;
+    overflow-wrap: anywhere;
+  }
+  .co-recap dd:last-child {
+    margin-bottom: 0;
+  }
+
+  /* 底部固定操作列：‹ 上一步 ｜ 合計（第 3 步） ｜ 下一步／送出預訂 */
+  form[data-co-on] .co-bar {
+    position: fixed;
+    right: 0;
+    bottom: calc(var(--m-tab-h) + env(safe-area-inset-bottom, 0px));
+    left: 0;
+    z-index: 55;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 16px;
+    border-top: 1px solid rgba(0, 0, 0, 0.07);
+    background: rgba(255, 255, 255, 0.96);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+  }
+  main form .co-prev {
+    display: grid;
+    place-items: center;
+    width: 48px;
+    min-height: 48px;
+    padding: 0;
+    border: 1.5px solid rgba(0, 0, 0, 0.15);
+    border-radius: 50%;
+    background: #fff;
+    color: var(--m-ink);
+  }
+  main form .co-prev[hidden],
+  .co-total[hidden] {
+    display: none;
+  }
+  .co-total {
+    font-size: 18px;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+  main form .co-next {
+    flex: 1;
+    min-height: 48px;
+    border: 0;
+    border-radius: 999px;
+    background: var(--m-accent);
+    color: #fff;
+    font-size: 16px;
+    font-weight: 600;
+  }
+}
+
+/* ===== app-shell 4.6：預訂成功頁 ===== */
+.cs-bar {
+  display: none;
+}
+
+@media (max-width: 767.98px) {
+  /* 置中的完成畫面 */
+  [data-co-success] {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: calc(100dvh - var(--m-header-h) - var(--m-tab-h) - 120px);
+    padding-top: 24px;
+    padding-bottom: 112px;
+  }
+  /* 原本的「← 返回」連結由底部操作列取代 */
+  [data-co-success] > a {
+    display: none;
+  }
+  [data-co-success] svg {
+    width: 96px;
+    height: 96px;
+  }
+  [data-co-success] > p.font-mono,
+  [data-co-success] > p.text-xs {
+    display: inline-block;
+    margin-top: 8px;
+    padding: 8px 16px;
+    border-radius: 999px;
+    background: #fff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    font-size: 14px !important;
+    overflow-wrap: anywhere;
+  }
+
+  /* 底部固定操作列 */
+  .cs-bar {
+    position: fixed;
+    right: 0;
+    bottom: calc(var(--m-tab-h) + env(safe-area-inset-bottom, 0px));
+    left: 0;
+    z-index: 55;
+    display: flex;
+    gap: 10px;
+    padding: 10px 16px;
+    border-top: 1px solid rgba(0, 0, 0, 0.07);
+    background: rgba(255, 255, 255, 0.96);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+  }
+  main .cs-bar a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 48px;
+    border-radius: 999px;
+    font-size: 16px;
+    font-weight: 600;
+    text-decoration: none;
+  }
+  main .cs-bar .cs-home {
+    padding: 0 22px;
+    border: 1.5px solid rgba(0, 0, 0, 0.15);
+    background: #fff;
+    color: var(--m-ink);
+  }
+  main .cs-bar .cs-more {
+    flex: 1;
+    background: var(--m-accent);
+    color: #fff;
+  }
+}
+
+/* 勾勾彈出動畫（系統開「減少動態效果」時不播放） */
+@media (max-width: 767.98px) and (prefers-reduced-motion: no-preference) {
+  [data-co-success] svg {
+    animation: cs-pop 0.5s cubic-bezier(0.2, 1.4, 0.4, 1) both;
+  }
+  @keyframes cs-pop {
+    from {
+      opacity: 0;
+      transform: scale(0.4);
+    }
+  }
+}
+
+/* ===== app-shell 2.7：首頁 Hero 左右滑動切換 ===== */
+@media (max-width: 767.98px) {
+  /* 讓橫向手勢交給 JS，直向捲動仍由瀏覽器處理 */
+  main [data-home-hero] {
+    touch-action: pan-y;
+  }
+}
+
+/* ===== app-shell 2.9：圖片載入前 shimmer 占位（純 CSS） ===== */
+@media (max-width: 767.98px) and (prefers-reduced-motion: no-preference) {
+  @keyframes m-shimmer {
+    from {
+      background-position: 200% 0;
+    }
+    to {
+      background-position: -200% 0;
+    }
+  }
+
+  /* 商品卡圖片容器（排除沒有圖片的 .flex 占位）、首頁路線磚 */
+  main a.group > div.bg-forest-100:not(.flex):first-child,
+  main [data-home-paths] .grid[class*="grid-cols-12"] a.bg-forest-100 {
+    background-image: linear-gradient(
+      100deg,
+      transparent 30%,
+      rgba(255, 255, 255, 0.55) 50%,
+      transparent 70%
+    );
+    background-size: 200% 100%;
+    animation: m-shimmer 1.6s linear 4 forwards;
+  }
+}
+
+/* ===== app-shell 5.1：品牌內容頁共通排版（story / vision / craft / about / amber / incense / materials） ===== */
+@media (max-width: 767.98px) {
+  main article.py-section {
+    padding-top: 20px;
+    padding-bottom: 20px;
+  }
+
+  /* 標題區：靠左、壓縮 */
+  main article.py-section header {
+    margin-bottom: 20px;
+    text-align: left;
+  }
+  main article.py-section header > p:first-child {
+    margin-bottom: 8px;
+    font-size: 12px;
+  }
+  main article.py-section header h1 {
+    margin-bottom: 8px;
+    font-size: 30px;
+    line-height: 1.15;
+  }
+  main article.py-section header p.italic {
+    margin-inline: 0;
+    font-size: 16px;
+    line-height: 1.5;
+  }
+
+  /* 內文：段距統一（prose 的上下邊距一併歸零，改由相鄰段落間距控制） */
+  main article.py-section [class*="space-y-6"] > p {
+    margin-block: 0 !important;
+    font-size: 16px;
+    line-height: 1.7;
+  }
+  main
+    article.py-section
+    [class*="space-y-6"]
+    > :not([hidden])
+    ~ :not([hidden]) {
+    margin-top: 14px !important;
+  }
+
+  /* 引言：縮小上下留白 */
+  main article.py-section blockquote {
+    margin-bottom: 18px !important;
+    padding-block: 12px;
+  }
+  main article.py-section blockquote > p {
+    font-size: 20px;
+    line-height: 1.4;
+  }
+}
+
+/* ===== app-shell 5.2：About／Contact 常見問題 → 可展開（沿用 3.4 的 [data-acc] 規則） ===== */
+@media (max-width: 767.98px) {
+  main [data-faq-section] {
+    margin-top: 20px;
+    padding-top: 16px;
+  }
+  main [data-faq-section] h2 {
+    margin-bottom: 8px;
+    font-size: 22px;
+    line-height: 1.2;
+  }
+  main [data-faq-list] > * {
+    margin-top: 0 !important;
+  }
+  main [data-faq-list] > details {
+    padding-left: 0;
+    border-left: 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  }
+  main [data-faq-list] summary h3 {
+    margin: 0;
+    font-size: 16px;
+    line-height: 1.4;
+  }
+}
+
+/* ===== app-shell 5.3：Materials 材質卡 → 可展開列 ===== */
+@media (max-width: 767.98px) {
+  /* 卡片之間縮小間距 */
+  main article.py-section .grid[class*="lg:grid-cols-3"] {
+    gap: 10px;
+  }
+  /* 卡片：只留左右內距，標題列自己撐高 */
+  main [data-mat-card] {
+    padding: 0 16px;
+    border-radius: 16px;
+  }
+  main [data-mat-card] summary h3 {
+    margin: 0;
+    font-size: 18px;
+    line-height: 1.3;
+  }
+  main [data-mat-card] > details > p {
+    font-size: 15px;
+    line-height: 1.7;
+  }
+}
+
+/* ===== app-shell 5.4：「選一件」頁（/quiz）重新設計 + 繼續閱讀卡片壓縮 ===== */
+/* 桌面版：時長說明預設隱藏，版面不變 */
+[data-qz-meta] {
+  display: none;
+}
+
+@media (max-width: 767.98px) {
+  /* ---- 選一件頁：標題區 ---- */
+  main [data-qz-page] {
+    padding-top: 20px;
+    padding-bottom: 24px;
+  }
+  main [data-qz-header] {
+    margin-bottom: 20px;
+    text-align: left;
+  }
+  main [data-qz-header] > p:first-child {
+    margin-bottom: 8px;
+    font-size: 12px;
+    letter-spacing: 0.3em;
+  }
+  main [data-qz-header] h1 {
+    margin-bottom: 8px;
+    font-size: 30px;
+    line-height: 1.15;
+  }
+  main [data-qz-header] > p:last-child {
+    margin-inline: 0;
+    font-size: 16px;
+    line-height: 1.5;
+  }
+  main [data-qz-page] .grid {
+    gap: 14px;
+  }
+
+  /* ---- 選一件頁：卡片 ---- */
+  main .qz-card {
+    display: flex !important;
+    flex-direction: column;
+    padding: 18px !important;
+    border: 0 !important;
+    border-radius: 20px !important;
+    background: #fff;
+    box-shadow:
+      0 1px 2px rgba(0, 0, 0, 0.05),
+      0 8px 24px rgba(31, 42, 36, 0.08) !important;
+    transition: transform 0.15s ease;
+  }
+  main .qz-card:active {
+    transform: scale(0.985);
+  }
+  main [data-qz-icon] {
+    display: grid;
+    place-items: center;
+    width: 48px;
+    height: 48px;
+    margin: 0 0 12px;
+    border-radius: 50%;
+    background: rgba(166, 95, 61, 0.1);
+    color: #a65f3d;
+  }
+  main [data-qz-icon] svg {
+    width: 24px;
+    height: 24px;
+  }
+  main .qz-card h2 {
+    margin: 0 0 6px;
+    font-size: 22px;
+    line-height: 1.2;
+  }
+  main [data-qz-body] > p {
+    display: -webkit-box;
+    margin: 0;
+    overflow: hidden;
+    font-size: 15px;
+    line-height: 1.55;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+  main [data-qz-foot] {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 14px;
+  }
+  main [data-qz-meta] {
+    display: block;
+    margin: 0;
+    font-size: 12px;
+    opacity: 0.6;
+  }
+  main [data-qz-foot] > p:last-child {
+    margin: 0;
+    padding: 8px 16px;
+    border-radius: 999px;
+    background: #a65f3d;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.2;
+    white-space: nowrap;
+  }
+  /* 手機版只留一個箭頭（桌面版維持原樣） */
+  main [data-qz-lead] {
+    display: none;
+  }
+
+  /* ---- 頁尾「繼續閱讀」卡片 ---- */
+  main [data-continue] > p {
+    margin-bottom: 12px;
+    font-size: 12px;
+    text-align: left;
+  }
+  main [data-continue] > .grid {
+    gap: 10px;
+  }
+  main [data-continue] a {
+    padding: 14px 16px;
+    border-radius: 16px;
+  }
+  main [data-continue] a h3 {
+    margin-bottom: 4px;
+    font-size: 18px;
+    line-height: 1.3;
+  }
+  main [data-continue] a p {
+    display: -webkit-box;
+    overflow: hidden;
+    font-size: 14px;
+    line-height: 1.5;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+}
+
+/* ===== app-shell 6.1：body 背景層次 ===== */
+@media (max-width: 767.98px) {
+  /* <body class="bg-white">（單一 class）權重高於 body 選擇器，這裡以更高權重改回淺灰 */
+  html body.bg-white {
+    background-color: var(--m-bg);
+  }
+  /* 2.5 的 chips 列原本因 body 是白色而暫用白底，改為同色 */
+  html body main [data-products-chips] {
+    background: var(--m-bg);
+  }
+}
+
+/* ===== app-shell 5.5：「選一件」頁（/quiz）壓縮到一個螢幕內 ===== */
+/* 卡片改橫向：圖示浮動在左、文字在右（用 float，不依賴 Card 內部結構）。必須放在 5.4 之後 */
+@media (max-width: 767.98px) {
+  main [data-qz-page] {
+    padding-top: 16px;
+    padding-bottom: 16px;
+  }
+  main [data-qz-header] {
+    margin-bottom: 14px;
+  }
+  main [data-qz-header] > p:first-child {
+    margin-bottom: 4px;
+  }
+  main [data-qz-header] h1 {
+    margin-bottom: 6px;
+    font-size: 28px;
+  }
+  main [data-qz-header] > p:last-child {
+    font-size: 15px;
+    line-height: 1.4;
+  }
+  main [data-qz-page] .grid {
+    gap: 12px;
+  }
+  main .qz-card {
+    display: block !important;
+    padding: 14px 16px !important;
+  }
+  main [data-qz-icon] {
+    float: left;
+    width: 44px;
+    height: 44px;
+    margin: 0 12px 0 0;
+  }
+  main [data-qz-icon] svg {
+    width: 22px;
+    height: 22px;
+  }
+  main [data-qz-body] {
+    display: flow-root;
+  }
+  main .qz-card h2 {
+    margin: 0 0 4px;
+    font-size: 20px;
+  }
+  main [data-qz-body] > p {
+    font-size: 14px;
+    line-height: 1.5;
+  }
+  main [data-qz-foot] {
+    margin-top: 10px;
+  }
+  main [data-qz-foot] > p:last-child {
+    padding: 7px 14px;
+    font-size: 13px;
+  }
+}
+
+/* ===== app-shell 2.10：首頁 Hero 再縮小 + 只留一顆 CTA ===== */
+@media (max-width: 767.98px) {
+  /* 約 50% 螢幕，讓「兩條手作路線」標題在第一屏就露出，提示可往下滑 */
+  main [data-home-hero] {
+    height: 50vh;
+    height: 50dvh;
+    min-height: 360px;
+    max-height: 460px;
+  }
+
+  /* 「慢慢看」與底部分頁「产品」重複，手機版隱藏 */
+  main [data-home-hero] .hero-text > div > a[href*="products"] {
+    display: none;
+  }
+
+  /* 只剩一顆按鈕時不要撐滿整列 */
+  main [data-home-hero] .hero-text > div > a {
+    flex: 0 1 240px;
+  }
+}
+
+/* ===== app-shell 2.11：Hero 唯一的 CTA 改實心陶土色（terra-500 / 700） ===== */
+@media (max-width: 767.98px) {
+  main [data-home-hero] .hero-text > div > a[href*="quiz"] {
+    background-color: #a45e3d !important;
+    border-color: #a45e3d !important;
+    color: #fffdf8 !important;
+    font-weight: 600;
+  }
+
+  main [data-home-hero] .hero-text > div > a[href*="quiz"]:active {
+    background-color: #5f3220 !important;
+    border-color: #5f3220 !important;
+  }
+}
+
+/* ===== app-shell 6.8：懸浮膠囊分頁列 =====
+   --m-tab-h 代表「底部固定列要避開的高度」：膠囊 60 + 離底 12 + 與上方固定列的間距 4。
+   其他固定操作列（商品詳情、購物車、問答、預訂）都用它定位，改這個值它們會一起跟著抬高。 */
+@media (max-width: 767.98px) {
+  :root {
+    --m-tab-h: 76px;
+  }
+
+  nav.m-tabbar {
+    left: 16px;
+    right: 16px;
+    bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+    height: 60px;
+    padding-bottom: 0;
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    border-radius: 30px;
+    background: rgba(255, 255, 255, 0.78);
+    -webkit-backdrop-filter: blur(18px) saturate(1.4);
+    backdrop-filter: blur(18px) saturate(1.4);
+    box-shadow:
+      0 10px 28px rgba(31, 42, 36, 0.18),
+      0 2px 6px rgba(31, 42, 36, 0.08);
+  }
+
+  /* 選中項：圖示後方一顆淡綠色膠囊 */
+  nav.m-tabbar .m-ico {
+    position: relative;
+    isolation: isolate;
+  }
+  nav.m-tabbar .m-tab.is-active .m-ico::before {
+    content: "";
+    position: absolute;
+    inset: -5px -16px;
+    z-index: -1;
+    border-radius: 999px;
+    background: rgba(63, 107, 79, 0.14);
+  }
+}
+
+/* ===== app-shell 2.12：首頁 Hero 圖片原色顯示（不變暗、不模糊） ===== */
+/* 試做：只動手機版；桌面版不變。必須放在 2.1 / 2.7 之後 */
+@media (max-width: 767.98px) {
+  /* 圖片不透明度固定 1：蓋過 JS 行內的 0.85 與 reduced-motion 的 0.6 */
+  main [data-home-hero] img.hero-slide-active {
+    opacity: 1 !important;
+  }
+  /* 停用緩慢放大：放大會讓點陣圖重新取樣而變軟 */
+  main [data-home-hero] img.hero-slide {
+    animation: none !important;
+  }
+  /* 取消整片深色漸層，只留底部一條薄漸層給圓點與文字 */
+  main [data-home-hero] > .absolute.inset-0 > .bg-gradient-to-br {
+    display: none;
+  }
+  main [data-home-hero] > .absolute.inset-0 > .bg-gradient-to-t {
+    background-image: linear-gradient(
+      to top,
+      rgba(0, 0, 0, 0.3),
+      transparent 40%
+    );
+  }
+}
+
+/* ===== app-shell 6.9：亮圖上的文字可讀性 =====
+   圖片現在可由後台更換，亮度不可控，所以讓「文字區自己有保護」，而不是靠挑圖。
+   顏色用 !important：要蓋過通用標題顏色（--m-ink）與 Tailwind 的 text-* 類別。 */
+@media (max-width: 767.98px) {
+  /* --- 首頁主圖：壓暗遮罩（偏左加深，文字都在左側；右側保留較多森林亮度） --- */
+  main [data-home-hero]::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 5;
+    pointer-events: none;
+    background:
+      linear-gradient(
+        90deg,
+        rgba(8, 20, 14, 0.6) 0%,
+        rgba(8, 20, 14, 0.4) 65%,
+        rgba(8, 20, 14, 0.18) 100%
+      ),
+      linear-gradient(0deg, rgba(8, 20, 14, 0.5) 0%, rgba(8, 20, 14, 0) 45%);
+  }
+
+  main [data-home-hero] .hero-text > p:first-child {
+    color: #f6e7d3 !important;
+    font-weight: 600;
+    text-shadow: 0 1px 8px rgba(0, 0, 0, 0.5);
+  }
+  main [data-home-hero] h1 {
+    color: #ffffff !important;
+    font-weight: 500 !important;
+    text-shadow:
+      0 2px 4px rgba(0, 0, 0, 0.3),
+      0 4px 24px rgba(0, 0, 0, 0.45);
+  }
+  /* 中文斜體是瀏覽器硬斜的，細字壓在圖上很難讀 → 正體 */
+  main [data-home-hero] .hero-text > p:nth-of-type(2) {
+    color: rgba(255, 255, 255, 0.96) !important;
+    font-style: normal;
+    font-weight: 400;
+    text-shadow:
+      0 1px 4px rgba(0, 0, 0, 0.4),
+      0 2px 16px rgba(0, 0, 0, 0.45);
+  }
+
+  /* --- 「两条手作路线」卡片：底部壓暗漸層（疊在圖片上、文字下） --- */
+  main [data-home-paths] .grid[class*="grid-cols-12"] a::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(
+      0deg,
+      rgba(8, 20, 14, 0.9) 0%,
+      rgba(8, 20, 14, 0.72) 30%,
+      rgba(8, 20, 14, 0.28) 58%,
+      rgba(8, 20, 14, 0) 78%
+    );
+  }
+
+  /* 小標與標題在中文是同一個詞，手機小卡片只留標題 */
+  main
+    [data-home-paths]
+    .grid[class*="grid-cols-12"]
+    a
+    > .p-7
+    > p:first-of-type {
+    display: none !important;
+  }
+  main [data-home-paths] .grid[class*="grid-cols-12"] a > .p-7 > h3 {
+    color: #ffffff !important;
+    font-weight: 600 !important;
+    text-shadow:
+      0 1px 3px rgba(0, 0, 0, 0.45),
+      0 2px 14px rgba(0, 0, 0, 0.5);
+  }
+  main [data-home-paths] .grid[class*="grid-cols-12"] a > .p-7 > span {
+    color: #f6e7d3 !important;
+    font-weight: 600;
+    border-color: rgba(246, 231, 211, 0.75) !important;
+    text-shadow: 0 1px 6px rgba(0, 0, 0, 0.5);
+  }
+}
+
+/* ===== contact：其他聯繫方式維持單欄列表，不套卡片（避免內容被裁切） ===== */
+@media (max-width: 767.98px) {
+  main section .grid[data-contact-channels] {
+    grid-template-columns: 1fr !important;
+    gap: 0 !important;
+  }
+  main section .grid[data-contact-channels] > * {
+    background: transparent;
+    box-shadow: none;
+    border-radius: 0;
+    overflow: visible;
+    min-height: 0;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+  main section .grid[data-contact-channels] > * > span:first-child {
+    width: auto;
+  }
+  main section .grid[data-contact-channels] > * > :last-child {
+    max-width: 100%;
+    overflow-wrap: anywhere;
+  }
+}
+
+/* ===== pd-bar 2:商品詳情底部列 — 加入購物車 + 預訂 ===== */
+@media (max-width: 767.98px) {
+  main [data-pd-bar] {
+    flex-direction: row;
+    gap: 10px;
+  }
+  main [data-pd-bar] button[type="submit"] {
+    flex: 1 1 0;
+    padding: 0 10px;
+    white-space: nowrap;
+  }
+  main [data-pd-bar] .pd-bar-add {
+    background: #fff;
+    color: var(--m-accent);
+    border: 1.5px solid var(--m-accent);
+  }
+}
+
+/* 加入購物車後的提示 */
+.pd-toast {
+  position: fixed;
+  left: 50%;
+  bottom: calc(var(--m-tab-h, 64px) + env(safe-area-inset-bottom, 0px) + 92px);
+  z-index: 70;
+  transform: translateX(-50%);
+  padding: 10px 18px;
+  border-radius: 999px;
+  background: rgba(31, 42, 36, 0.92);
+  color: #fff;
+  font-size: 14px;
+  white-space: nowrap;
+  pointer-events: none;
+  animation: pd-toast 2.6s ease forwards;
+}
+@keyframes pd-toast {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, 8px);
+  }
+  12%,
+  80% {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, 0);
+  }
+}

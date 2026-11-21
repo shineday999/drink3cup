@@ -1,0 +1,184 @@
+---
+import { XIAOHONGSHU_URL } from "../lib/social";
+// Footer — 全站共用底欄 (2026-10-01 新增,Awwwards tier)
+// 三欄 + newsletter + legal strip
+import { createT } from "../i18n/t";
+import { defaultLocale, type Locale, localizedPath } from "../i18n/config";
+
+const locale = (Astro.locals.locale ?? defaultLocale) as Locale;
+const messages = (Astro.locals.messages ?? {}) as Record<string, unknown>;
+const t = createT(messages);
+
+const sections = [
+  {
+    title: t("footer.section_shop"),
+    links: [
+      { label: t("footer.link_all"), href: localizedPath(locale, "/products") },
+      { label: t("footer.link_amber"), href: localizedPath(locale, "/amber") },
+      {
+        label: t("footer.link_incense"),
+        href: localizedPath(locale, "/incense"),
+      },
+      { label: t("footer.link_quiz"), href: localizedPath(locale, "/quiz") },
+    ],
+  },
+  {
+    title: t("footer.section_brand"),
+    links: [
+      { label: t("footer.link_story"), href: localizedPath(locale, "/story") },
+      {
+        label: t("footer.link_vision"),
+        href: localizedPath(locale, "/vision"),
+      },
+      { label: t("footer.link_craft"), href: localizedPath(locale, "/craft") },
+      {
+        label: t("footer.link_materials"),
+        href: localizedPath(locale, "/materials"),
+      },
+      { label: t("footer.link_blog"), href: localizedPath(locale, "/blog") },
+    ],
+  },
+  {
+    title: t("footer.section_follow"),
+    links: [
+      { label: t("footer.social_instagram"), href: "https://instagram.com/" },
+      { label: t("footer.social_pinterest"), href: "https://pinterest.com/" },
+      {
+        label: t("footer.social_xiaohongshu"),
+        href: XIAOHONGSHU_URL,
+      },
+    ],
+  },
+];
+
+interface Props {
+  siteName: string;
+  themeLabel?: string;
+  subThemeLabel?: string;
+}
+const { siteName, themeLabel = "", subThemeLabel = "" } = Astro.props;
+---
+
+<footer data-site-footer class="mt-24 bg-forest-900 text-cream-100">
+  <div class="max-w-6xl mx-auto px-6 py-16">
+    <!-- Top: brand block + newsletter -->
+    <div
+      class="grid grid-cols-1 lg:grid-cols-5 gap-12 mb-14 pb-12 border-b border-cream-100/30"
+    >
+      <div class="lg:col-span-2">
+        <div class="flex items-center gap-2.5 mb-5">
+          <svg viewBox="0 0 32 32" class="w-9 h-9" aria-hidden="true">
+            <path
+              d="M16 6 A10 10 0 1 1 8.5 11.5"
+              fill="none"
+              stroke="#F2EDDF"
+              stroke-width="2"
+              stroke-linecap="round"></path>
+            <circle cx="16" cy="16" r="3.75" fill="#D29E7B"></circle>
+          </svg>
+          <span
+            class="font-serif text-2xl font-light text-cream-50 tracking-wide"
+          >
+            {t("common.site_name")}
+          </span>
+        </div>
+        <p
+          class="text-sm text-cream-100/70 leading-relaxed mb-5 max-w-sm font-sans"
+        >
+          {t("footer.tagline")}
+        </p>
+        <p
+          class="text-[10px] uppercase tracking-[0.4em] text-terra-300 font-sans"
+        >
+          {t("footer.made_with")}
+        </p>
+        {
+          (themeLabel || subThemeLabel) && (
+            <p class="text-[10px] uppercase tracking-[0.4em] text-terra-300/70 mt-1 font-sans">
+              {themeLabel}
+              {subThemeLabel ? ` · ${subThemeLabel}` : ""}
+            </p>
+          )
+        }
+      </div>
+
+      <div class="lg:col-span-3">
+        <p
+          class="text-[10px] uppercase tracking-[0.4em] text-terra-300 mb-2 font-sans"
+        >
+          {t("footer.newsletter_kicker")}
+        </p>
+        <h3
+          class="font-serif text-2xl md:text-3xl font-light text-cream-50 mb-2 leading-tight text-balance"
+        >
+          {t("footer.newsletter_title")}
+        </h3>
+        <p
+          class="text-sm text-cream-100/70 mb-5 max-w-md font-sans leading-relaxed"
+        >
+          {t("footer.newsletter_desc")}
+        </p>
+        <form
+          method="POST"
+          action="/api/newsletter"
+          class="flex flex-col sm:flex-row gap-2 max-w-md"
+        >
+          <input type="hidden" name="locale" value={locale} />
+          <input
+            type="email"
+            name="email"
+            required
+            placeholder={t("footer.newsletter_placeholder")}
+            class="form-input flex-1 bg-cream-100/5 border-cream-100/25 text-cream-50 placeholder:text-cream-100/40"
+          />
+          <button
+            type="submit"
+            class="px-5 py-3 bg-terra-500 hover:bg-terra-700 text-cream-50 font-sans text-sm tracking-wide rounded-md transition-colors duration-500 whitespace-nowrap magnetic"
+          >
+            {t("footer.newsletter_submit")}
+          </button>
+        </form>
+
+        {
+          Astro.url.searchParams.get("subscribed") === "1" && (
+            <p class="text-xs text-terra-300 mt-3 font-sans italic tracking-wide">
+              ✓ {t("footer.newsletter_success")}
+            </p>
+          )
+        }
+      </div>
+    </div>
+
+    <!-- Middle: link sections -->
+    <div class="grid grid-cols-2 md:grid-cols-3 gap-8 mb-14">
+      {
+        sections.map((section) => (
+          <div>
+            <p class="text-[10px] uppercase tracking-[0.4em] text-terra-300 mb-4 font-sans">
+              {section.title}
+            </p>
+            <ul class="space-y-2.5 text-sm font-sans">
+              {section.links.map((link) => (
+                <li>
+                  <a
+                    href={link.href}
+                    class="text-cream-100/85 hover:text-cream-50 transition-colors duration-300 link-underline"
+                  >
+                    {link.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))
+      }
+    </div>
+
+    <!-- Bottom: legal -->
+    <div
+      class="pt-8 border-t border-cream-100/20 flex items-center justify-center text-xs text-cream-100/55 font-sans"
+    >
+      <p>{t("footer.year", { siteName })}</p>
+    </div>
+  </div>
+</footer>

@@ -1,0 +1,144 @@
+---
+import AdminLayout from "../../../layouts/AdminLayout.astro";
+import { env } from "cloudflare:workers";
+import { createT, tEnum } from "../../../i18n/t";
+import { defaultLocale, type Locale } from "../../../i18n/config";
+import zhHansMessages from "../../../i18n/messages/zh-Hans.json";
+
+const locale = (Astro.locals.locale ?? defaultLocale) as Locale;
+const messages = zhHansMessages as Record<string, unknown>;
+const t = createT(messages);
+void locale;
+
+interface ReviewRow {
+  id: string;
+  product_id: string;
+  customer_name: string;
+  rating: number;
+  content: string;
+  status: string;
+  created_at: number;
+}
+
+const STATUSES = ["pending", "approved", "rejected"];
+const requested = Astro.url.searchParams.get("status") ?? "";
+const filter = STATUSES.includes(requested) ? requested : "";
+
+const sql = `SELECT id, product_id, customer_name, rating, content, status, created_at FROM reviews ${
+  filter ? "WHERE status = ?" : ""
+} ORDER BY created_at DESC LIMIT 100`;
+
+let reviews: { results: ReviewRow[] } = { results: [] };
+const counts: Record<string, number> = {};
+let totalCount = 0;
+
+if (env?.DB) {
+  const stmt = env.DB.prepare(sql);
+  reviews = await (filter ? stmt.bind(filter) : stmt).all<ReviewRow>();
+
+  const countRows = await env.DB.prepare(
+    "SELECT status, COUNT(*) AS c FROM reviews GROUP BY status",
+  ).all<{ status: string; c: number }>();
+  for (const r of countRows.results ?? []) {
+    counts[r.status] = r.c;
+    totalCount += r.c;
+  }
+}
+
+const chips = [
+  { value: "", label: "全部", n: totalCount },
+  ...STATUSES.map((s) => ({
+    value: s,
+    label: tEnum(t, "status", s),
+    n: counts[s] ?? 0,
+  })),
+];
+const th =
+  "px-3 py-2 text-left text-xs font-medium tracking-wide text-text-secondary";
+---
+
+<AdminLayout title={t("admin.reviews_list.title")} active="reviews">
+  <nav class="mb-3 flex gap-2 overflow-x-auto pb-1" aria-label="评论状态筛选">
+    {
+      chips.map((c) => (
+        <a
+          href={c.value ? `/admin/reviews?status=${c.value}` : "/admin/reviews"}
+          aria-current={filter === c.value ? "page" : undefined}
+          class={`shrink-0 rounded-full border px-3 py-1 text-sm transition-colors ${
+            filter === c.value
+              ? "border-forest-700 bg-forest-700 text-bg-base"
+              : "border-text-muted/30 text-text-secondary hover:border-forest-700"
+          }`}
+        >
+          {c.label}
+          <span class="ml-1 tabular-nums opacity-70">{c.n}</span>
+        </a>
+      ))
+    }
+  </nav>
+
+  <div
+    class="overflow-x-auto rounded-card border border-text-muted/20 bg-bg-card"
+  >
+    <table class="w-full text-sm leading-normal">
+      <thead class="bg-forest-100">
+        <tr>
+          <th class={th}>评分</th>
+          <th class={th}>顾客</th>
+          <th class={th}>内容</th>
+          <th class={th}>状态</th>
+          <th class={th}>日期</th>
+        </tr>
+      </thead>
+      <tbody>
+        {
+          reviews.results.length === 0 && (
+            <tr>
+              <td colspan="5" class="px-3 py-8 text-center text-text-muted">
+                {t("admin.reviews_list.empty")}
+              </td>
+            </tr>
+          )
+        }
+        {
+          reviews.results.map((r) => (
+            <tr
+              class="border-t border-text-muted/10 align-top transition-colors hover:bg-forest-50"
+              title={r.id}
+            >
+              <td class="whitespace-nowrap px-3 py-2 text-accent-700">
+                {"★".repeat(r.rating)}
+                <span class="ml-1 text-xs text-text-muted">{r.rating}/5</span>
+              </td>
+              <td class="px-3 py-2">
+                <div class="font-medium">{r.customer_name}</div>
+                <div class="font-mono text-xs text-text-muted">
+                  {r.product_id}
+                </div>
+              </td>
+              <td class="max-w-md px-3 py-2 leading-relaxed text-text-secondary">
+                {r.content}
+              </td>
+              <td class="px-3 py-2">
+                <span
+                  class={`rounded px-2 py-0.5 text-xs ${
+                    r.status === "approved"
+                      ? "bg-success/20 text-success"
+                      : r.status === "rejected"
+                        ? "bg-error/20 text-error"
+                        : "bg-warning/20 text-warning"
+                  }`}
+                >
+                  {tEnum(t, "status", r.status)}
+                </span>
+              </td>
+              <td class="whitespace-nowrap px-3 py-2 font-mono text-xs text-text-muted">
+                {new Date(r.created_at * 1000).toISOString().slice(0, 10)}
+              </td>
+            </tr>
+          ))
+        }
+      </tbody>
+    </table>
+  </div>
+</AdminLayout>

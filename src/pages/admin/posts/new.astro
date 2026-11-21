@@ -1,0 +1,176 @@
+---
+import AdminLayout from "../../../layouts/AdminLayout.astro";
+import { createT } from "../../../i18n/t";
+import { defaultLocale, type Locale } from "../../../i18n/config";
+import zhHansMessages from "../../../i18n/messages/zh-Hans.json";
+
+const LOCALES = ["zh-Hans", "en", "ms-MY", "id-ID"] as const;
+const OTHER_LOCALES = LOCALES.filter((l) => l !== "zh-Hans");
+const locale = (Astro.locals.locale ?? defaultLocale) as Locale;
+const messages = zhHansMessages as Record<string, unknown>;
+const t = createT(messages);
+void locale;
+
+const card =
+  "bg-bg-card border border-text-muted/20 rounded-card p-4 space-y-3";
+const field =
+  "w-full px-3 py-2 border border-text-muted/30 rounded-md bg-bg-base";
+---
+
+<AdminLayout title={t("admin.posts_new.title")} active="blog">
+  <p class="mb-3 max-w-3xl text-sm text-text-secondary">
+    {t("admin.posts_new.subtitle")}
+  </p>
+
+  <form method="POST" action="/api/admin/posts" class="max-w-3xl space-y-4">
+    <div class={card}>
+      <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
+        <div>
+          <label class="mb-1 block text-sm font-medium" for="slug"
+            >{t("admin.posts_new.label_slug")}</label
+          >
+          <input
+            id="slug"
+            name="slug"
+            required
+            placeholder="fushun-amber-coal-jet"
+            class={`${field} font-mono`}
+          />
+        </div>
+        <div>
+          <label class="mb-1 block text-sm font-medium" for="category"
+            >{t("admin.posts_new.label_category")}</label
+          >
+          <select id="category" name="category" class={field}>
+            <option value="">—</option>
+            <option value="material">material</option>
+            <option value="craft">craft</option>
+            <option value="style">style</option>
+            <option value="culture">culture</option>
+          </select>
+        </div>
+        <div>
+          <label class="mb-1 block text-sm font-medium" for="status"
+            >{t("admin.posts_new.label_status")}</label
+          >
+          <select id="status" name="status" class={field}>
+            <option value="draft">draft</option>
+            <option value="published">published</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <section class={card}>
+      <h2 class="font-serif text-lg">
+        zh-Hans {t("admin.posts_new.locale_required")}
+      </h2>
+      <input
+        type="hidden"
+        name="translations[zh-Hans][locale]"
+        value="zh-Hans"
+      />
+      <div>
+        <label class="mb-1 block text-sm font-medium" for="title-zh-Hans">
+          {t("admin.posts_new.label_title")}
+        </label>
+        <input
+          id="title-zh-Hans"
+          name="translations[zh-Hans][title]"
+          required
+          class={field}
+        />
+      </div>
+      <div>
+        <label class="mb-1 block text-sm font-medium" for="excerpt-zh-Hans">
+          {t("admin.posts_new.label_excerpt")}
+        </label>
+        <textarea
+          id="excerpt-zh-Hans"
+          name="translations[zh-Hans][excerpt]"
+          rows="2"
+          class={field}></textarea>
+      </div>
+      <div>
+        <label class="mb-1 block text-sm font-medium" for="body-zh-Hans">
+          {t("admin.posts_new.label_body")}
+          {t("admin.posts_new.body_required")}
+        </label>
+        <textarea
+          id="body-zh-Hans"
+          name="translations[zh-Hans][body_markdown]"
+          rows="10"
+          required
+          class={`${field} font-mono text-sm`}></textarea>
+      </div>
+    </section>
+
+    {
+      OTHER_LOCALES.map((loc) => (
+        <details class={card}>
+          <summary class="cursor-pointer font-serif text-lg">{loc}</summary>
+          <div class="mt-3 space-y-3">
+            <input
+              type="hidden"
+              name={`translations[${loc}][locale]`}
+              value={loc}
+            />
+            <div>
+              <label
+                class="mb-1 block text-sm font-medium"
+                for={`title-${loc}`}
+              >
+                {t("admin.posts_new.label_title")}
+              </label>
+              <input
+                id={`title-${loc}`}
+                name={`translations[${loc}][title]`}
+                class={field}
+              />
+            </div>
+            <div>
+              <label
+                class="mb-1 block text-sm font-medium"
+                for={`excerpt-${loc}`}
+              >
+                {t("admin.posts_new.label_excerpt")}
+              </label>
+              <textarea
+                id={`excerpt-${loc}`}
+                name={`translations[${loc}][excerpt]`}
+                rows="2"
+                class={field}
+              />
+            </div>
+            <div>
+              <label class="mb-1 block text-sm font-medium" for={`body-${loc}`}>
+                {t("admin.posts_new.label_body")}
+              </label>
+              <textarea
+                id={`body-${loc}`}
+                name={`translations[${loc}][body_markdown]`}
+                rows="10"
+                class={`${field} font-mono text-sm`}
+              />
+            </div>
+          </div>
+        </details>
+      ))
+    }
+
+    <div
+      class="sticky bottom-0 -mx-4 flex items-center gap-3 border-t border-text-muted/20 bg-cream-50/95 px-4 py-3 backdrop-blur sm:mx-0 sm:px-0"
+    >
+      <button
+        type="submit"
+        class="rounded-md bg-forest-700 px-4 py-2 text-bg-base transition-colors hover:bg-forest-900"
+        >{t("admin.posts_new.create_draft")}</button
+      >
+      <a
+        href="/admin/posts"
+        class="rounded-md border border-text-muted/30 px-4 py-2 transition-colors hover:bg-bg-base"
+        >{t("admin.posts_new.cancel")}</a
+      >
+    </div>
+  </form>
+</AdminLayout>

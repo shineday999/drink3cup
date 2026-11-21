@@ -1,0 +1,63 @@
+---
+import Layout from "@layouts/Layout.astro";
+import { env } from "cloudflare:workers";
+import HomeContent from "@components/HomeContent.astro";
+import { createT } from "../../i18n/t";
+import { defaultLocale, isLocale, type Locale } from "../../i18n/config";
+
+const lang = Astro.params.lang ?? "";
+
+// Wave 88.5: default locale 加 prefix (e.g. /zh-Hans/) 不再 404,
+// 直接走下面 render(等同訪問 /,但 URL prefix 保留)
+if (!isLocale(lang)) {
+  return Astro.rewrite("/404");
+}
+
+const locale = lang as Locale;
+const messages = (Astro.locals.messages ?? {}) as Record<string, unknown>;
+const t = createT(messages);
+
+const pageTitle = `${t("common.site_name")} — ${t("common.tagline")}`;
+const pageDescription = t("home.hero_p3") ?? "";
+void locale;
+// Wave 62: SSR inject 動態 LCP preload (per-locale)
+// try/catch 包 D1 query 防 SSR fail → 15 bytes partial HTML
+let lcpImageUrl: string | null = null;
+let lcpMobileImageUrl: string | null = null;
+try {
+  if (env?.DB) {
+    const row = await env.DB.prepare(
+      "SELECT image_url, mobile_image_url FROM hero_banners WHERE active = 1 ORDER BY sort_order ASC, created_at ASC LIMIT 1",
+    ).first<{ image_url: string; mobile_image_url: string | null }>();
+    lcpImageUrl = row?.image_url ?? null;
+    lcpMobileImageUrl = row?.mobile_image_url || row?.image_url || null;
+  }
+} catch {
+  lcpImageUrl = null;
+  lcpMobileImageUrl = null;
+}
+---
+
+<Layout title={pageTitle} description={pageDescription}>
+  {
+    lcpImageUrl && (
+      <Fragment slot="head">
+        <link
+          rel="preload"
+          as="image"
+          href={lcpMobileImageUrl ?? lcpImageUrl}
+          media="(max-width: 768px)"
+          fetchpriority="high"
+        />
+        <link
+          rel="preload"
+          as="image"
+          href={lcpImageUrl}
+          media="(min-width: 769px)"
+          fetchpriority="high"
+        />
+      </Fragment>
+    )
+  }
+  <HomeContent />
+</Layout>

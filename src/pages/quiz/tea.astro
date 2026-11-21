@@ -1,0 +1,84 @@
+---
+import Layout from "@layouts/Layout.astro";
+import QuizWizard from "@components/QuizWizard.astro";
+import { createT } from "../../i18n/t";
+import { defaultLocale, localizedPath, type Locale } from "../../i18n/config";
+import { TEA_STEPS } from "../../lib/quiz";
+
+const locale = (Astro.locals.locale ?? defaultLocale) as Locale;
+const messages = (Astro.locals.messages ?? {}) as Record<string, unknown>;
+const t = createT(messages);
+
+// 茶葉分類在後台的實際代碼（首頁卡片帶進來；沒帶就用 tea）
+const catParam = Astro.url.searchParams.get("cat") ?? "tea";
+const cat = /^[a-z0-9][a-z0-9-]{0,29}$/.test(catParam) ? catParam : "tea";
+
+const pageTitle = `${t("quiz.tea.title")} — ${t("common.site_name")}`;
+void locale;
+---
+
+<Layout title={pageTitle} description={t("quiz.tea.desc")}>
+  <div data-quiz-page class="max-w-2xl mx-auto px-6 py-section">
+    <a
+      href={localizedPath(locale, "/quiz")}
+      class="text-sm text-text-secondary hover:text-text-primary mb-6 inline-block"
+    >
+      ← {t("common.back")}
+    </a>
+
+    <header class="mb-8">
+      <h1 class="text-display-sm font-serif text-text-primary mb-3">
+        {t("quiz.tea.title")}
+      </h1>
+      <p class="text-text-secondary">{t("quiz.tea.desc")}</p>
+    </header>
+
+    <form
+      data-quiz
+      data-qw-pending
+      method="POST"
+      action="/api/quiz/recommend"
+      class="space-y-8"
+    >
+      <input type="hidden" name="type" value="tea" />
+      <input type="hidden" name="cat" value={cat} />
+      <QuizWizard />
+
+      {
+        TEA_STEPS.map((step, idx) => (
+          <fieldset class="bg-bg-card border border-text-muted/20 rounded-card p-6">
+            <legend class="flex items-center gap-3 mb-4">
+              <span class="w-8 h-8 rounded-full bg-forest-700 text-bg-base flex items-center justify-center text-sm font-medium">
+                {idx + 1}
+              </span>
+              <span class="font-serif text-lg text-text-primary">
+                {t(step.titleKey)}
+              </span>
+            </legend>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              {step.options.map((opt) => (
+                <label class="flex items-center gap-3 px-3 py-2.5 border border-text-muted/20 rounded-md cursor-pointer hover:border-accent-500 has-[:checked]:border-accent-700 has-[:checked]:bg-accent-700/5">
+                  <input
+                    type="radio"
+                    name={`answers[${step.id}]`}
+                    value={opt.value}
+                    required={step.id !== "brew"}
+                    class="text-accent-700"
+                  />
+                  <span class="text-sm">{t(opt.labelKey)}</span>
+                </label>
+              ))}
+            </div>
+          </fieldset>
+        ))
+      }
+
+      <button
+        type="submit"
+        class="w-full px-6 py-3 bg-forest-700 text-cream-50 rounded-md text-lg font-medium hover:bg-forest-900 transition-colors"
+      >
+        {t("quiz.recommend")}
+      </button>
+    </form>
+  </div>
+</Layout>

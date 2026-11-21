@@ -1,0 +1,24 @@
+# 牛马得饰 / OxHorseCraft
+> 森林系琥珀飾品與東方香品,把森林穿戴在身上。預訂制手動接單,4 語國際化(zh-Hans / en / ms-MY / id-ID)。
+
+## 產品線
+- [琥珀飾品系列](/amber): 從原石到圓潤,波羅的海 / 緬甸 / 撫順 / 多明尼加 / 西西里琥珀
+- [東方香品系列](/incense): 沉香、檀香、楠木,從木屑到一縷煙
+- [看所有作品](/products): 完整目錄,含 2 條產品線
+
+## 關於本站
+- [關於這裡](/about): 這個角落留下的是作品,不是人;森林、琥珀、香、慢
+
+## 故事與工藝
+- [品牌故事](/story): 森林,在手中
+- [森林以南的哲學](/vision): 慢、靜、留白的工藝
+- [手作的過程](/craft): 刀磨、火候、等待
+- [材料的來歷](/materials): 5 種琥珀 + 沉香 + 檀香
+
+## 互動
+- [選一件適合你的](/quiz): 5 題互動測驗
+- [聯絡](/contact)
+
+## 關於本站
+- [網站地圖](/sitemap.xml): 44 個 URL,4 語 locale
+- [AI 爬蟲規則](/robots.txt): 14 個 AI crawler 歡迎抓取(GPTBot / ClaudeBot / PerplexityBot / Googlebot-Extended 等)

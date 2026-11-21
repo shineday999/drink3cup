@@ -1,0 +1,163 @@
+---
+// ProductCard — Editorial layout, Cormorant Garamond name, no rounded corners (sharp edges),
+// subtle hover scale, generous whitespace between elements
+import { createT } from "../i18n/t";
+import { defaultLocale, localizedPath, type Locale } from "../i18n/config";
+
+interface Props {
+  slug: string;
+  name: string;
+  shortDescription?: string | undefined;
+  category: string;
+  imageUrl?: string | undefined;
+  priceFrom?: string | undefined;
+  variant?: "default" | "large" | "compact";
+}
+
+const {
+  slug,
+  name,
+  shortDescription,
+  category,
+  imageUrl,
+  priceFrom,
+  variant = "default",
+} = Astro.props;
+
+// Wave 15: catLabel now uses t() instead of hardcoded English.
+// Falls back to capitalized category if a locale is missing the key.
+const locale = (Astro.locals.locale ?? defaultLocale) as Locale;
+const messages = (Astro.locals.messages ?? {}) as Record<string, unknown>;
+const t = createT(messages);
+void locale;
+
+// 6.4d: Unsplash 圖只需 640px（卡片最寬約 400px），原 800px 太大
+const displayUrl =
+  imageUrl && /^https:\/\/images\.unsplash\.com\//.test(imageUrl)
+    ? imageUrl
+        .replace(/([?&])w=\d+/, "$1w=640")
+        .replace(/([?&])h=\d+/, "$1h=640")
+    : imageUrl;
+
+const fallback = category.charAt(0).toUpperCase() + category.slice(1);
+const catLabel: Record<string, string> = {
+  jewelry: t("nav.amber") || fallback,
+  incense: t("nav.incense") || fallback,
+};
+---
+
+<a
+  href={localizedPath(locale, `/products/${slug}`)}
+  class:list={[
+    "group block relative overflow-hidden border border-forest-100 hover:border-forest-300 transition-colors duration-700",
+    variant === "large" ? "h-full" : "",
+  ]}
+>
+  {
+    imageUrl ? (
+      <div
+        class:list={[
+          "relative overflow-hidden bg-forest-100",
+          variant === "compact"
+            ? "aspect-[3/4]"
+            : variant === "large"
+              ? "aspect-[5/4]"
+              : "aspect-[1/1]",
+        ]}
+      >
+        <img
+          decoding="async"
+          src={displayUrl}
+          alt={name}
+          class="w-full h-full object-cover cinematic group-hover:scale-[1.04] transition-transform duration-[1400ms] ease-out"
+          loading="lazy"
+          onerror="if(!this.dataset.fb){this.dataset.fb='1';this.src='https://images.unsplash.com/photo-1502082553048-f009c37129b9?w=800&h=800&fit=crop'}else{this.onerror=null;this.src='https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=800&h=800&fit=crop'}"
+        />
+      </div>
+    ) : (
+      <div
+        class:list={[
+          "bg-forest-100 flex items-center justify-center",
+          variant === "compact"
+            ? "aspect-[3/4]"
+            : variant === "large"
+              ? "aspect-[5/4]"
+              : "aspect-[1/1]",
+        ]}
+      >
+        <svg
+          viewBox="0 0 100 100"
+          class:list={[
+            variant === "compact" ? "w-10 h-10" : "w-16 h-16",
+            "text-forest-700",
+          ]}
+          fill="currentColor"
+        >
+          <circle cx="50" cy="50" r="30" opacity="0.3" />
+          <circle cx="50" cy="50" r="20" opacity="0.5" />
+          <circle cx="50" cy="50" r="10" opacity="0.7" />
+        </svg>
+      </div>
+    )
+  }
+
+  <div
+    class:list={[
+      variant === "compact" ? "p-4" : "p-5",
+      variant === "large" ? "p-7" : "",
+    ]}
+  >
+    <p
+      class:list={[
+        "uppercase tracking-[0.4em] text-forest-600 font-sans",
+        variant === "compact" ? "text-[9px] mb-1.5" : "text-[10px] mb-2",
+      ]}
+    >
+      {catLabel[category] ?? category}
+    </p>
+    <h3
+      class:list={[
+        "font-serif font-light text-forest-800 leading-tight group-hover:text-forest-600 transition-colors duration-500",
+        variant === "compact"
+          ? "text-base mb-1.5"
+          : variant === "large"
+            ? "text-2xl md:text-3xl mb-2"
+            : "text-xl mb-2",
+      ]}
+    >
+      {name}
+    </h3>
+    {
+      shortDescription && (
+        <p
+          class:list={[
+            "text-forest-700 leading-relaxed font-light line-clamp-2",
+            variant === "compact"
+              ? "text-[11px] mb-1.5"
+              : variant === "large"
+                ? "text-sm mb-3"
+                : "text-xs mb-2",
+          ]}
+        >
+          {shortDescription}
+        </p>
+      )
+    }
+    {
+      priceFrom && (
+        <p
+          class:list={[
+            "font-sans tracking-wide text-forest-700",
+            variant === "compact"
+              ? "text-[11px]"
+              : variant === "large"
+                ? "text-sm"
+                : "text-xs",
+          ]}
+        >
+          {priceFrom}
+        </p>
+      )
+    }
+  </div>
+</a>

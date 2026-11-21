@@ -1,0 +1,211 @@
+---
+import AdminLayout from "../../../layouts/AdminLayout.astro";
+import { env } from "cloudflare:workers";
+import { createT, tEnum } from "../../../i18n/t";
+import { defaultLocale, type Locale } from "../../../i18n/config";
+import zhHansMessages from "../../../i18n/messages/zh-Hans.json";
+import { formatPrice } from "../../../lib/format";
+import { PRODUCT_SHEET_EDIT_URL } from "../../../lib/sheet-sync";
+
+const locale = (Astro.locals.locale ?? defaultLocale) as Locale;
+const messages = zhHansMessages as Record<string, unknown>;
+const t = createT(messages);
+void locale;
+
+interface ProductRow {
+  id: string;
+  slug: string;
+  category: string;
+  subcategory: string | null;
+  status: string;
+  image_url: string | null;
+  created_at: number;
+  name_zh: string | null;
+  cny_cents: number | null;
+}
+
+const STATUSES = ["active", "draft", "archived"];
+const requested = Astro.url.searchParams.get("status") ?? "";
+const filter = STATUSES.includes(requested) ? requested : "";
+
+const sql = `SELECT p.id, p.slug, p.category, p.subcategory, p.status, p.image_url, p.created_at,
+              pt.name AS name_zh,
+              (SELECT pp.amount FROM product_variants pv
+                 JOIN product_prices pp
+                   ON pp.variant_id = pv.id AND pp.currency = 'CNY'
+                WHERE pv.product_id = p.id
+                ORDER BY pv.sku LIMIT 1) AS cny_cents
+       FROM products p
+       LEFT JOIN product_translations pt
+         ON pt.product_id = p.id AND pt.locale = 'zh-Hans'
+       ${filter ? "WHERE p.status = ?" : ""}
+       ORDER BY p.created_at DESC LIMIT 100`;
+
+let products: { results: ProductRow[] } = { results: [] };
+const counts: Record<string, number> = {};
+let totalCount = 0;
+
+if (env?.DB) {
+  const stmt = env.DB.prepare(sql);
+  products = await (filter ? stmt.bind(filter) : stmt).all<ProductRow>();
+
+  const countRows = await env.DB.prepare(
+    "SELECT status, COUNT(*) AS c FROM products GROUP BY status",
+  ).all<{ status: string; c: number }>();
+  for (const r of countRows.results ?? []) {
+    counts[r.status] = r.c;
+    totalCount += r.c;
+  }
+}
+
+const chips = [
+  { value: "", label: "全部", n: totalCount },
+  ...STATUSES.map((s) => ({
+    value: s,
+    label: tEnum(t, "status", s),
+    n: counts[s] ?? 0,
+  })),
+];
+const th =
+  "px-3 py-2 text-left text-xs font-medium tracking-wide text-text-secondary";
+---
+
+<AdminLayout title={t("admin.products_list.title")} active="products">
+  <a
+    slot="actions"
+    href={PRODUCT_SHEET_EDIT_URL}
+    target="_blank"
+    rel="noopener noreferrer"
+    class="text-sm text-text-secondary hover:underline">商品描述表格 ↗</a
+  >
+  <nav class="mb-3 flex gap-2 overflow-x-auto pb-1" aria-label="商品状态筛选">
+    {
+      chips.map((c) => (
+        <a
+          href={
+            c.value ? `/admin/products?status=${c.value}` : "/admin/products"
+          }
+          aria-current={filter === c.value ? "page" : undefined}
+          class={`shrink-0 rounded-full border px-3 py-1 text-sm transition-colors ${
+            filter === c.value
+              ? "border-forest-700 bg-forest-700 text-bg-base"
+              : "border-text-muted/30 text-text-secondary hover:border-forest-700"
+          }`}
+        >
+          {c.label}
+          <span class="ml-1 tabular-nums opacity-70">{c.n}</span>
+        </a>
+      ))
+    }
+  </nav>
+
+  <div
+    class="overflow-x-auto rounded-card border border-text-muted/20 bg-bg-card"
+  >
+    <table class="w-full text-sm leading-normal">
+      <thead class="bg-forest-100">
+        <tr>
+          <th class={th}>{t("admin.products_list.col_image")}</th>
+          <th class={th}>{t("admin.products_list.col_name")}</th>
+          <th class={th}>{t("admin.products_list.col_category")}</th>
+          <th class={th}>售价</th>
+          <th class={th}>{t("admin.products_list.col_status")}</th>
+          <th class={`${th} text-right`}>
+            {t("admin.products_list.col_actions")}
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        {
+          products.results.length === 0 && (
+            <tr>
+              <td colspan="6" class="px-3 py-8 text-center text-text-muted">
+                {t("admin.products_list.empty")}{" "}
+                <a href="/admin/products/new" class="text-accent-700 underline">
+                  {t("admin.products_list.empty_link")}
+                </a>
+                .
+              </td>
+            </tr>
+          )
+        }
+        {
+          products.results.map((p) => (
+            <tr class="border-t border-text-muted/10 transition-colors hover:bg-forest-50">
+              <td class="px-3 py-2">
+                {p.image_url ? (
+                  <img
+                    loading="lazy"
+                    decoding="async"
+                    src={p.image_url}
+                    alt={p.slug}
+                    class="h-10 w-10 rounded border border-text-muted/20 object-cover"
+                  />
+                ) : (
+                  <div class="flex h-10 w-10 items-center justify-center rounded bg-text-muted/10 text-xs text-text-muted">
+                    —
+                  </div>
+                )}
+              </td>
+              <td class="px-3 py-2" title={p.id}>
+                <div class="font-medium">{p.name_zh ?? "—"}</div>
+                <div class="font-mono text-xs text-text-muted">{p.slug}</div>
+              </td>
+              <td class="px-3 py-2">
+                {tEnum(t, "category", p.category)}
+                {p.subcategory && (
+                  <span class="text-text-muted">
+                    {" "}
+                    / {tEnum(t, "subcategory", p.subcategory)}
+                  </span>
+                )}
+              </td>
+              <td class="whitespace-nowrap px-3 py-2">
+                {p.cny_cents != null ? (
+                  formatPrice(p.cny_cents, "CNY", "zh-Hans")
+                ) : (
+                  <span class="text-text-muted">—</span>
+                )}
+              </td>
+              <td class="px-3 py-2">
+                <span
+                  class={`rounded px-2 py-0.5 text-xs ${
+                    p.status === "active"
+                      ? "bg-success/20 text-success"
+                      : p.status === "archived"
+                        ? "bg-error/20 text-error"
+                        : "bg-warning/20 text-warning"
+                  }`}
+                >
+                  {tEnum(t, "status", p.status)}
+                </span>
+              </td>
+              <td class="whitespace-nowrap px-3 py-2 text-right">
+                <a
+                  href={`/admin/products/${p.id}`}
+                  class="text-accent-700 hover:underline"
+                >
+                  {t("admin.products_list.link_edit")}
+                </a>
+                <form
+                  method="POST"
+                  action={`/api/admin/products/${p.id}`}
+                  class="ml-3 inline"
+                  onsubmit="return confirm('确定删除该商品？此操作无法撤销。')"
+                >
+                  <input type="hidden" name="_action" value="delete" />
+                  <button
+                    type="submit"
+                    class="text-sm text-error hover:underline"
+                  >
+                    {t("admin.products_list.delete")}
+                  </button>
+                </form>
+              </td>
+            </tr>
+          ))
+        }
+      </tbody>
+    </table>
+  </div>
+</AdminLayout>

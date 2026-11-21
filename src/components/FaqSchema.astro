@@ -1,0 +1,29 @@
+---
+// FaqSchema.astro — JSON-LD FAQPage for SEO / AEO / GEO
+// Wave 34 Phase 2.4.a: per-page FAQ structured data
+import { defaultLocale } from "../i18n/config";
+
+interface Faq {
+  q: string;
+  a: string;
+}
+
+interface Props {
+  items: Faq[];
+}
+
+const { items } = Astro.props as Props;
+void (Astro.locals.locale ?? defaultLocale);
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: items.map((f) => ({
+    "@type": "Question",
+    name: f.q,
+    acceptedAnswer: { "@type": "Answer", text: f.a },
+  })),
+};
+---
+
+<script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />

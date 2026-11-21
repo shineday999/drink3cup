@@ -1,0 +1,25 @@
+---
+// 共用：details[data-acc] 手機版預設收合、桌面版永遠展開（點擊不收合）。
+// 與商品詳情頁（3.4）相同邏輯；inline 執行，避免先展開再收合的閃爍。
+---
+
+<script is:inline>
+  (function () {
+    var mq = window.matchMedia("(max-width: 767.98px)");
+    var accs = document.querySelectorAll("details[data-acc]");
+    function sync() {
+      accs.forEach(function (d) {
+        d.open = !mq.matches;
+      });
+    }
+    sync();
+    if (mq.addEventListener) mq.addEventListener("change", sync);
+    accs.forEach(function (d) {
+      var s = d.querySelector("summary");
+      if (!s) return;
+      s.addEventListener("click", function (e) {
+        if (!mq.matches) e.preventDefault();
+      });
+    });
+  })();
+</script>

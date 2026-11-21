@@ -1,0 +1,53 @@
+---
+import { defaultLocale, isLocale } from "../../i18n/config";
+
+// Astro.params.path 是 string | string[] | undefined — 我們要 join
+const lang = Astro.params.lang ?? "";
+const pathParts = Astro.params.path ?? [];
+const subPath =
+  "/" + (Array.isArray(pathParts) ? pathParts.join("/") : pathParts);
+
+// 非法 locale (e.g. /abc/...) → 404
+// Wave 88.5: default locale 加 prefix (e.g. /zh-Hans/products) 不再 404,
+// 改走下面 rewrite 到 subPath,等同訪問 /products (locale 仍由 middleware 從 URL 設為 zh-Hans)
+if (!isLocale(lang)) {
+  Astro.response.status = 404;
+  return Astro.rewrite("/404");
+}
+
+// Wave 39: 對應不到的 path → locale-specific 404 (不 strip locale)
+// (避免 middleware 把 locale 重設成 zh-Hans,user 才看到正確 locale 404)
+const KNOWN_TOP = new Set([
+  "/",
+  "/products",
+  "/story",
+  "/vision",
+  "/craft",
+  "/materials",
+  "/amber",
+  "/incense",
+  "/blog",
+  "/quiz",
+  "/contact",
+  "/about",
+  "/more",
+  "/cart",
+  "/checkout",
+  "/404",
+]);
+const isKnownSubPath =
+  KNOWN_TOP.has(subPath) ||
+  subPath.startsWith("/blog/") ||
+  subPath.startsWith("/products/") ||
+  subPath.startsWith("/checkout/") ||
+  subPath.startsWith("/quiz/");
+if (!isKnownSubPath) {
+  Astro.response.status = 404;
+  return Astro.rewrite("/404");
+}
+
+// 內部 rewrite 到根路徑,保留 URL 但 render 對應 page。
+// Astro.locals.locale 由 middleware 從 URL path 設成正確值,rewrite 後
+// render 的 page 透過 context.locals.messages 拿到對應 locale 的 i18n。
+return Astro.rewrite(subPath);
+---

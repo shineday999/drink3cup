@@ -1,0 +1,126 @@
+---
+import { env } from "cloudflare:workers";
+
+import Layout from "@layouts/Layout.astro";
+import Card from "@components/Card.astro";
+import { createT } from "../../i18n/t";
+import { defaultLocale, localizedPath, type Locale } from "../../i18n/config";
+import { kindOf, type QuizKind } from "../../lib/category-kind";
+import { parseTextMap } from "../../lib/categories";
+
+const locale = (Astro.locals.locale ?? defaultLocale) as Locale;
+const messages = (Astro.locals.messages ?? {}) as Record<string, unknown>;
+const t = createT(messages);
+
+const pageTitle = `${t("nav.quiz")} — ${t("common.site_name")}`;
+
+// 「選一件」卡片：跟首頁一樣讀後台分類（site_categories），有測驗的分類才出現卡片
+// （內建 jewelry / incense，以及茶葉 tea）。後台新增茶葉分類後這裡會自動多一張。
+interface QuizEntry {
+  kind: QuizKind;
+  href: string;
+  title: string;
+  desc: string;
+}
+
+let rows: Array<{ code: string; titles: string }> = [];
+try {
+  const res = env?.DB
+    ? await env.DB.prepare(
+        "SELECT code, titles FROM site_categories ORDER BY sort_order ASC, code ASC",
+      ).all<{ code: string; titles: string }>()
+    : null;
+  rows = res?.results ?? [];
+} catch {
+  rows = [];
+}
+if (rows.length === 0) {
+  rows = [
+    { code: "jewelry", titles: "{}" },
+    { code: "incense", titles: "{}" },
+  ];
+}
+
+const entries: QuizEntry[] = [];
+const seen = new Set<QuizKind>();
+for (const r of rows) {
+  const titles = parseTextMap(r.titles);
+  const kind = kindOf(r.code, titles["zh-Hans"]);
+  if (!kind || seen.has(kind)) continue;
+  seen.add(kind);
+  entries.push({
+    kind,
+    href:
+      kind === "tea"
+        ? localizedPath(locale, `/quiz/tea?cat=${r.code}`)
+        : localizedPath(locale, `/quiz/${kind}`),
+    title: String(t(`quiz.${kind}.title`)),
+    desc: String(t(`quiz.${kind}.desc`)),
+  });
+}
+
+// 各測驗的圖示（SVG path）
+const ICON_PATH: Record<QuizKind, string> = {
+  jewelry: "M12 6.5a2 2 0 100-4 2 2 0 000 4zM12 8v8m-3 0h6m-6 4h6",
+  incense: "M12 3v3m0 0c-2 0-3 2-3 4 0 4 3 6 3 11 0-5 3-7 3-11 0-2-1-4-3-4z",
+  tea: "M4 9h12v4a5 5 0 01-5 5H9a5 5 0 01-5-5V9zm12 1h1.5a2.5 2.5 0 010 5H16M8 3v2m4-2v2",
+};
+---
+
+<Layout title={pageTitle} description={t("quiz.intro")}>
+  <div data-qz-page class="max-w-4xl mx-auto px-6 py-section">
+    <header data-qz-header class="text-center mb-12">
+      <p
+        class="text-sm uppercase tracking-[0.3em] text-accent-700 font-sans mb-3"
+      >
+        {t("quiz.kicker")}
+      </p>
+      <h1
+        class="text-display-sm md:text-display-md font-serif text-text-primary mb-4"
+      >
+        {t("nav.quiz")}
+      </h1>
+      <p class="text-lg text-text-secondary max-w-2xl mx-auto">
+        {t("quiz.intro")}
+      </p>
+    </header>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      {
+        entries.map((e) => (
+          <Card
+            href={e.href}
+            class="qz-card hover:border-accent-500 transition-colors p-8"
+          >
+            <div data-qz-icon class="text-accent-700 mb-3">
+              <svg
+                class="w-12 h-12"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="1.5"
+                  d={ICON_PATH[e.kind]}
+                />
+              </svg>
+            </div>
+            <div data-qz-body>
+              <h2 class="font-serif text-2xl mb-2">{e.title}</h2>
+              <p class="text-text-secondary mb-4">{e.desc}</p>
+              <div data-qz-foot>
+                <p data-qz-meta>{t("home.cta_meta")}</p>
+                <p class="text-sm text-accent-700 font-medium">
+                  <span data-qz-lead>→ </span>
+                  {t("quiz.start")} →
+                </p>
+              </div>
+            </div>
+          </Card>
+        ))
+      }
+    </div>
+  </div>
+</Layout>

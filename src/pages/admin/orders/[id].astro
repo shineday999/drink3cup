@@ -1,0 +1,401 @@
+---
+import AdminLayout from "../../../layouts/AdminLayout.astro";
+import { env } from "cloudflare:workers";
+import { createT, tEnum } from "../../../i18n/t";
+import { defaultLocale, type Locale } from "../../../i18n/config";
+import zhHansMessages from "../../../i18n/messages/zh-Hans.json";
+import { formatPrice } from "../../../lib/format";
+
+const id = Astro.params.id;
+const locale = (Astro.locals.locale ?? defaultLocale) as Locale;
+const messages = zhHansMessages as Record<string, unknown>;
+const t = createT(messages);
+void locale;
+
+const order = env?.DB
+  ? await env.DB.prepare("SELECT * FROM orders WHERE id = ?").bind(id).first<{
+      id: string;
+      customer_email: string;
+      customer_name: string;
+      customer_phone: string | null;
+      shipping_address: string;
+      locale: string;
+      items: string;
+      subtotal: number;
+      currency: string;
+      shipping_fee: number;
+      total: number;
+      status: string;
+      payment_status: string;
+      notes: string | null;
+      tracking_number: string | null;
+      created_at: number;
+      updated_at: number;
+    }>()
+  : null;
+
+const shippingAddress = order
+  ? (JSON.parse(order.shipping_address) as Record<string, string>)
+  : {};
+const items = order
+  ? (JSON.parse(order.items) as Array<{
+      slug: string;
+      qty: number;
+      sku?: string;
+      priceCents?: number | null;
+    }>)
+  : [];
+
+// Wave 28.8: 沒 price snapshot (legacy orders) → 用 product_prices JOIN 查當前 USD 價
+const priceMap = new Map<string, number>();
+const missingSkus = items
+  .filter((i) => i.sku && i.priceCents == null)
+  .map((i) => i.sku!);
+if (missingSkus.length > 0 && env?.DB) {
+  const placeholders = missingSkus.map(() => "?").join(",");
+  const priceRows = await env.DB.prepare(
+    `SELECT pv.sku, pp.amount AS price_cents
+     FROM product_variants pv
+     JOIN product_prices pp ON pp.variant_id = pv.id
+     WHERE pv.sku IN (${placeholders}) AND pp.currency = 'CNY'`,
+  )
+    .bind(...missingSkus)
+    .all<{ sku: string; price_cents: number }>();
+  for (const r of priceRows.results ?? []) {
+    priceMap.set(r.sku, r.price_cents);
+  }
+}
+function linePriceCents(i: {
+  sku?: string;
+  priceCents?: number | null;
+  qty: number;
+}): number | null {
+  const p = i.priceCents ?? (i.sku ? priceMap.get(i.sku) : null);
+  return p == null ? null : p * i.qty;
+}
+
+function statusColor(s: string) {
+  return s === "pending"
+    ? "bg-warning/20 text-warning"
+    : s === "confirmed" || s === "shipped"
+      ? "bg-forest-100 text-forest-700"
+      : s === "delivered"
+        ? "bg-success/20 text-success"
+        : "bg-error/20 text-error";
+}
+---
+
+<AdminLayout
+  title={`${t("admin.orders_detail.title_prefix")} ${id}`}
+  active="orders"
+>
+  <a
+    href="/admin/orders"
+    slot="actions"
+    class="text-sm text-text-muted hover:text-text-primary">← 返回订单列表</a
+  >
+  {
+    !order ? (
+      <div class="rounded-card border border-error bg-error/10 p-4 text-error">
+        {t("admin.orders_detail.not_found")}
+      </div>
+    ) : (
+      <>
+        <section class="mb-4 flex flex-wrap items-center gap-x-6 gap-y-2 rounded-card border border-text-muted/20 bg-bg-card px-4 py-3">
+          <div>
+            <p class="text-xs text-text-muted">
+              {t("admin.orders_detail.meta_id")}
+            </p>
+            <p class="font-mono text-sm">{order.id}</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <span
+              class={`rounded px-2 py-0.5 text-xs ${statusColor(order.status)}`}
+            >
+              {tEnum(t, "status", order.status)}
+            </span>
+            <span
+              class={`rounded px-2 py-0.5 text-xs ${statusColor(order.payment_status)}`}
+            >
+              {tEnum(t, "payment", order.payment_status)}
+            </span>
+          </div>
+          <p class="text-xs text-text-muted">
+            {new Date(order.created_at * 1000)
+              .toISOString()
+              .slice(0, 16)
+              .replace("T", " ")}
+          </p>
+          <div class="ml-auto text-right">
+            <p class="text-xs text-text-muted">
+              {t("admin.orders_detail.total")}
+            </p>
+            <p class="font-serif text-xl tabular-nums">
+              {formatPrice(order.total, order.currency, locale)}
+            </p>
+          </div>
+        </section>
+
+        <div class="grid gap-4 lg:grid-cols-3">
+          <div class="space-y-4 lg:col-span-2">
+            <section class="rounded-card border border-text-muted/20 bg-bg-card p-4">
+              <h2 class="mb-2 font-serif text-lg">
+                {t("admin.orders_detail.sec_items", { n: items.length })}
+              </h2>
+              <div class="overflow-x-auto">
+                <table class="w-full text-sm leading-normal">
+                  <thead class="text-text-muted">
+                    <tr>
+                      <th class="py-1 text-left text-xs font-medium tracking-wide">
+                        {t("admin.orders_detail.col_slug")}
+                      </th>
+                      <th class="py-1 text-left text-xs font-medium tracking-wide">
+                        {t("admin.orders_detail.col_sku")}
+                      </th>
+                      <th class="py-1 text-right text-xs font-medium tracking-wide">
+                        {t("admin.orders_detail.col_qty")}
+                      </th>
+                      <th class="py-1 text-right text-xs font-medium tracking-wide">
+                        {t("admin.orders_detail.col_price")}
+                      </th>
+                      <th class="py-1 text-right text-xs font-medium tracking-wide">
+                        {t("admin.orders_detail.col_line_total")}
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {items.map((i) => {
+                      const unit =
+                        i.priceCents ??
+                        (i.sku ? (priceMap.get(i.sku) ?? null) : null);
+                      return (
+                        <tr class="border-t border-text-muted/10">
+                          <td class="py-1.5 font-mono text-xs">{i.slug}</td>
+                          <td class="py-1.5 font-mono text-xs">
+                            {i.sku ?? "—"}
+                          </td>
+                          <td class="py-1.5 text-right">{i.qty}</td>
+                          <td class="py-1.5 text-right font-mono">
+                            {unit != null
+                              ? formatPrice(
+                                  unit,
+                                  i.priceCents != null ? order.currency : "CNY",
+                                  locale,
+                                )
+                              : "—"}
+                          </td>
+                          <td class="py-1.5 text-right font-mono">
+                            {linePriceCents(i) != null
+                              ? formatPrice(
+                                  linePriceCents(i)!,
+                                  i.priceCents != null ? order.currency : "CNY",
+                                  locale,
+                                )
+                              : "—"}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                  <tfoot>
+                    <tr class="border-t-2 border-text-muted/30">
+                      <td colspan="4" class="py-1.5 text-right text-text-muted">
+                        {t("admin.orders_detail.subtotal")}
+                      </td>
+                      <td class="py-1.5 text-right font-mono">
+                        {formatPrice(order.subtotal, order.currency, locale)}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td colspan="4" class="py-1.5 text-right text-text-muted">
+                        {t("admin.orders_detail.shipping_fee")}
+                      </td>
+                      <td class="py-1.5 text-right font-mono">
+                        {formatPrice(
+                          order.shipping_fee,
+                          order.currency,
+                          locale,
+                        )}
+                      </td>
+                    </tr>
+                    <tr class="border-t border-text-muted/30 font-medium">
+                      <td colspan="4" class="py-2 text-right">
+                        {t("admin.orders_detail.total")}
+                      </td>
+                      <td class="py-2 text-right font-mono">
+                        {formatPrice(order.total, order.currency, locale)}
+                      </td>
+                    </tr>
+                  </tfoot>
+                </table>
+              </div>
+            </section>
+
+            <section class="rounded-card border border-text-muted/20 bg-bg-card p-4 text-sm">
+              <h2 class="mb-2 font-serif text-lg">
+                {t("admin.orders_detail.sec_shipping")}
+              </h2>
+              <p>{shippingAddress.address}</p>
+              <p>
+                {shippingAddress.city}, {shippingAddress.postal}
+              </p>
+              <p>{shippingAddress.country}</p>
+            </section>
+          </div>
+
+          <aside class="space-y-4">
+            <section class="rounded-card border border-text-muted/20 bg-bg-card p-4 lg:sticky lg:top-20">
+              <h2 class="mb-3 font-serif text-lg">
+                {t("admin.orders_detail.sec_status_update")}
+              </h2>
+              <form
+                method="POST"
+                action={`/api/admin/orders/${id}/status`}
+                class="space-y-3"
+              >
+                <div class="grid grid-cols-2 gap-3">
+                  <div>
+                    <label
+                      class="mb-1 block text-xs text-text-muted"
+                      for="status"
+                    >
+                      {t("admin.orders_detail.field_order_status")}
+                    </label>
+                    <select
+                      id="status"
+                      name="status"
+                      class="w-full rounded-md border border-text-muted/30 bg-bg-base px-2 py-2 text-sm"
+                    >
+                      {[
+                        "pending",
+                        "confirmed",
+                        "shipped",
+                        "delivered",
+                        "cancelled",
+                      ].map((s) => (
+                        <option value={s} selected={order.status === s}>
+                          {tEnum(t, "status", s)}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label
+                      class="mb-1 block text-xs text-text-muted"
+                      for="payment_status"
+                    >
+                      {t("admin.orders_detail.field_payment")}
+                    </label>
+                    <select
+                      id="payment_status"
+                      name="payment_status"
+                      class="w-full rounded-md border border-text-muted/30 bg-bg-base px-2 py-2 text-sm"
+                    >
+                      {["unpaid", "paid", "refunded"].map((s) => (
+                        <option value={s} selected={order.payment_status === s}>
+                          {tEnum(t, "payment", s)}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+                <div>
+                  <label
+                    class="mb-1 block text-xs text-text-muted"
+                    for="tracking_number"
+                  >
+                    {t("admin.orders_detail.field_tracking")}
+                  </label>
+                  <input
+                    id="tracking_number"
+                    name="tracking_number"
+                    value={order.tracking_number ?? ""}
+                    class="w-full rounded-md border border-text-muted/30 bg-bg-base px-3 py-2 font-mono text-sm"
+                  />
+                </div>
+                <div>
+                  <label class="mb-1 block text-xs text-text-muted" for="notes">
+                    {t("admin.orders_detail.field_notes")}
+                  </label>
+                  <textarea
+                    id="notes"
+                    name="notes"
+                    rows="2"
+                    class="w-full rounded-md border border-text-muted/30 bg-bg-base px-3 py-2 text-sm"
+                  >
+                    {order.notes ?? ""}
+                  </textarea>
+                </div>
+                <button
+                  type="submit"
+                  class="w-full rounded-md bg-forest-700 px-4 py-2 text-bg-base transition-colors hover:bg-forest-900"
+                >
+                  {t("admin.orders_detail.btn_update")}
+                </button>
+              </form>
+            </section>
+
+            <section class="rounded-card border border-text-muted/20 bg-bg-card p-4 text-sm">
+              <h2 class="mb-2 font-serif text-lg">
+                {t("admin.orders_detail.sec_customer")}
+              </h2>
+              <dl class="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1.5">
+                <dt class="text-text-muted">
+                  {t("admin.orders_detail.field_name")}
+                </dt>
+                <dd>{order.customer_name}</dd>
+                <dt class="text-text-muted">
+                  {t("admin.orders_detail.field_email")}
+                </dt>
+                <dd class="break-all">
+                  <a
+                    href={`mailto:${order.customer_email}`}
+                    class="text-accent-700 underline"
+                  >
+                    {order.customer_email}
+                  </a>
+                </dd>
+                <dt class="text-text-muted">
+                  {t("admin.orders_detail.field_phone")}
+                </dt>
+                <dd>{order.customer_phone ?? "—"}</dd>
+                <dt class="text-text-muted">
+                  {t("admin.orders_detail.field_locale")}
+                </dt>
+                <dd>{order.locale}</dd>
+              </dl>
+              <p class="mt-3 text-xs text-text-muted">
+                {t("admin.orders_detail.meta_updated")}{" "}
+                {new Date(order.updated_at * 1000)
+                  .toISOString()
+                  .slice(0, 16)
+                  .replace("T", " ")}
+              </p>
+            </section>
+          </aside>
+        </div>
+      </>
+    )
+  }
+  <script is:inline>
+    (function () {
+      var statusEl = document.getElementById("status");
+      var paymentEl = document.getElementById("payment_status");
+      if (!statusEl || !paymentEl) return;
+      var MAP = {
+        pending: "unpaid",
+        confirmed: "paid",
+        shipped: "paid",
+        delivered: "paid",
+        cancelled: "refunded",
+      };
+      statusEl.addEventListener("change", function () {
+        var next = MAP[statusEl.value];
+        if (next && !paymentEl.dataset.touched) paymentEl.value = next;
+      });
+      paymentEl.addEventListener("change", function () {
+        paymentEl.dataset.touched = "1";
+      });
+    })();
+  </script>
+</AdminLayout>

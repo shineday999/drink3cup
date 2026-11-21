@@ -1,0 +1,83 @@
+---
+// SVG 漸層抽象樹葉組件 — 用於 Hero 背景與 OG image
+// 計畫書 §4.1 色板:森林綠 + 琥珀金
+---
+
+<svg
+  viewBox="0 0 800 800"
+  xmlns="http://www.w3.org/2000/svg"
+  preserveAspectRatio="xMidYMid slice"
+  aria-hidden="true"
+  class="w-full h-full"
+>
+  <defs>
+    <linearGradient id="forest-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1A2E1A" stop-opacity="0.85"></stop>
+      <stop offset="50%" stop-color="#4A6B47" stop-opacity="0.75"></stop>
+      <stop offset="100%" stop-color="#8FA88C" stop-opacity="0.6"></stop>
+    </linearGradient>
+    <linearGradient id="amber-grad" x1="100%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#8C6B3E" stop-opacity="0.4"></stop>
+      <stop offset="100%" stop-color="#C9925B" stop-opacity="0.25"></stop>
+    </linearGradient>
+    <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#DCE5DC" stop-opacity="0.3"></stop>
+      <stop offset="100%" stop-color="#DCE5DC" stop-opacity="0"></stop>
+    </radialGradient>
+  </defs>
+
+  <!-- Base forest gradient -->
+  <rect width="800" height="800" fill="url(#forest-grad)"></rect>
+
+  <!-- Abstract leaf shapes -->
+  <g opacity="0.5">
+    <path
+      d="M 200 250 Q 350 150, 500 250 T 700 350"
+      stroke="#DCE5DC"
+      stroke-width="2"
+      fill="none"></path>
+    <path
+      d="M 100 450 Q 250 350, 400 450 T 700 550"
+      stroke="#DCE5DC"
+      stroke-width="1.5"
+      fill="none"
+      opacity="0.7"></path>
+    <path
+      d="M 150 600 Q 300 500, 450 600 T 750 700"
+      stroke="#DCE5DC"
+      stroke-width="1"
+      fill="none"
+      opacity="0.5"></path>
+  </g>
+
+  <!-- Amber accent shapes -->
+  <g opacity="0.6">
+    <ellipse
+      cx="600"
+      cy="200"
+      rx="180"
+      ry="80"
+      fill="url(#amber-grad)"
+      transform="rotate(-15 600 200)"></ellipse>
+    <ellipse
+      cx="200"
+      cy="550"
+      rx="160"
+      ry="70"
+      fill="url(#amber-grad)"
+      transform="rotate(20 200 550)"></ellipse>
+  </g>
+
+  <!-- Center glow -->
+  <rect width="800" height="800" fill="url(#glow)"></rect>
+
+  <!-- Single stylized leaf at center -->
+  <g transform="translate(400 400) rotate(-15)" opacity="0.7">
+    <path
+      d="M 0 -120 Q 80 -60, 60 60 Q 0 120, -60 60 Q -80 -60, 0 -120 Z"
+      fill="#DCE5DC"
+      opacity="0.4"></path>
+    <path d="M 0 -120 L 0 80" stroke="#C9925B" stroke-width="1.5" opacity="0.8"
+    ></path>
+  </g>
+</svg>

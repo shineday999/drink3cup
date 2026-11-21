@@ -1,0 +1,77 @@
+---
+import Layout from "@layouts/Layout.astro";
+import RevealOnScroll from "@components/RevealOnScroll.astro";
+import ContinueReading from "@components/ContinueReading.astro";
+import BreadcrumbSchema from "@components/BreadcrumbSchema.astro";
+import { createT } from "../i18n/t";
+import { localizedPath, defaultLocale, type Locale } from "../i18n/config";
+
+const locale = (Astro.locals.locale ?? defaultLocale) as Locale;
+const messages = (Astro.locals.messages ?? {}) as Record<string, unknown>;
+const t = createT(messages);
+
+const breadcrumbItems = [
+  { name: t("nav.home"), url: "/" },
+  { name: t("nav.incense"), url: "/incense" },
+];
+---
+
+<Layout
+  title={`${t("incense.title")} — ${t("common.site_name")}`}
+  description={t("incense.p1")}
+>
+  <Fragment slot="head">
+    <BreadcrumbSchema items={breadcrumbItems} />
+  </Fragment>
+  <article class="max-w-4xl mx-auto px-6 py-section">
+    <RevealOnScroll>
+      <header class="mb-16 text-center">
+        <p
+          class="text-[10px] uppercase tracking-[0.4em] text-forest-600 font-sans mb-4"
+        >
+          {t("incense.kicker")}
+        </p>
+        <h1
+          class="text-display-sm md:text-display-md font-serif text-text-primary mb-4 leading-[1.08]"
+        >
+          {t("incense.title")}
+        </h1>
+        <p class="text-lg text-text-secondary italic max-w-xl mx-auto">
+          {t("incense.subtitle")}
+        </p>
+      </header>
+    </RevealOnScroll>
+
+    <RevealOnScroll>
+      <div
+        class="space-y-6 text-text-secondary font-sans leading-relaxed text-base max-w-3xl mx-auto"
+      >
+        <p>{t("incense.p1")}</p>
+        <p>{t("incense.p2")}</p>
+        <p>{t("incense.p3")}</p>
+      </div>
+    </RevealOnScroll>
+  </article>
+  <div class="max-w-5xl mx-auto px-6 pb-section">
+    <ContinueReading
+      heading={t("continue.heading")}
+      links={[
+        {
+          href: localizedPath(locale, "/materials"),
+          label: t("continue.incense_next_1_label"),
+          desc: t("continue.incense_next_1_desc"),
+        },
+        {
+          href: localizedPath(locale, "/craft"),
+          label: t("continue.incense_next_2_label"),
+          desc: t("continue.incense_next_2_desc"),
+        },
+        {
+          href: localizedPath(locale, "/products?cat=incense"),
+          label: t("continue.incense_next_3_label"),
+          desc: t("continue.incense_next_3_desc"),
+        },
+      ]}
+    />
+  </div>
+</Layout>

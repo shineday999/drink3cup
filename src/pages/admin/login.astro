@@ -1,0 +1,123 @@
+---
+// /admin/login — local email + password login form
+// 2026-10-01: replaces Cloudflare Access flow
+// Wave 16: 加 global.css import(補 :root vars)+ t() i18n 整合
+import "../../styles/global.css";
+import { createT } from "../../i18n/t";
+import { defaultLocale, type Locale } from "../../i18n/config";
+import zhHansMessages from "../../i18n/messages/zh-Hans.json";
+import { getAdminFromContext } from "../../lib/auth";
+
+const admin = await getAdminFromContext(Astro);
+if (admin) {
+  return Astro.redirect("/admin", 303);
+}
+
+const locale = (Astro.locals.locale ?? defaultLocale) as Locale;
+const messages = zhHansMessages as Record<string, unknown>;
+const t = createT(messages);
+const url = Astro.url;
+const redirectTo = url.searchParams.get("redirect") ?? "/admin";
+const error = url.searchParams.get("error");
+
+// Wave 28.8g: login 頁 <title> 也跟 site_name 變動
+const siteName: string =
+  Astro.locals.siteSettings?.siteName[locale] ??
+  Astro.locals.siteSettings?.siteName["zh-Hans"] ??
+  Astro.locals.siteSettings?.siteName["en"] ??
+  "cnamber-store";
+---
+
+<!doctype html>
+<html lang={locale}>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{t("admin.login.title")} · {siteName}</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  </head>
+  <body
+    class="min-h-screen bg-cream-50 font-sans text-text-primary flex items-center justify-center px-4"
+  >
+    <div
+      class="pointer-events-none fixed inset-0 overflow-hidden"
+      aria-hidden="true"
+    >
+      <div
+        class="absolute -top-32 -right-32 w-96 h-96 rounded-full bg-accent-300/25 blur-3xl"
+      >
+      </div>
+      <div
+        class="absolute -bottom-32 -left-32 w-96 h-96 rounded-full bg-forest-300/20 blur-3xl"
+      >
+      </div>
+    </div>
+    <div
+      class="relative max-w-md w-full bg-bg-card border border-text-muted/20 rounded-card p-8 shadow-soft overflow-hidden animate-fade-up"
+    >
+      <div
+        class="absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r from-accent-700 via-accent-500 to-accent-300"
+        aria-hidden="true"
+      >
+      </div>
+      <div class="text-center mb-6">
+        <h1 class="font-serif text-2xl text-forest-800 mb-1">
+          {siteName}
+        </h1>
+        <p class="text-xs uppercase tracking-wider text-text-muted">
+          {t("admin.common.admin_badge")} · {t("admin.login.local_signin")}
+        </p>
+      </div>
+
+      {
+        error && (
+          <div class="mb-4 p-3 border border-red-500/30 bg-red-50 text-red-700 text-sm rounded">
+            {error === "invalid" && t("admin.login.error_invalid")}
+            {error === "empty" && t("admin.login.error_empty")}
+            {error === "server" && t("admin.login.error_server")}
+          </div>
+        )
+      }
+
+      <form method="POST" action="/api/admin/login" class="space-y-4">
+        <input type="hidden" name="redirect" value={redirectTo} />
+        <div>
+          <label class="block text-sm font-medium mb-1" for="email"
+            >{t("admin.login.email_label")}</label
+          >
+          <input
+            id="email"
+            name="email"
+            type="email"
+            required
+            autocomplete="username"
+            class="w-full px-3 py-2 border border-text-muted/30 rounded-md bg-bg-base"
+          />
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-1" for="password"
+            >{t("admin.login.password_label")}</label
+          >
+          <input
+            id="password"
+            name="password"
+            type="password"
+            required
+            autocomplete="current-password"
+            class="w-full px-3 py-2 border border-text-muted/30 rounded-md bg-bg-base"
+          />
+        </div>
+        <button
+          type="submit"
+          class="w-full px-4 py-2 bg-forest-700 text-bg-base rounded-md hover:bg-forest-900 transition-colors"
+        >
+          {t("admin.login.signin")}
+        </button>
+      </form>
+
+      <p class="text-xs text-text-muted text-center mt-6">
+        {t("admin.login.authorized_notice")}
+      </p>
+    </div>
+  </body>
+</html>

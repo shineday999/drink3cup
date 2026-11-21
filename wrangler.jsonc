@@ -1,0 +1,33 @@
+{
+  // NEW site: https://mycafe.de5.net  (completely separate from any other project)
+  // IDs below are PLACEHOLDERS. Create NEW resources in Cloudflare and paste the IDs here.
+  // See docs/PLAN.md step S11.
+  "name": "mycafe",
+  "compatibility_date": "2024-09-23",
+  "compatibility_flags": ["nodejs_compat"],
+  "pages_build_output_dir": "./dist",
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "mycafe",
+      "database_id": "REPLACE_WITH_NEW_D1_ID",
+      "migrations_dir": "migrations",
+    },
+  ],
+  "r2_buckets": [
+    {
+      "binding": "PRODUCT_IMAGES",
+      "bucket_name": "mycafe-images",
+    },
+  ],
+  "kv_namespaces": [
+    { "binding": "I18N", "id": "REPLACE_WITH_NEW_KV_I18N_ID" },
+    { "binding": "SESSION", "id": "REPLACE_WITH_NEW_KV_SESSION_ID" },
+  ],
+  "ai": { "binding": "AI" },
+  "vars": {
+    "SITE_URL": "https://mycafe.de5.net",
+    "EMAIL_FROM": "MyCafe <hello@mycafe.de5.net>",
+    "EMAIL_REPLY_TO": "hello@mycafe.de5.net",
+  },
+}

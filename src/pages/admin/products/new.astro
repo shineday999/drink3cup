@@ -1,0 +1,591 @@
+---
+import AdminLayout from "../../../layouts/AdminLayout.astro";
+import { env } from "cloudflare:workers";
+import { createT, tEnum } from "../../../i18n/t";
+import zhHansMessages from "../../../i18n/messages/zh-Hans.json";
+import { getDB } from "../../../lib/db";
+import {
+  ensureCategoryTable,
+  listCategories,
+  type SiteCategory,
+} from "../../../lib/categories";
+import { getRates } from "../../../lib/format";
+import { kindOf } from "../../../lib/category-kind";
+import {
+  CATEGORIES,
+  SUBCATEGORIES,
+  TAG_GROUPS,
+  MAX_IMAGES,
+  createProduct,
+  emptyNewProduct,
+  pickImages,
+  readNewProductForm,
+  todayStamp,
+  validateNewProduct,
+} from "../../../lib/admin-products";
+
+// 新增商品：同一個頁面處理顯示與送出（出錯時保留已填內容）
+if (!Astro.locals.admin) {
+  return new Response("Unauthorized", { status: 401 });
+}
+
+const t = createT(zhHansMessages as Record<string, unknown>);
+
+// 分類選項 = 「分类图片」页的分类（代码 + 简体中文标题），不再写死两个
+const LEGACY_LABEL: Record<string, string> = {
+  jewelry: String(t("admin.category_images.slot_jewelry")),
+  incense: String(t("admin.category_images.slot_incense")),
+};
+let siteCategories: SiteCategory[] = [];
+try {
+  const db = getDB();
+  await ensureCategoryTable(db);
+  siteCategories = await listCategories(db);
+} catch {
+  siteCategories = [];
+}
+if (siteCategories.length === 0) {
+  // 读不到分类表时退回内建两个，页面仍可使用
+  siteCategories = CATEGORIES.map((code, i) => ({
+    code,
+    sort_order: i + 1,
+    titles: {},
+    descs: {},
+  }));
+}
+const categoryOptions = siteCategories.map((c) => ({
+  code: c.code,
+  label: c.titles["zh-Hans"] || LEGACY_LABEL[c.code] || c.code,
+  kind: kindOf(c.code, c.titles["zh-Hans"]),
+}));
+const kinds = Object.fromEntries(categoryOptions.map((o) => [o.code, o.kind]));
+const categoryCodes = categoryOptions.map((c) => c.code);
+
+let values = emptyNewProduct(categoryCodes[0]);
+let errors: string[] = [];
+
+if (Astro.request.method === "POST") {
+  const form = await Astro.request.formData();
+  values = readNewProductForm(form);
+  const files = pickImages(form);
+  errors = validateNewProduct(values, files, categoryCodes);
+
+  if (errors.length === 0) {
+    const intent =
+      String(form.get("intent") ?? "draft") === "publish" ? "publish" : "draft";
+    try {
+      const result = await createProduct(
+        getDB(),
+        env.PRODUCT_IMAGES,
+        values,
+        files,
+        intent,
+        categoryCodes,
+        kinds,
+      );
+      const q = new URLSearchParams({ created: result.status });
+      if (intent === "publish" && result.status !== "active") {
+        q.set("blocked", result.blocked.join("、"));
+      }
+      return Astro.redirect(
+        `/admin/products/${result.id}?${q.toString()}`,
+        303,
+      );
+    } catch (e) {
+      errors = [e instanceof Error ? e.message : "保存失败，请稍后重试"];
+    }
+  }
+}
+
+const stamp = todayStamp();
+// 價格預覽用：1 人民幣 = 多少該幣別（來自後台「汇率」表）
+const rates = Object.fromEntries(
+  ["CNY", "USD", "MYR", "IDR"].map((c) => [c, getRates()[c] ?? 1]),
+);
+const field =
+  "w-full px-3 py-2 border border-text-muted/30 rounded-md bg-bg-base";
+const card =
+  "bg-bg-card border border-text-muted/20 rounded-card p-4 space-y-3";
+---
+
+<AdminLayout title={t("admin.products_new.title")} active="products">
+  <p class="mb-3 max-w-3xl text-sm text-text-secondary">
+    填完下面 4 个部分就可以上架。编号和规格编号由系统自动生成，不需要手动填写。
+  </p>
+
+  {
+    errors.length > 0 && (
+      <div
+        role="alert"
+        class="mb-4 max-w-3xl rounded-card border border-error/40 bg-error/10 p-4 text-sm"
+      >
+        <p class="font-medium text-error mb-1">还有几项需要处理：</p>
+        <ul class="list-disc pl-5 space-y-0.5">
+          {errors.map((m) => (
+            <li>{m}</li>
+          ))}
+        </ul>
+        <p class="mt-2 text-text-muted">图片不会被保留，请重新选择。</p>
+      </div>
+    )
+  }
+
+  <form
+    id="np-form"
+    method="POST"
+    enctype="multipart/form-data"
+    data-stamp={stamp}
+    class="max-w-3xl space-y-4"
+  >
+    <input type="hidden" name="intent" value="draft" />
+
+    <!-- 1. 基本资料 -->
+    <section class={card}>
+      <h2 class="font-serif text-lg">① 这是什么商品</h2>
+
+      <fieldset>
+        <legend class="block text-sm font-medium mb-2">
+          分类 <span class="text-error">*</span>
+        </legend>
+        <div class="grid grid-cols-2 gap-3">
+          {
+            categoryOptions.map((c) => (
+              <label class="flex items-center justify-center gap-2 rounded-md border border-text-muted/30 px-3 py-3 cursor-pointer transition-colors has-[:checked]:border-forest-700 has-[:checked]:bg-forest-50">
+                <input
+                  type="radio"
+                  name="category"
+                  value={c.code}
+                  checked={values.category === c.code}
+                  class="accent-forest-700"
+                />
+                <span>{c.label}</span>
+              </label>
+            ))
+          }
+        </div>
+      </fieldset>
+
+      <div>
+        <label class="block text-sm font-medium mb-1" for="np-sub">子分类</label
+        >
+        <select id="np-sub" name="subcategory" class={field}>
+          <option value="">—</option>
+          {
+            CATEGORIES.map((c) =>
+              SUBCATEGORIES[c].map((s) => (
+                <option
+                  value={s}
+                  data-cat={c}
+                  selected={values.subcategory === s}
+                >
+                  {tEnum(t, "subcategory", s)}
+                </option>
+              )),
+            )
+          }
+        </select>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium mb-1" for="np-name-zh"
+            >中文名称 <span class="text-error">*</span></label
+          >
+          <input
+            id="np-name-zh"
+            name="name_zh"
+            type="text"
+            required
+            maxlength="100"
+            value={values.name_zh}
+            placeholder="如：抚顺琥珀吊坠"
+            class={field}
+          />
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-1" for="np-name-en"
+            >英文名称 <span class="text-error">*</span></label
+          >
+          <input
+            id="np-name-en"
+            name="name_en"
+            type="text"
+            required
+            maxlength="100"
+            value={values.name_en}
+            placeholder="如：Fushun Amber Pendant"
+            class={field}
+          />
+        </div>
+      </div>
+      <p class="text-xs text-text-muted -mt-2">
+        编号：<span id="np-slug-preview" class="font-mono text-text-secondary"
+        ></span>
+        （保存时如果重复，系统会自动加序号）
+      </p>
+
+      <div>
+        <label class="block text-sm font-medium mb-1" for="np-short-zh"
+          >一句话简介（选填）</label
+        >
+        <input
+          id="np-short-zh"
+          name="short_zh"
+          type="text"
+          maxlength="200"
+          value={values.short_zh}
+          class={field}
+        />
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium mb-1" for="np-desc-zh"
+          >中文描述 <span class="text-error">*</span></label
+        >
+        <textarea id="np-desc-zh" name="desc_zh" rows="3" required class={field}
+          >{values.desc_zh}</textarea
+        >
+      </div>
+
+      <details class="text-sm">
+        <summary class="cursor-pointer text-text-secondary"
+          >英文描述（选填，之后也可以在「翻译」里补）</summary
+        >
+        <textarea name="desc_en" rows="3" class={`${field} mt-2`}
+          >{values.desc_en}</textarea
+        >
+      </details>
+    </section>
+
+    <!-- 2. 售价与库存 -->
+    <section class={card}>
+      <h2 class="font-serif text-lg">② 售价与库存</h2>
+      <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
+        <div>
+          <label class="block text-sm font-medium mb-1" for="np-price"
+            >售价（人民币 ¥） <span class="text-error">*</span></label
+          >
+          <input
+            id="np-price"
+            name="price"
+            type="text"
+            inputmode="decimal"
+            required
+            value={values.price}
+            placeholder="如：680"
+            class={field}
+          />
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-1" for="np-stock"
+            >库存 <span class="text-error">*</span></label
+          >
+          <input
+            id="np-stock"
+            name="stock"
+            type="number"
+            min="0"
+            step="1"
+            required
+            value={values.stock}
+            class={field}
+          />
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-1" for="np-weight"
+            >重量（克，选填）</label
+          >
+          <input
+            id="np-weight"
+            name="weight"
+            type="number"
+            min="0"
+            step="1"
+            value={values.weight}
+            class={field}
+          />
+        </div>
+      </div>
+      <p id="np-price-preview" class="text-xs text-text-muted"></p>
+    </section>
+
+    <!-- 3. 图片 -->
+    <section class={card}>
+      <h2 class="font-serif text-lg">③ 图片</h2>
+      <div>
+        <input
+          id="np-images"
+          name="images"
+          type="file"
+          multiple
+          accept="image/jpeg,image/png,image/webp,image/gif"
+          class={`${field} file:mr-4 file:py-1 file:px-3 file:border-0 file:bg-forest-700 file:text-bg-base file:rounded file:cursor-pointer text-sm`}
+        />
+        <p class="text-xs text-text-muted mt-1">
+          第一张是封面。最多 {MAX_IMAGES} 张，每张 5MB 以内（JPG / PNG / WebP / GIF）。立即上架至少需要
+          1 张。
+        </p>
+      </div>
+      <p id="np-img-msg" class="text-sm text-error" role="alert"></p>
+      <div id="np-img-grid" class="grid grid-cols-3 sm:grid-cols-6 gap-2"></div>
+    </section>
+
+    <!-- 4. 标签 -->
+    <section class={card}>
+      <h2 class="font-serif text-lg">④ 标签</h2>
+      <p class="text-xs text-text-muted -mt-2">
+        「为我推荐」测验会拿客人的答案来比对这些标签，勾得越准，推荐越准。
+      </p>
+      {
+        categoryOptions
+          .filter((o) => o.kind !== null)
+          .map((co) => (
+            <div
+              data-tag-cat={co.code}
+              hidden={values.category !== co.code}
+              class="space-y-4"
+            >
+              {TAG_GROUPS[co.kind!].map((g) => (
+                <fieldset>
+                  <legend class="text-sm font-medium mb-2">
+                    {t(g.titleKey)}
+                  </legend>
+                  <div class="flex flex-wrap gap-2">
+                    {g.options.map((o) => (
+                      <label class="cursor-pointer rounded-full border border-text-muted/30 px-3 py-1.5 text-sm transition-colors has-[:checked]:border-forest-700 has-[:checked]:bg-forest-700 has-[:checked]:text-bg-base has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-accent-500/40">
+                        <input
+                          type="checkbox"
+                          name="tag"
+                          value={o.value}
+                          checked={values.tags.includes(o.value)}
+                          disabled={values.category !== co.code}
+                          class="sr-only"
+                        />
+                        {t(o.labelKey)}
+                      </label>
+                    ))}
+                  </div>
+                </fieldset>
+              ))}
+            </div>
+          ))
+      }
+    </section>
+
+    <div
+      class="sticky bottom-0 -mx-4 sm:mx-0 bg-cream-50/95 backdrop-blur border-t border-text-muted/20 px-4 sm:px-0 py-3"
+    >
+      <div class="flex flex-wrap items-center gap-3">
+        <button
+          type="submit"
+          value="draft"
+          class="px-5 py-2.5 border border-text-muted/40 rounded-md hover:bg-bg-base transition-colors"
+        >
+          存为草稿
+        </button>
+        <button
+          type="submit"
+          value="publish"
+          class="px-5 py-2.5 bg-forest-700 text-bg-base rounded-md hover:bg-forest-900 transition-colors"
+        >
+          立即上架
+        </button>
+        <a
+          href="/admin/products"
+          class="ml-auto text-sm text-text-muted hover:underline">取消</a
+        >
+      </div>
+      <p class="text-xs text-text-muted mt-2">
+        立即上架需要：中文名称、中文描述、售价、至少 1
+        张图片。缺图片时会先存成草稿。
+      </p>
+    </div>
+  </form>
+
+  <script
+    id="np-rates"
+    type="application/json"
+    is:inline
+    set:html={JSON.stringify(rates)}
+  />
+  <script is:inline>
+    (function () {
+      var form = document.getElementById("np-form");
+      if (!form) return;
+      var rates = JSON.parse(
+        document.getElementById("np-rates").textContent || "{}",
+      );
+      var stamp = form.getAttribute("data-stamp") || "";
+
+      // --- 分类切换：子分类选项与标签组 ---
+      var subSel = document.getElementById("np-sub");
+      function curCat() {
+        var c = form.querySelector('input[name="category"]:checked');
+        return c ? c.value : "jewelry";
+      }
+      function applyCat() {
+        var cat = curCat();
+        Array.prototype.forEach.call(
+          subSel.querySelectorAll("option[data-cat]"),
+          function (o) {
+            var show = o.getAttribute("data-cat") === cat;
+            o.hidden = !show;
+            o.disabled = !show;
+          },
+        );
+        var sel = subSel.options[subSel.selectedIndex];
+        if (
+          sel &&
+          sel.getAttribute("data-cat") &&
+          sel.getAttribute("data-cat") !== cat
+        ) {
+          subSel.value = "";
+        }
+        Array.prototype.forEach.call(
+          form.querySelectorAll("[data-tag-cat]"),
+          function (g) {
+            var show = g.getAttribute("data-tag-cat") === cat;
+            g.hidden = !show;
+            Array.prototype.forEach.call(
+              g.querySelectorAll("input"),
+              function (i) {
+                i.disabled = !show;
+              },
+            );
+          },
+        );
+      }
+      Array.prototype.forEach.call(
+        form.querySelectorAll('input[name="category"]'),
+        function (r) {
+          r.addEventListener("change", applyCat);
+        },
+      );
+      applyCat();
+
+      // --- 编号预览（与服务器规则相同；最终以服务器为准） ---
+      function slugify(s) {
+        return s
+          .normalize("NFKD")
+          .replace(/[\u0300-\u036f]/g, "")
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, "-")
+          .replace(/^-+|-+$/g, "")
+          .slice(0, 60)
+          .replace(/-+$/, "");
+      }
+      var nameEn = document.getElementById("np-name-en");
+      var slugOut = document.getElementById("np-slug-preview");
+      function updSlug() {
+        var s = slugify(nameEn.value);
+        slugOut.textContent = s
+          ? stamp + "-" + s
+          : stamp + "-（填写英文名称后显示）";
+      }
+      nameEn.addEventListener("input", updSlug);
+      updSlug();
+
+      // --- 售价预览：各语言前台实际会显示的价格 ---
+      var priceEl = document.getElementById("np-price");
+      var priceOut = document.getElementById("np-price-preview");
+      var targets = [
+        ["zh-Hans", "CNY"],
+        ["en", "USD"],
+        ["ms-MY", "MYR"],
+        ["id-ID", "IDR"],
+      ];
+      function fmt(loc, cur, cny) {
+        var v = cny * (rates[cur] || 1);
+        try {
+          return new Intl.NumberFormat(loc, {
+            style: "currency",
+            currency: cur,
+            maximumFractionDigits: 0,
+          }).format(v);
+        } catch {
+          return cur + " " + Math.round(v);
+        }
+      }
+      function updPrice() {
+        var v = parseFloat((priceEl.value || "").replace(/,/g, ""));
+        if (!(v > 0)) {
+          priceOut.textContent =
+            "填入售价后，这里会显示各语言前台的显示价格（依「汇率」页的数值换算）。";
+          return;
+        }
+        priceOut.textContent =
+          "前台显示：" +
+          targets
+            .map(function (t) {
+              return fmt(t[0], t[1], v);
+            })
+            .join(" ・ ");
+      }
+      priceEl.addEventListener("input", updPrice);
+      updPrice();
+
+      // --- 图片预览与基本检查 ---
+      var fileEl = document.getElementById("np-images");
+      var grid = document.getElementById("np-img-grid");
+      var msg = document.getElementById("np-img-msg");
+      var okTypes = ["image/jpeg", "image/png", "image/webp", "image/gif"];
+      fileEl.addEventListener("change", function () {
+        grid.textContent = "";
+        msg.textContent = "";
+        var files = Array.prototype.slice.call(fileEl.files || []);
+        var problem = "";
+        if (files.length > 6) problem = "最多上传 6 张图片";
+        files.forEach(function (f) {
+          if (!problem && okTypes.indexOf(f.type) === -1)
+            problem = "不支持的图片格式：" + f.name;
+          if (!problem && f.size > 5 * 1024 * 1024)
+            problem = "图片过大：" + f.name + "（单张上限 5MB）";
+        });
+        if (problem) {
+          msg.textContent = problem;
+          fileEl.value = "";
+          return;
+        }
+        files.forEach(function (f, i) {
+          var cell = document.createElement("div");
+          cell.className = "relative";
+          var img = document.createElement("img");
+          img.src = URL.createObjectURL(f);
+          img.alt = f.name;
+          img.className =
+            "w-full aspect-square object-cover rounded border border-text-muted/20";
+          cell.appendChild(img);
+          if (i === 0) {
+            var tag = document.createElement("span");
+            tag.textContent = "封面";
+            tag.className =
+              "absolute left-1 top-1 rounded bg-forest-700 px-1.5 py-0.5 text-[10px] text-bg-base";
+            cell.appendChild(tag);
+          }
+          grid.appendChild(cell);
+        });
+      });
+
+      // --- 送出：记录按下的是「草稿」还是「上架」，并防止重复送出 ---
+      var intentEl = form.querySelector('input[name="intent"]');
+      form.addEventListener("submit", function (e) {
+        var b = e.submitter;
+        if (b && b.value) intentEl.value = b.value;
+        Array.prototype.forEach.call(
+          form.querySelectorAll('button[type="submit"]'),
+          function (x) {
+            x.disabled = true;
+          },
+        );
+      });
+      window.addEventListener("pageshow", function () {
+        Array.prototype.forEach.call(
+          form.querySelectorAll('button[type="submit"]'),
+          function (x) {
+            x.disabled = false;
+          },
+        );
+      });
+    })();
+  </script>
+</AdminLayout>

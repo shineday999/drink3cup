@@ -1,0 +1,239 @@
+---
+import Layout from "@layouts/Layout.astro";
+import CheckoutWizard from "@components/CheckoutWizard.astro";
+import { env } from "cloudflare:workers";
+import { createT } from "../i18n/t";
+import { defaultLocale, localizedPath, type Locale } from "../i18n/config";
+import { readCart } from "../lib/cart";
+import { formatPrice } from "../lib/format";
+
+const locale = (Astro.locals.locale ?? defaultLocale) as Locale;
+const messages = (Astro.locals.messages ?? {}) as Record<string, unknown>;
+const t = createT(messages);
+const productsPath = localizedPath(locale, "/products");
+
+const items = readCart(Astro.request.headers.get("cookie"));
+
+// 跟 cart.astro 同一個聚合 SQL (GROUP BY slug,sku),確保 checkout total = cart subtotal + 顯示 SKU。
+const enriched =
+  env?.DB && items.length > 0
+    ? await env.DB.prepare(
+        `SELECT p.slug, pv.sku, MIN(pp.amount) AS amount, pp.currency
+       FROM products p
+       LEFT JOIN product_variants pv ON pv.product_id = p.id
+       LEFT JOIN product_prices pp ON pp.variant_id = pv.id AND pp.currency = 'CNY'
+       WHERE p.slug IN (${items.map(() => "?").join(",")})
+       GROUP BY p.slug, pv.sku`,
+      )
+        .bind(...items.map((i) => i.slug))
+        .all()
+    : { results: [] as Array<Record<string, unknown>> };
+
+const keyMap = new Map<string, { qty: number; slug: string; sku: string }>();
+for (const it of items) {
+  const k = `${it.slug}::${it.sku ?? ""}`;
+  const ex = keyMap.get(k);
+  if (ex) ex.qty += it.qty;
+  else keyMap.set(k, { qty: it.qty, slug: it.slug, sku: it.sku ?? "" });
+}
+
+// SQL GROUP BY (slug, sku) 展開 product 全部 variant,只顯示 cart 內實際 add 過的 (slug, sku)
+const visible = enriched.results.filter((row) => {
+  const k = `${row.slug}::${row.sku ?? ""}`;
+  return keyMap.has(k);
+});
+
+const subtotalCents = visible.reduce((sum, row) => {
+  const k = `${row.slug}::${row.sku ?? ""}`;
+  const qty = keyMap.get(k)!.qty;
+  return sum + ((row.amount as number) ?? 0) * qty;
+}, 0);
+
+const totalDisplay = formatPrice(subtotalCents, "CNY", locale);
+---
+
+<Layout
+  title={`${t("checkout.title") ?? "Checkout"} — ${t("common.site_name")}`}
+>
+  <div data-co-page class="max-w-2xl mx-auto px-6 py-section">
+    <h1 class="text-display-sm font-serif text-text-primary mb-4">
+      {t("checkout.title") ?? "Checkout"}
+    </h1>
+    <p class="text-text-secondary mb-8">
+      {
+        t("checkout.help") ??
+          "Reservation — we will contact you to confirm payment."
+      }
+    </p>
+
+    {
+      items.length === 0 ? (
+        <p class="text-text-muted">
+          {t("checkout.cart_empty") ?? "Your cart is empty."}{" "}
+          <a href={productsPath} class="text-accent-700 underline">
+            {t("checkout.browse_products") ?? "Browse products"}
+          </a>
+          .
+        </p>
+      ) : (
+        <form
+          data-checkout
+          data-co-pending
+          method="POST"
+          action="/api/orders/create"
+          class="bg-bg-card border border-text-muted/20 rounded-card p-6 space-y-4"
+        >
+          <CheckoutWizard />
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium mb-1" for="name">
+                {t("checkout.name") ?? "Name"} *
+              </label>
+              <input
+                id="name"
+                autocomplete="name"
+                name="customer_name"
+                required
+                class="w-full px-3 py-2 border border-text-muted/30 rounded-md bg-bg-base"
+              />
+            </div>
+            <div>
+              <label class="block text-sm font-medium mb-1" for="email">
+                {t("checkout.email") ?? "Email"} *
+              </label>
+              <input
+                id="email"
+                autocomplete="email"
+                inputmode="email"
+                name="customer_email"
+                type="email"
+                required
+                class="w-full px-3 py-2 border border-text-muted/30 rounded-md bg-bg-base"
+              />
+            </div>
+          </div>
+          <div>
+            <label class="block text-sm font-medium mb-1" for="phone">
+              {t("checkout.phone") ?? "Phone"}
+            </label>
+            <input
+              id="phone"
+              autocomplete="tel"
+              inputmode="tel"
+              name="customer_phone"
+              class="w-full px-3 py-2 border border-text-muted/30 rounded-md bg-bg-base"
+            />
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium mb-1" for="country">
+                {t("checkout.country") ?? "Country"} *
+              </label>
+              <input
+                id="country"
+                autocomplete="country-name"
+                name="country"
+                required
+                class="w-full px-3 py-2 border border-text-muted/30 rounded-md bg-bg-base"
+              />
+            </div>
+            <div>
+              <label class="block text-sm font-medium mb-1" for="city">
+                {t("checkout.city") ?? "City"} *
+              </label>
+              <input
+                id="city"
+                autocomplete="address-level2"
+                name="city"
+                required
+                class="w-full px-3 py-2 border border-text-muted/30 rounded-md bg-bg-base"
+              />
+            </div>
+          </div>
+          <div>
+            <label class="block text-sm font-medium mb-1" for="address">
+              {t("checkout.address") ?? "Address"} *
+            </label>
+            <input
+              id="address"
+              autocomplete="street-address"
+              name="address"
+              required
+              class="w-full px-3 py-2 border border-text-muted/30 rounded-md bg-bg-base"
+            />
+          </div>
+          <div>
+            <label class="block text-sm font-medium mb-1" for="postal">
+              {t("checkout.postal") ?? "Postal code"}
+            </label>
+            <input
+              id="postal"
+              autocomplete="postal-code"
+              inputmode="text"
+              name="postal"
+              class="w-full px-3 py-2 border border-text-muted/30 rounded-md bg-bg-base"
+            />
+          </div>
+          <div>
+            <label class="block text-sm font-medium mb-1" for="notes">
+              {t("checkout.notes") ?? "Notes"}
+            </label>
+            <textarea
+              id="notes"
+              name="notes"
+              rows="3"
+              class="w-full px-3 py-2 border border-text-muted/30 rounded-md bg-bg-base"
+            />
+          </div>
+
+          <div class="text-sm text-text-muted pt-2 border-t border-text-muted/20 mt-4 space-y-1">
+            <p class="text-xs uppercase tracking-[0.3em] text-text-muted mb-2">
+              {t("cart.title")}
+            </p>
+            {visible.map((row) => {
+              const k = `${row.slug}::${row.sku ?? ""}`;
+              const qty = keyMap.get(k)!.qty;
+              return (
+                <div class="flex justify-between py-1">
+                  <span>
+                    {row.sku ? (
+                      <span class="font-mono bg-bg-base px-1.5 py-0.5 rounded border border-text-muted/30 mr-2 text-xs">
+                        {row.sku}
+                      </span>
+                    ) : null}
+                    × {qty}
+                  </span>
+                  <span class="font-mono">
+                    {formatPrice(
+                      ((row.amount as number) ?? 0) * qty,
+                      "CNY",
+                      locale,
+                    )}
+                  </span>
+                </div>
+              );
+            })}
+            <div class="flex justify-between py-1 border-t border-text-muted/20 mt-1 pt-2">
+              <span class="font-medium">
+                {t("cart.subtotal") ?? "Subtotal"}
+              </span>
+              <span class="font-mono font-medium">{totalDisplay}</span>
+            </div>
+            <p class="text-xs text-text-muted mt-1">
+              {t("checkout.shipping_note") ??
+                "Shipping calculated upon confirmation"}
+              .
+            </p>
+          </div>
+
+          <button
+            type="submit"
+            class="w-full px-6 py-3 bg-forest-700 text-bg-base rounded-md font-medium hover:bg-forest-900 transition-colors"
+          >
+            {t("checkout.submit") ?? "Submit reservation"}
+          </button>
+        </form>
+      )
+    }
+  </div>
+</Layout>

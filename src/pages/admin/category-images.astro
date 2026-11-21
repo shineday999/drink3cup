@@ -1,0 +1,492 @@
+---
+import { env } from "cloudflare:workers";
+import AdminLayout from "../../layouts/AdminLayout.astro";
+import { createT } from "../../i18n/t";
+import zhHansMessages from "../../i18n/messages/zh-Hans.json";
+import { locales, localeNames } from "../../i18n/config";
+import { getDB } from "../../lib/db";
+import {
+  ensureCategoryTable,
+  listCategories,
+  type SiteCategory,
+} from "../../lib/categories";
+
+// /admin/category-images — 首頁「手作路线」分類卡片：標題、簡介、圖片、排序；可新增 / 刪除分類。
+// 沒上傳圖片的 jewelry / incense 使用靜態預設圖。
+const t = createT(zhHansMessages as Record<string, unknown>);
+
+const FALLBACK: Record<string, string> = {
+  jewelry: "/images/banners/cat-jewelry.jpg",
+  incense: "/images/banners/cat-incense.jpg",
+};
+const LEGACY_LABEL: Record<string, string> = {
+  jewelry: String(t("admin.category_images.slot_jewelry")),
+  incense: String(t("admin.category_images.slot_incense")),
+};
+
+interface ImageRow {
+  key: string;
+  url: string;
+}
+
+let categories: SiteCategory[] = [];
+const images: Record<string, string> = {};
+if (env?.DB) {
+  try {
+    const db = getDB();
+    await ensureCategoryTable(db);
+    categories = await listCategories(db);
+  } catch {
+    categories = [];
+  }
+  try {
+    const res = await env.DB.prepare(
+      "SELECT key, url FROM site_images WHERE key LIKE 'cat_%'",
+    ).all<ImageRow>();
+    for (const r of res.results ?? []) images[r.key.slice(4)] = r.url;
+  } catch {
+    // site_images 還沒建立：全部用預設圖
+  }
+}
+const saved = Astro.url.searchParams.get("saved") === "1";
+const label = (c: SiteCategory) =>
+  c.titles["zh-Hans"] || LEGACY_LABEL[c.code] || c.code;
+---
+
+<AdminLayout title={t("admin.category_images.title")} active="category_images">
+  <p class="mb-3 text-sm text-text-secondary">
+    首页「手作路线」的分类卡片：可改各语言标题与简介、换图片、调整顺序，也可以新增或删除分类。语言栏留空时，首页会使用默认文字。
+  </p>
+
+  {
+    saved && (
+      <div class="mb-4 bg-success/10 border border-success/30 text-success px-4 py-3 rounded text-sm">
+        {t("admin.category_images.saved")}
+      </div>
+    )
+  }
+
+  <div
+    id="ci-root"
+    class="max-w-3xl space-y-3"
+    data-m-pending={t("admin.category_images.pending")}
+    data-m-saving={t("admin.category_images.saving")}
+    data-m-reset-confirm={t("admin.category_images.reset_confirm")}
+    data-m-err-small={t("admin.category_images.err_small")}
+    data-m-err-decode={t("admin.category_images.err_decode")}
+    data-m-err-upload={t("admin.category_images.err_upload")}
+    data-m-nothing={t("admin.category_images.nothing")}
+  >
+    {
+      categories.map((c) => {
+        const custom = images[c.code] ?? null;
+        const src = custom ?? FALLBACK[c.code] ?? null;
+        return (
+          <section
+            data-ci-slot={c.code}
+            class="bg-bg-card border border-text-muted/20 rounded-card p-4 flex flex-col sm:flex-row gap-4"
+          >
+            <div class="w-28 shrink-0">
+              <div class="relative aspect-[4/5] overflow-hidden rounded-md bg-forest-100">
+                <img
+                  data-ci-preview={c.code}
+                  src={src ?? undefined}
+                  hidden={!src}
+                  alt={label(c)}
+                  class="w-full h-full object-cover"
+                />
+              </div>
+              <p data-ci-badge={c.code} class="mt-2 text-xs text-text-muted">
+                {custom
+                  ? t("admin.category_images.current_custom")
+                  : src
+                    ? t("admin.category_images.current_default")
+                    : "未设置图片"}
+              </p>
+            </div>
+            <div class="flex-1 space-y-3 min-w-0">
+              <div class="flex items-start justify-between gap-3">
+                <h3 class="font-serif text-lg">
+                  {label(c)}{" "}
+                  <span class="font-mono text-xs text-text-muted">
+                    {c.code}
+                  </span>
+                </h3>
+                <button
+                  type="button"
+                  data-ci-delete={c.code}
+                  class="shrink-0 text-xs text-error underline underline-offset-2 hover:opacity-80"
+                >
+                  删除分类
+                </button>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                {locales.map((l) => (
+                  <label class="block text-xs text-text-muted">
+                    标题 · {localeNames[l]}
+                    <input
+                      type="text"
+                      maxlength="60"
+                      data-ci-title={c.code}
+                      data-loc={l}
+                      value={c.titles[l] ?? ""}
+                      class="mt-1 block w-full rounded border border-text-muted/30 bg-white px-2 py-1 text-sm text-text-primary"
+                    />
+                  </label>
+                ))}
+              </div>
+
+              <details open>
+                <summary class="cursor-pointer text-xs text-forest-700">
+                  简介（显示在首页卡片上，可选）
+                </summary>
+                <div class="grid grid-cols-1 gap-2 mt-2">
+                  {locales.map((l) => (
+                    <label class="block text-xs text-text-muted">
+                      简介 · {localeNames[l]}
+                      <input
+                        type="text"
+                        maxlength="200"
+                        data-ci-desc={c.code}
+                        data-loc={l}
+                        value={c.descs[l] ?? ""}
+                        class="mt-1 block w-full rounded border border-text-muted/30 bg-white px-2 py-1 text-sm text-text-primary"
+                      />
+                    </label>
+                  ))}
+                </div>
+              </details>
+
+              <label class="inline-block text-xs text-text-muted">
+                排序（数字小的在前）
+                <input
+                  type="number"
+                  data-ci-sort={c.code}
+                  value={c.sort_order}
+                  class="ml-2 w-20 rounded border border-text-muted/30 bg-white px-2 py-1 text-sm text-text-primary"
+                />
+              </label>
+
+              <input
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                data-ci-file={c.code}
+                class="block w-full text-sm"
+              />
+              <p class="text-xs text-text-muted">
+                {t("admin.category_images.hint")}
+              </p>
+              {custom && (
+                <button
+                  type="button"
+                  data-ci-reset={c.code}
+                  class="text-xs text-forest-700 underline underline-offset-2 hover:text-forest-900"
+                >
+                  {t("admin.category_images.reset")}
+                </button>
+              )}
+            </div>
+          </section>
+        );
+      })
+    }
+
+    <section
+      class="bg-bg-card border border-dashed border-text-muted/40 rounded-card p-4 space-y-3"
+    >
+      <h3 class="font-serif text-lg">新增分类</h3>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+        <label class="block text-xs text-text-muted">
+          代码（小写英文、数字、连字符，如 bracelet）
+          <input
+            id="ci-new-code"
+            type="text"
+            maxlength="30"
+            class="mt-1 block w-full rounded border border-text-muted/30 bg-white px-2 py-1 text-sm text-text-primary"
+          />
+        </label>
+        <label class="block text-xs text-text-muted">
+          标题 · 简体中文
+          <input
+            id="ci-new-title"
+            type="text"
+            maxlength="60"
+            class="mt-1 block w-full rounded border border-text-muted/30 bg-white px-2 py-1 text-sm text-text-primary"
+          />
+        </label>
+      </div>
+      <label class="block text-xs text-text-muted">
+        简介 · 简体中文（可选，显示在首页卡片上）
+        <input
+          id="ci-new-desc"
+          type="text"
+          maxlength="200"
+          class="mt-1 block w-full rounded border border-text-muted/30 bg-white px-2 py-1 text-sm text-text-primary"
+        />
+      </label>
+      <p class="text-xs text-text-muted">
+        代码就是商品的分类代码（首页卡片会链接到
+        /products?cat=代码）。建立后再补其他语言标题与图片。
+      </p>
+      <button
+        type="button"
+        id="ci-new-add"
+        class="px-4 py-2 border border-forest-700 text-forest-700 rounded-md hover:bg-forest-700 hover:text-bg-base transition-colors text-sm"
+      >
+        新增
+      </button>
+    </section>
+
+    <div
+      class="sticky bottom-0 z-10 py-3 bg-bg-base border-t border-text-muted/20 flex items-center justify-between gap-3"
+    >
+      <span id="ci-status" aria-live="polite" class="text-sm text-text-muted"
+      ></span>
+      <button
+        type="button"
+        id="ci-save"
+        disabled
+        class="px-6 py-2 bg-forest-700 text-bg-base rounded-md hover:bg-forest-900 transition-colors text-sm disabled:opacity-50"
+      >
+        {t("admin.category_images.save")}
+      </button>
+    </div>
+  </div>
+
+  <script is:inline>
+    (function () {
+      var root = document.getElementById("ci-root");
+      if (!root) return;
+      var statusEl = document.getElementById("ci-status");
+      var saveBtn = document.getElementById("ci-save");
+      var pending = {};
+
+      function msg(k) {
+        return root.getAttribute("data-m-" + k) || "";
+      }
+      function setStatus(text, isError) {
+        statusEl.textContent = text;
+        statusEl.style.color = isError ? "#b42318" : "";
+      }
+      function api(body) {
+        return fetch("/api/admin/categories", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+          credentials: "same-origin",
+        }).then(function (res) {
+          return res
+            .json()
+            .catch(function () {
+              return {};
+            })
+            .then(function (j) {
+              if (!res.ok) throw new Error(j.error || msg("err-upload"));
+              return j;
+            });
+        });
+      }
+
+      // 置中裁切成指定尺寸（cover），輸出 JPEG
+      function cover(bmp, w, h, quality) {
+        return new Promise(function (resolve, reject) {
+          var c = document.createElement("canvas");
+          c.width = w;
+          c.height = h;
+          var ctx = c.getContext("2d");
+          ctx.fillStyle = "#ffffff";
+          ctx.fillRect(0, 0, w, h);
+          var scale = Math.max(w / bmp.width, h / bmp.height);
+          var sw = w / scale;
+          var sh = h / scale;
+          ctx.drawImage(
+            bmp,
+            (bmp.width - sw) / 2,
+            (bmp.height - sh) / 2,
+            sw,
+            sh,
+            0,
+            0,
+            w,
+            h,
+          );
+          c.toBlob(
+            function (b) {
+              if (b) resolve({ blob: b, canvas: c });
+              else reject(new Error("toBlob"));
+            },
+            "image/jpeg",
+            quality,
+          );
+        });
+      }
+
+      // 任何文字 / 排序變動就允許儲存
+      root.addEventListener("input", function (e) {
+        var el = e.target;
+        if (
+          el &&
+          el.getAttribute &&
+          (el.hasAttribute("data-ci-title") ||
+            el.hasAttribute("data-ci-desc") ||
+            el.hasAttribute("data-ci-sort"))
+        ) {
+          saveBtn.disabled = false;
+        }
+      });
+
+      root.addEventListener("change", function (e) {
+        var el = e.target;
+        var slot = el && el.getAttribute && el.getAttribute("data-ci-file");
+        if (!slot) return;
+        var file = el.files && el.files[0];
+        if (!file) return;
+        setStatus("", false);
+        createImageBitmap(file)
+          .then(function (bmp) {
+            // 4:5 裁切後的寬度至少要有 480，否則放大會糊
+            var cropW = Math.min(bmp.width, bmp.height * 0.8);
+            if (cropW < 480) throw new Error("small");
+            return Promise.all([
+              cover(bmp, 800, 1000, 0.82),
+              cover(bmp, 480, 600, 0.8),
+            ]);
+          })
+          .then(function (r) {
+            pending[slot] = { big: r[0].blob, small: r[1].blob };
+            var img = root.querySelector('[data-ci-preview="' + slot + '"]');
+            img.src = r[0].canvas.toDataURL("image/jpeg", 0.8);
+            img.hidden = false;
+            root.querySelector('[data-ci-badge="' + slot + '"]').textContent =
+              msg("pending");
+            saveBtn.disabled = false;
+          })
+          .catch(function (err) {
+            delete pending[slot];
+            el.value = "";
+            setStatus(
+              err && err.message === "small"
+                ? msg("err-small")
+                : msg("err-decode"),
+              true,
+            );
+          });
+      });
+
+      function postImage(fd) {
+        return fetch("/api/admin/category-images", {
+          method: "POST",
+          body: fd,
+          credentials: "same-origin",
+        }).then(function (res) {
+          if (!res.ok) throw new Error("upload");
+        });
+      }
+
+      // 收集所有分類目前的標題 / 簡介 / 排序
+      function collect() {
+        var items = [];
+        root.querySelectorAll("[data-ci-slot]").forEach(function (sec) {
+          var code = sec.getAttribute("data-ci-slot");
+          var titles = {};
+          var descs = {};
+          sec.querySelectorAll("[data-ci-title]").forEach(function (i) {
+            titles[i.getAttribute("data-loc")] = i.value;
+          });
+          sec.querySelectorAll("[data-ci-desc]").forEach(function (i) {
+            descs[i.getAttribute("data-loc")] = i.value;
+          });
+          var sortEl = sec.querySelector("[data-ci-sort]");
+          items.push({
+            code: code,
+            sort_order: sortEl ? Number(sortEl.value) || 0 : 0,
+            titles: titles,
+            descs: descs,
+          });
+        });
+        return items;
+      }
+
+      saveBtn.addEventListener("click", function () {
+        var slots = Object.keys(pending);
+        saveBtn.disabled = true;
+        setStatus(msg("saving"), false);
+        var chain = api({ action: "save", items: collect() });
+        slots.forEach(function (slot) {
+          chain = chain.then(function () {
+            var fd = new FormData();
+            fd.append("slot", slot);
+            fd.append("image", pending[slot].big, "cat-800.jpg");
+            fd.append("image_small", pending[slot].small, "cat-480.jpg");
+            return postImage(fd);
+          });
+        });
+        chain
+          .then(function () {
+            window.location.href = "/admin/category-images?saved=1";
+          })
+          .catch(function (err) {
+            saveBtn.disabled = false;
+            setStatus((err && err.message) || msg("err-upload"), true);
+          });
+      });
+
+      root.addEventListener("click", function (e) {
+        var target = e.target;
+        if (!target || !target.closest) return;
+
+        var resetBtn = target.closest("[data-ci-reset]");
+        if (resetBtn) {
+          if (!window.confirm(msg("reset-confirm"))) return;
+          var fd = new FormData();
+          fd.append("slot", resetBtn.getAttribute("data-ci-reset"));
+          fd.append("_action", "reset");
+          postImage(fd)
+            .then(function () {
+              window.location.href = "/admin/category-images?saved=1";
+            })
+            .catch(function () {
+              setStatus(msg("err-upload"), true);
+            });
+          return;
+        }
+
+        var delBtn = target.closest("[data-ci-delete]");
+        if (delBtn) {
+          var code = delBtn.getAttribute("data-ci-delete");
+          if (
+            !window.confirm("确定删除分类「" + code + "」？图片也会一起删除。")
+          )
+            return;
+          api({ action: "delete", code: code })
+            .then(function () {
+              window.location.href = "/admin/category-images?saved=1";
+            })
+            .catch(function (err) {
+              setStatus((err && err.message) || msg("err-upload"), true);
+            });
+          return;
+        }
+
+        if (target.closest("#ci-new-add")) {
+          var codeEl = document.getElementById("ci-new-code");
+          var titleEl = document.getElementById("ci-new-title");
+          setStatus("", false);
+          api({
+            action: "create",
+            code: codeEl.value,
+            titles: { "zh-Hans": titleEl.value },
+            descs: { "zh-Hans": document.getElementById("ci-new-desc").value },
+          })
+            .then(function () {
+              window.location.href = "/admin/category-images?saved=1";
+            })
+            .catch(function (err) {
+              setStatus((err && err.message) || msg("err-upload"), true);
+            });
+        }
+      });
+    })();
+  </script>
+</AdminLayout>

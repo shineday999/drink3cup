@@ -1,0 +1,51 @@
+# cnamber.ccwu.cc robots.txt
+# Wave 32 SEO + AEO + GEO: allow all standard crawlers + explicit AI bot allowlist
+
+User-agent: *
+Allow: /
+Disallow: /admin/
+Allow: /api/images/
+Disallow: /api/
+Disallow: /checkout/
+
+# AI / LLM crawlers — explicit allow (AEO + GEO optimization)
+User-agent: GPTBot
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Perplexity-User
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+User-agent: meta-externalagent
+Allow: /
+
+User-agent: DuckAssistBot
+Allow: /
+
+User-agent: Amazonbot
+Allow: /
+
+User-agent: CCBot
+Allow: /
+
+Sitemap: https://cnamber.ccwu.cc/sitemap.xml

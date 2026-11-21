@@ -1,0 +1,232 @@
+---
+import AdminLayout from "../../../layouts/AdminLayout.astro";
+import { env } from "cloudflare:workers";
+import Tabs from "../../../components/Tabs.astro";
+import { createT, tEnum } from "../../../i18n/t";
+import { defaultLocale, type Locale } from "../../../i18n/config";
+import zhHansMessages from "../../../i18n/messages/zh-Hans.json";
+
+const id = Astro.params.id;
+const locale = (Astro.locals.locale ?? defaultLocale) as Locale;
+const messages = zhHansMessages as Record<string, unknown>;
+const t = createT(messages);
+void locale;
+
+const post = env?.DB
+  ? await env.DB.prepare("SELECT * FROM posts WHERE id = ?").bind(id).first<{
+      id: string;
+      slug: string;
+      status: string;
+      category: string | null;
+      cover_image_url: string | null;
+      author_email: string | null;
+      published_at: number | null;
+      faq: string | null;
+    }>()
+  : null;
+
+const translations = env?.DB
+  ? await env.DB.prepare("SELECT * FROM post_translations WHERE post_id = ?")
+      .bind(id)
+      .all<{
+        locale: string;
+        title: string;
+        excerpt: string | null;
+        body_markdown: string;
+      }>()
+  : { results: [] };
+
+const LOCALES = ["zh-Hans", "en", "ms-MY", "id-ID"] as const;
+const trByLocale = (l: string) =>
+  translations.results.find((t) => t.locale === l);
+
+if (!post) {
+  return Astro.redirect("/admin/posts");
+}
+
+const field =
+  "w-full px-3 py-2 border border-text-muted/30 rounded-md bg-bg-base";
+---
+
+<AdminLayout
+  title={`${t("admin.posts_detail.title_prefix")}${post.slug}`}
+  active="blog"
+>
+  <a
+    slot="actions"
+    href="/admin/posts"
+    class="text-sm text-text-secondary hover:underline">返回列表</a
+  >
+
+  <Tabs
+    tabs={[
+      { id: "core", label: t("admin.posts_detail.tab_core") },
+      { id: "translations", label: t("admin.posts_detail.tab_translations") },
+    ]}
+    defaultTab="core"
+  >
+    <div slot="core">
+      <div
+        class="mb-4 max-w-2xl rounded-card border border-text-muted/20 bg-bg-card p-4"
+      >
+        <form method="POST" action={`/api/admin/posts/${id}`} class="space-y-3">
+          <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
+            <div>
+              <label class="mb-1 block text-sm font-medium" for="category"
+                >{t("admin.posts_detail.label_category")}</label
+              >
+              <select id="category" name="category" class={field}>
+                {
+                  ["material", "craft", "style", "culture"].map((c) => (
+                    <option value={c} selected={post.category === c}>
+                      {tEnum(t, "post_category", c)}
+                    </option>
+                  ))
+                }
+              </select>
+            </div>
+            <div>
+              <label class="mb-1 block text-sm font-medium" for="status"
+                >{t("admin.posts_detail.label_status")}</label
+              >
+              <select id="status" name="status" class={field}>
+                {
+                  ["draft", "published", "archived"].map((s) => (
+                    <option value={s} selected={post.status === s}>
+                      {tEnum(t, "status", s)}
+                    </option>
+                  ))
+                }
+              </select>
+            </div>
+            <div>
+              <label class="mb-1 block text-sm font-medium" for="cover"
+                >{t("admin.posts_detail.label_cover_url")}</label
+              >
+              <input
+                id="cover"
+                name="cover_image_url"
+                value={post.cover_image_url ?? ""}
+                class={`${field} font-mono text-xs`}
+              />
+            </div>
+          </div>
+          <div class="flex items-end gap-3">
+            <div class="flex-1">
+              <label class="mb-1 block text-sm font-medium" for="author-email"
+                >{t("admin.posts_detail.label_author_email")}</label
+              >
+              <input
+                id="author-email"
+                name="author_email"
+                value={post.author_email ?? ""}
+                type="email"
+                class={`${field} font-mono text-xs`}
+                placeholder="author@example.com"
+              />
+            </div>
+            <button
+              type="submit"
+              class="rounded-md bg-forest-700 px-4 py-2 text-bg-base transition-colors hover:bg-forest-900"
+              >{t("admin.posts_detail.save_meta")}</button
+            >
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div slot="translations">
+      <div class="max-w-3xl space-y-3">
+        {
+          LOCALES.map((loc) => {
+            const tr = trByLocale(loc);
+            return (
+              <details
+                open={loc === "zh-Hans"}
+                class="rounded-card border border-text-muted/20 bg-bg-card p-4"
+              >
+                <summary class="cursor-pointer">
+                  <span class="font-serif text-lg">{loc}</span>
+                  <span class="ml-2 text-sm text-text-muted">
+                    {tr?.title ? tr.title : "未填写"}
+                  </span>
+                </summary>
+                <form
+                  method="POST"
+                  action={`/api/admin/posts/${id}/translations`}
+                  class="mt-3 space-y-3"
+                >
+                  <input type="hidden" name="locale" value={loc} />
+                  <div>
+                    <label
+                      class="mb-1 block text-sm font-medium"
+                      for={`title-${loc}`}
+                    >
+                      {t("admin.posts_detail.label_title")}
+                    </label>
+                    <input
+                      id={`title-${loc}`}
+                      name="title"
+                      value={tr?.title ?? ""}
+                      class={field}
+                    />
+                  </div>
+                  <div>
+                    <label
+                      class="mb-1 block text-sm font-medium"
+                      for={`excerpt-${loc}`}
+                    >
+                      {t("admin.posts_detail.label_excerpt")}
+                    </label>
+                    <textarea
+                      id={`excerpt-${loc}`}
+                      name="excerpt"
+                      rows="2"
+                      class={field}
+                    >
+                      {tr?.excerpt ?? ""}
+                    </textarea>
+                  </div>
+                  <div>
+                    <label
+                      class="mb-1 block text-sm font-medium"
+                      for={`body-${loc}`}
+                    >
+                      {t("admin.posts_detail.label_body")}
+                    </label>
+                    <textarea
+                      id={`body-${loc}`}
+                      name="body_markdown"
+                      rows="12"
+                      class={`${field} font-mono text-sm`}
+                    >
+                      {tr?.body_markdown ?? ""}
+                    </textarea>
+                  </div>
+                  <button
+                    type="submit"
+                    class="rounded-md bg-forest-700 px-4 py-2 text-sm text-bg-base transition-colors hover:bg-forest-900"
+                  >
+                    {t("admin.posts_detail.save_translation", { loc })}
+                  </button>
+                </form>
+              </details>
+            );
+          })
+        }
+      </div>
+    </div>
+  </Tabs>
+
+  <div
+    class="mt-4 max-w-3xl rounded-card border border-text-muted/20 bg-bg-card px-4 py-3 text-sm"
+  >
+    <span class="text-text-secondary"
+      >文章 FAQ 已搬到独立管理页，所有文章与商品的 FAQ 集中维护。</span
+    >
+    <a
+      href="/admin/faqs"
+      class="ml-2 font-medium text-accent-700 hover:underline">→ FAQ 维护</a
+    >
+  </div>
+</AdminLayout>

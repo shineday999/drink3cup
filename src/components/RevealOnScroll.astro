@@ -1,0 +1,75 @@
+---
+// RevealOnScroll — IntersectionObserver fade-in with stagger
+// 用法:<RevealOnScroll delay={100}><div>內容</div></RevealOnScroll>
+//
+// Progressive enhancement:SSR HTML 預設 visible (opacity 1)。
+// JS ready 後才加上 `.reveal-pending` (opacity 0) 再啟動 IntersectionObserver。
+// 即使 JS fail、script 還沒執行、或 IntersectionObserver 沒 trigger,
+// 所有內容仍然可見 — reveal 動畫是 bonus,不是 gating。
+interface Props {
+  delay?: number;
+  class?: string;
+  as?: string;
+}
+
+const { delay = 0, class: className = "" } = Astro.props;
+---
+
+<div class:list={["reveal-on-scroll", className]} data-reveal-delay={delay}>
+  <slot />
+</div>
+
+<script>
+  function initReveals() {
+    const elements =
+      document.querySelectorAll<HTMLElement>(".reveal-on-scroll");
+    if (elements.length === 0) return;
+
+    // 第一階段:把全部 reveal-on-scroll 設為 pending(hidden),
+    // IntersectionObserver 對 viewport 內的元素會立即 callback isIntersecting: true,
+    // 所以 hero 等一進 viewport 就會 reveal。
+    elements.forEach((el) => el.classList.add("reveal-pending"));
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          const target = entry.target as HTMLElement;
+          const delay = parseInt(target.dataset.revealDelay || "0", 10);
+          window.setTimeout(() => {
+            target.classList.remove("reveal-pending");
+            target.classList.add("revealed");
+          }, delay);
+          observer.unobserve(target);
+        });
+      },
+      { threshold: 0.08, rootMargin: "0px 0px -40px 0px" },
+    );
+
+    elements.forEach((el) => observer.observe(el));
+
+    // Awwwards-grade safety net: after 2s, force-reveal any still-pending.
+    // Covers cases where JS fires but IntersectionObserver never triggers
+    // (headless render, prefers-reduced-motion, slow scroll, blocked scripts).
+    // Reveal is additive — never gating.
+    window.setTimeout(() => {
+      document
+        .querySelectorAll(".reveal-on-scroll.reveal-pending")
+        .forEach((el) => {
+          el.classList.remove("reveal-pending");
+          el.classList.add("revealed");
+        });
+    }, 2000);
+  }
+
+  // 等 DOMContentLoaded 後再 querySelectorAll,確保拿到的是 SSR 完整 HTML 中的全部 elements
+  // (避免 inline script 提早執行時 DOM 還在 parsing 中段,漏掉後續 RevealOnScroll 區塊)
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initReveals);
+  } else {
+    initReveals();
+  }
+  // Astro view transitions: re-init reveals after every page navigation
+  // (DOMContentLoaded only fires once; astro:page-load fires on initial + each swap).
+  document.addEventListener("astro:page-load", initReveals);
+</script>

@@ -1,0 +1,22 @@
+/*
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: geolocation=(), microphone=(), camera=(), payment=()
+  Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
+  Cross-Origin-Opener-Policy: same-origin
+
+/admin/*
+  X-Frame-Options: DENY
+  Cache-Control: no-store
+
+/api/*
+  X-Content-Type-Options: nosniff
+  Cache-Control: no-store
+
+/sw.js
+  Cache-Control: no-cache
+  Service-Worker-Allowed: /
+
+/offline.html
+  X-Robots-Tag: noindex

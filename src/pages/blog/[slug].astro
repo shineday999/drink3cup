@@ -1,0 +1,195 @@
+---
+import Layout from "@layouts/Layout.astro";
+import { env } from "cloudflare:workers";
+import FaqSchema from "@components/FaqSchema.astro";
+import { createT } from "../../i18n/t";
+import { defaultLocale, localizedPath, type Locale } from "../../i18n/config";
+
+const locale = (Astro.locals.locale ?? defaultLocale) as Locale;
+const messages = (Astro.locals.messages ?? {}) as Record<string, unknown>;
+const t = createT(messages);
+
+const slug = Astro.params.slug ?? "";
+
+const post = env?.DB
+  ? await env.DB.prepare(
+      `SELECT p.*, pt.locale, pt.title, pt.excerpt, pt.body_markdown
+         FROM posts p
+         LEFT JOIN post_translations pt ON pt.post_id = p.id AND pt.locale = ?
+         WHERE p.slug = ? AND p.status = 'published'`,
+    )
+      .bind(locale, slug)
+      .first<{
+        id: string;
+        slug: string;
+        category: string | null;
+        cover_image_url: string | null;
+        author_email: string | null;
+        published_at: number | null;
+        title: string | null;
+        excerpt: string | null;
+        body_markdown: string | null;
+        faq: string | null;
+      }>()
+  : null;
+
+if (!post) {
+  Astro.response.status = 404;
+  return Astro.rewrite("/404");
+}
+
+// 簡易 markdown 渲染(粗體 + 段落)
+function renderMarkdown(md: string): string {
+  return md
+    .split(/\n\n+/)
+    .map((para) => {
+      const escaped = para
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+      const formatted = escaped
+        .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
+        .replace(/\*(.+?)\*/g, "<em>$1</em>")
+        .replace(
+          /^##\s+(.+)$/gm,
+          '<h2 class="font-serif text-2xl mt-8 mb-3">$1</h2>',
+        )
+        .replace(
+          /^#\s+(.+)$/gm,
+          '<h1 class="font-serif text-display-sm mt-8 mb-4">$1</h1>',
+        )
+        .replace(/\n/g, "<br>");
+      return formatted.startsWith("<h")
+        ? formatted
+        : `<p class="mb-4 leading-relaxed">${formatted}</p>`;
+    })
+    .join("");
+}
+
+const title = post.title ?? post.slug;
+void locale;
+
+// Wave 37.1: parse per-locale FAQ from posts.faq JSON column
+const postFaqs: { q: string; a: string }[] = (() => {
+  if (!post.faq) return [];
+  try {
+    const parsed = JSON.parse(post.faq);
+    const arr = Array.isArray(parsed?.[locale])
+      ? parsed[locale]
+      : Array.isArray(parsed?.en)
+        ? parsed.en
+        : [];
+    return arr.filter(
+      (it: unknown) =>
+        it &&
+        typeof it === "object" &&
+        typeof (it as { q?: unknown }).q === "string" &&
+        typeof (it as { a?: unknown }).a === "string",
+    );
+  } catch {
+    return [];
+  }
+})();
+---
+
+<Layout
+  title={`${title} — ${t("common.site_name")}`}
+  description={post.excerpt ?? ""}
+>
+  {
+    postFaqs.length > 0 && (
+      <Fragment slot="head">
+        <FaqSchema items={postFaqs} />
+      </Fragment>
+    )
+  }
+  <article class="max-w-3xl mx-auto px-6 py-section">
+    <a
+      href={localizedPath(locale, "/blog")}
+      class="text-sm text-text-secondary hover:text-text-primary inline-block mb-6"
+      >← Blog</a
+    >
+
+    {
+      post.category && (
+        <div class="text-xs uppercase tracking-[0.3em] text-accent-700 mb-3 font-sans">
+          {post.category}
+        </div>
+      )
+    }
+    <h1
+      class="text-display-sm md:text-display-md font-serif text-text-primary mb-3"
+    >
+      {title}
+    </h1>
+    {
+      post.published_at && (
+        <div class="text-sm text-text-muted mb-6">
+          {new Date(post.published_at * 1000).toISOString().slice(0, 10)}
+        </div>
+      )
+    }
+
+    {
+      post.cover_image_url && (
+        <img
+          loading="lazy"
+          decoding="async"
+          decoding="async"
+          src={post.cover_image_url}
+          alt={title}
+          class="w-full aspect-video object-cover rounded-card mb-8"
+        />
+      )
+    }
+
+    {
+      post.excerpt && (
+        <p class="text-lg text-text-secondary italic mb-8 leading-relaxed border-l-4 border-accent-300 pl-4">
+          {post.excerpt}
+        </p>
+      )
+    }
+
+    <div
+      class="prose prose-lg max-w-none text-text-primary font-sans"
+      set:html={renderMarkdown(post.body_markdown ?? "")}
+    />
+
+    {
+      postFaqs.length > 0 && (
+        <section class="mt-16 pt-8 border-t border-text-muted/20">
+          <p class="text-[10px] uppercase tracking-[0.4em] text-forest-600 font-sans mb-3">
+            {t("blog.faq_kicker")}
+          </p>
+          <h2 class="text-display-sm font-serif text-text-primary mb-6 leading-tight">
+            {t("blog.faq_heading")}
+          </h2>
+          <div class="space-y-4">
+            {postFaqs.map((f, i) => (
+              <details
+                class="border border-text-muted/20 rounded-card p-4 group"
+                open={i === 0}
+              >
+                <summary class="cursor-pointer font-medium text-text-primary flex items-center justify-between">
+                  <span>{f.q}</span>
+                  <span class="text-text-muted group-open:rotate-45 transition-transform text-xl">
+                    +
+                  </span>
+                </summary>
+                <p class="mt-3 text-text-secondary leading-relaxed">{f.a}</p>
+              </details>
+            ))}
+          </div>
+        </section>
+      )
+    }
+
+    <div class="mt-12 pt-6 border-t border-text-muted/20 text-sm">
+      <a
+        href={localizedPath(locale, "/blog")}
+        class="text-text-secondary hover:text-text-primary">← Back to Blog</a
+      >
+    </div>
+  </article>
+</Layout>

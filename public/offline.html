@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="zh-Hans">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <meta name="theme-color" content="#ffffff" />
+    <title>Offline</title>
+    <style>
+      :root {
+        color-scheme: light;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        min-height: 100dvh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+        background: #f3f1ea;
+        color: #2d4a3e;
+        font-family:
+          system-ui,
+          -apple-system,
+          "Segoe UI",
+          "Noto Sans SC",
+          sans-serif;
+        text-align: center;
+      }
+      main {
+        max-width: 360px;
+      }
+      svg {
+        width: 64px;
+        height: 64px;
+        margin-bottom: 20px;
+      }
+      h1 {
+        margin: 0 0 12px;
+        font-size: 22px;
+        font-weight: 600;
+      }
+      p {
+        margin: 0 0 28px;
+        font-size: 15px;
+        line-height: 1.7;
+        color: #4b5d52;
+      }
+      button {
+        min-height: 48px;
+        padding: 0 32px;
+        border: 0;
+        border-radius: 999px;
+        background: #2d4a3e;
+        color: #fff;
+        font: inherit;
+        font-size: 16px;
+        cursor: pointer;
+      }
+      button:focus-visible {
+        outline: 3px solid #8fb39f;
+        outline-offset: 3px;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+      >
+        <path
+          d="M2 8.8a15 15 0 0 1 20 0M5 12.5a10 10 0 0 1 14 0M8.5 16.1a5 5 0 0 1 7 0"
+        />
+        <circle cx="12" cy="19.5" r="0.8" fill="currentColor" />
+        <path d="M3 3l18 18" />
+      </svg>
+      <h1 id="t">目前没有网络连接</h1>
+      <p id="d">请检查网络后重试。商品与购物车需要联网才能更新。</p>
+      <button id="b" type="button">重新加载</button>
+    </main>
+    <script>
+      (function () {
+        var T = {
+          "zh-Hans": [
+            "目前没有网络连接",
+            "请检查网络后重试。商品与购物车需要联网才能更新。",
+            "重新加载",
+          ],
+          en: [
+            "You're offline",
+            "Please check your connection and try again. Products and your cart need a network connection.",
+            "Try again",
+          ],
+          "ms-MY": [
+            "Anda di luar talian",
+            "Sila semak sambungan anda dan cuba lagi. Produk dan troli memerlukan sambungan internet.",
+            "Cuba lagi",
+          ],
+          "id-ID": [
+            "Anda sedang offline",
+            "Periksa koneksi Anda lalu coba lagi. Produk dan keranjang memerlukan koneksi internet.",
+            "Coba lagi",
+          ],
+        };
+        var m = document.cookie.match(/(?:^|; )cnamber_locale=([^;]+)/);
+        var l = m ? decodeURIComponent(m[1]) : "";
+        if (!T[l]) {
+          var n = (navigator.language || "").toLowerCase();
+          l =
+            n.indexOf("ms") === 0
+              ? "ms-MY"
+              : n.indexOf("id") === 0
+                ? "id-ID"
+                : n.indexOf("en") === 0
+                  ? "en"
+                  : "zh-Hans";
+        }
+        document.documentElement.lang = l;
+        document.title = T[l][0];
+        document.getElementById("t").textContent = T[l][0];
+        document.getElementById("d").textContent = T[l][1];
+        document.getElementById("b").textContent = T[l][2];
+        document.getElementById("b").addEventListener("click", function () {
+          location.reload();
+        });
+        window.addEventListener("online", function () {
+          location.reload();
+        });
+      })();
+    </script>
+  </body>
+</html>

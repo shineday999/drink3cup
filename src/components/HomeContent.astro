@@ -1,0 +1,823 @@
+---
+import { env } from "cloudflare:workers";
+
+// HomeContent — 2026-10-01 Awwwards-tier hero (year badge, scroll indicator, slide dots, stagger reveal)
+// Inline footer 移除 — 改由 Layout.astro 透過 <Footer /> 全站統一渲染
+import ProductCard from "@components/ProductCard.astro";
+import RevealOnScroll from "@components/RevealOnScroll.astro";
+import { createT } from "../i18n/t";
+import { formatPrice } from "../lib/format";
+import { parseTextMap } from "../lib/categories";
+import { kindOf } from "../lib/category-kind";
+import { localizedPath, defaultLocale, type Locale } from "../i18n/config";
+
+const locale = (Astro.locals.locale ?? defaultLocale) as Locale;
+const messages = (Astro.locals.messages ?? {}) as Record<string, unknown>;
+const t = createT(messages);
+
+// 首頁用到的 D1 查詢彼此獨立：同時送出，只付「一趟往返」的時間。
+// 原本 5 個查詢依序 await，每個都多一趟往返；Lighthouse 時間軸顯示 head 送出後
+// 約 0.6 秒 HTML 才串流完，這是首頁 TTFB / FCP 偏慢的主因。
+// 分類圖片、分類文字兩個查詢各自容錯（資料表還沒建立時維持預設）；商品與橫幅沿用原本的錯誤行為。
+function tolerant<T>(p: Promise<D1Result<T>>): Promise<D1Result<T> | null> {
+  return p.catch(() => null);
+}
+const dbq = env?.DB;
+const [siteImgRes, siteCatRes, featuredRes, bannerRes] = await Promise.all([
+  dbq
+    ? tolerant(
+        dbq
+          .prepare(
+            "SELECT key, url, url_small FROM site_images WHERE key LIKE 'cat_%'",
+          )
+          .all<{ key: string; url: string; url_small: string | null }>(),
+      )
+    : null,
+  dbq
+    ? tolerant(
+        dbq
+          .prepare(
+            "SELECT code, titles, descs FROM site_categories ORDER BY sort_order ASC, code ASC",
+          )
+          .all<{ code: string; titles: string; descs: string }>(),
+      )
+    : null,
+  dbq
+    ? dbq
+        .prepare(
+          `SELECT p.id, p.slug, p.category,
+                pt.name, pt.short_description,
+                MIN(pp.amount) AS min_price, pp.currency AS min_currency,
+                (SELECT pv.image_urls FROM product_variants pv WHERE pv.product_id = p.id LIMIT 1) AS image_urls
+         FROM products p
+         LEFT JOIN product_translations pt ON pt.product_id = p.id AND pt.locale = ?
+         LEFT JOIN product_variants pv ON pv.product_id = p.id
+         LEFT JOIN product_prices pp ON pp.variant_id = pv.id AND pp.currency = 'CNY'
+         WHERE p.status = 'active'
+         GROUP BY p.id
+         ORDER BY p.created_at DESC LIMIT 3`,
+        )
+        .bind(locale)
+        .all<FeaturedProduct>()
+    : null,
+  dbq
+    ? dbq
+        .prepare(
+          "SELECT id, image_url, mobile_image_url, alt_text FROM hero_banners WHERE active = 1 ORDER BY sort_order ASC, created_at ASC",
+        )
+        .all<{
+          id: string;
+          image_url: string;
+          mobile_image_url: string | null;
+          alt_text: string | null;
+        }>()
+    : null,
+]);
+
+// 後台「分類圖片」：沒上傳（或資料表還不存在）時沿用靜態預設圖
+const catImages = {
+  jewelry: {
+    src: "/images/banners/cat-jewelry.jpg",
+    small: "/images/banners/cat-jewelry-480.jpg",
+  },
+  incense: {
+    src: "/images/banners/cat-incense.jpg",
+    small: "/images/banners/cat-incense-480.jpg",
+  },
+};
+for (const r of siteImgRes?.results ?? []) {
+  const slot =
+    r.key === "cat_jewelry"
+      ? "jewelry"
+      : r.key === "cat_incense"
+        ? "incense"
+        : null;
+  if (slot && r.url) {
+    catImages[slot] = { src: r.url, small: r.url_small || r.url };
+  }
+}
+
+// 分類卡片：由後台「分類圖片」管理（site_categories）；沒有資料時用預設的 jewelry / incense
+interface HomeCategory {
+  code: string;
+  zhTitle: string;
+  kicker: string;
+  title: string;
+  desc: string;
+  alt: string;
+  src: string | null;
+  small: string | null;
+}
+const LEGACY_CAT_KEYS: Record<
+  string,
+  { kicker: string; title: string; desc: string; alt: string }
+> = {
+  jewelry: {
+    kicker: "nav.amber",
+    title: "home.cat_amber_title",
+    desc: "home.cat_amber_desc",
+    alt: "home.cat_amber_alt",
+  },
+  incense: {
+    kicker: "nav.incense",
+    title: "home.cat_incense_title",
+    desc: "home.cat_incense_desc",
+    alt: "home.cat_incense_alt",
+  },
+};
+const legacyT = (key: string | undefined): string => {
+  if (!key) return "";
+  const v: unknown = t(key);
+  return typeof v === "string" && v !== key ? v : "";
+};
+let homeCatRows: Array<{
+  code: string;
+  titles: Record<string, string>;
+  descs: Record<string, string>;
+}> = [
+  { code: "jewelry", titles: {}, descs: {} },
+  { code: "incense", titles: {}, descs: {} },
+];
+const homeCatImages: Record<string, { src: string; small: string }> = {};
+if (siteCatRes) {
+  const list = siteCatRes.results ?? [];
+  if (list.length > 0) {
+    homeCatRows = list.map((r) => ({
+      code: r.code,
+      titles: parseTextMap(r.titles),
+      descs: parseTextMap(r.descs),
+    }));
+  }
+}
+for (const r of siteImgRes?.results ?? []) {
+  if (r.url) {
+    homeCatImages[r.key.slice(4)] = {
+      src: r.url,
+      small: r.url_small || r.url,
+    };
+  }
+}
+const homeCatDefaults = catImages as unknown as Record<
+  string,
+  { src: string; small: string } | undefined
+>;
+const homeCategories: HomeCategory[] = homeCatRows.map((c) => {
+  const lk = LEGACY_CAT_KEYS[c.code];
+  const title =
+    c.titles[locale] || legacyT(lk?.title) || c.titles["zh-Hans"] || c.code;
+  const img = homeCatImages[c.code] ?? homeCatDefaults[c.code] ?? null;
+  return {
+    code: c.code,
+    zhTitle: c.titles["zh-Hans"] ?? "",
+    // 後台有設定名稱時，名稱只顯示後台的；沒設定才退回舊的導覽名稱
+    kicker: c.titles[locale] || c.titles["zh-Hans"] ? "" : legacyT(lk?.kicker),
+    title,
+    desc: c.descs[locale] || legacyT(lk?.desc) || c.descs["zh-Hans"] || "",
+    alt: legacyT(lk?.alt) || title,
+    src: img?.src ?? null,
+    small: img?.small ?? null,
+  };
+});
+
+// 「找一件」卡片：跟著分類走，名稱讀後台「分类图片」的標題。
+// 只有 jewelry / incense 有測驗；自訂分類的卡片連到該分類的商品列表。
+interface QuizCard {
+  href: string;
+  icon: "jewelry" | "incense" | "generic";
+  kicker: string;
+  heading: string;
+  desc: string;
+  meta: string;
+  btn: string;
+}
+const quizCards: QuizCard[] = homeCategories.map((c) => {
+  if (c.code === "jewelry") {
+    return {
+      href: localizedPath(locale, "/quiz/jewelry"),
+      icon: "jewelry",
+      kicker: c.title,
+      heading: String(t("home.cta_quiz_jewelry")),
+      desc: String(t("home.cta_jewelry_desc")),
+      meta: String(t("home.cta_meta")),
+      btn: String(t("home.cta_jewelry_btn")),
+    };
+  }
+  if (c.code === "incense") {
+    return {
+      href: localizedPath(locale, "/quiz/incense"),
+      icon: "incense",
+      kicker: c.title,
+      heading: String(t("home.cta_quiz_incense")),
+      desc: String(t("home.cta_incense_desc")),
+      meta: String(t("home.cta_meta")),
+      btn: String(t("home.cta_incense_btn")),
+    };
+  }
+  if (kindOf(c.code, c.zhTitle) === "tea") {
+    return {
+      href: localizedPath(locale, `/quiz/tea?cat=${c.code}`),
+      icon: "generic",
+      kicker: c.title,
+      heading: `${String(t("home.cta_pick_prefix"))}${c.title}`,
+      desc: c.desc,
+      meta: String(t("home.cta_meta")),
+      btn: String(t("home.cta_jewelry_btn")),
+    };
+  }
+  return {
+    href: localizedPath(locale, `/products?cat=${c.code}`),
+    icon: "generic",
+    kicker: c.title,
+    heading: `${String(t("home.cta_pick_prefix"))}${c.title}`,
+    desc: c.desc,
+    meta: "",
+    btn: String(t("home.cat_explore")),
+  };
+});
+
+// Wave 28.7f: 首頁 hero 大標 + 副標題 從 D1 site_settings 讀
+// (admin 編輯即時生效,4 語各自獨立,缺值 fallback i18n home.hero_title/subtitle)
+const siteSettings = Astro.locals.siteSettings;
+const heroTitle =
+  siteSettings?.siteName?.[locale] ??
+  siteSettings?.siteName?.["zh-Hans"] ??
+  t("home.hero_title");
+const heroSubtitle =
+  siteSettings?.heroSubtitle?.[locale] ??
+  siteSettings?.heroSubtitle?.["zh-Hans"] ??
+  t("home.hero_subtitle");
+
+interface FeaturedProduct {
+  id: string;
+  slug: string;
+  category: string;
+  name: string | null;
+  short_description: string | null;
+  min_price: number | null;
+  min_currency: string | null;
+  image_urls: string | null;
+}
+
+const featured = featuredRes ?? { results: [] as FeaturedProduct[] };
+
+function firstImage(json: string | null | undefined): string | undefined {
+  if (!json) return undefined;
+  try {
+    const urls = JSON.parse(json) as string[];
+    return Array.isArray(urls) && urls.length > 0 ? urls[0] : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+const bannerRows = bannerRes ?? {
+  results: [] as Array<{
+    id: string;
+    image_url: string;
+    mobile_image_url: string | null;
+    alt_text: string | null;
+  }>,
+};
+
+// 6.4: 本機橫幅(/images/banners/xxx.jpg)有對應的 xxx-768.jpg 手機版
+function localMobileVariant(src: string): string {
+  return /^\/images\/banners\/[^/]+\.jpg$/.test(src)
+    ? src.replace(/\.jpg$/, "-768.jpg")
+    : src;
+}
+
+// 6.4d: 輪播第 2 張起先不載入，改放 data-src / data-srcset，頁面載完並閒置後由 script 啟用
+const lazyAttr = (name: string, value: string, eager: boolean) =>
+  eager ? { [name]: value } : { [`data-${name}`]: value };
+
+const slides = bannerRows.results.map((b) => ({
+  src: b.image_url,
+  // Wave 65: 真實 mobile variant (real responsive LCP 縮小);fallback desktop src
+  mobileSrc: b.mobile_image_url ?? localMobileVariant(b.image_url),
+  alt: b.alt_text ?? "",
+}));
+---
+
+<!-- 1. Hero — Awwwards-tier: year badge, scroll indicator, slide dots, stagger reveal -->
+<section
+  data-home-hero
+  class="relative h-[88vh] min-h-[640px] overflow-hidden bg-forest-900 text-cream-50"
+>
+  <div class="absolute inset-0">
+    {
+      slides.map((slide, i) => (
+        <picture>
+          {/*
+            Wave 64 responsive LCP semantic: <picture> + <source media> + <img> fallback.
+            目前 srcset 只有 1 個 1920w descriptor (banner 原圖 1920x1080 per Wave 26 hint).
+            真實 mobile variant (e.g. 768w webp) 需 Wave 65+ — 要 admin upload mobile variant
+            + D1 schema `mobile_image_url` column + 後端 image variant API,或
+            Cloudflare cf-image-resizing (Pro plan + DNS zone config,非 code scope).
+            此處 semantic 改進對 SEO + a11y + future-ready 有好處,browser 知道 image intrinsic width.
+          */}
+          <source
+            media="(max-width: 768px)"
+            {...lazyAttr(
+              "srcset",
+              `${slide.mobileSrc} ${slide.mobileSrc === slide.src ? "1920w" : "768w"}`,
+              i === 0,
+            )}
+            sizes="100vw"
+            type="image/jpeg"
+          />
+          <source
+            media="(min-width: 769px)"
+            {...lazyAttr("srcset", `${slide.src} 1920w`, i === 0)}
+            sizes="100vw"
+            type="image/jpeg"
+          />
+          <img
+            decoding="async"
+            data-hero-slide
+            data-slide-index={i}
+            {...lazyAttr("src", slide.src, i === 0)}
+            alt={slide.alt}
+            class={`hero-slide absolute inset-0 w-full h-full object-cover transition-opacity duration-[1800ms] ease-out ${i === 0 ? "opacity-85 hero-slide-active" : "opacity-0"}`}
+            loading={i === 0 ? "eager" : "lazy"}
+            fetchpriority={i === 0 ? "high" : "auto"}
+          />
+        </picture>
+      ))
+    }
+    <div
+      class="absolute inset-0 bg-gradient-to-br from-forest-900/90 via-forest-900/55 to-forest-900/95"
+    >
+    </div>
+    <div
+      class="absolute inset-0 bg-gradient-to-t from-forest-900/80 via-forest-900/30 to-transparent"
+    >
+    </div>
+  </div>
+
+  <script is:inline>
+    (function () {
+      const slides = document.querySelectorAll("[data-hero-slide]");
+      if (slides.length <= 1) return;
+      const dots = document.querySelectorAll("[data-hero-dot]");
+      let i = 0;
+      // 6.4d: 啟用延後載入的輪播圖（可重複呼叫）
+      function hydrate() {
+        document.querySelectorAll("[data-hero-slide]").forEach((img) => {
+          const pic = img.parentNode;
+          if (pic)
+            pic.querySelectorAll("source[data-srcset]").forEach((s) => {
+              s.setAttribute("srcset", s.getAttribute("data-srcset"));
+              s.removeAttribute("data-srcset");
+            });
+          const d = img.getAttribute("data-src");
+          if (d) {
+            img.setAttribute("src", d);
+            img.removeAttribute("data-src");
+          }
+        });
+      }
+      const kick = () => {
+        if ("requestIdleCallback" in window)
+          requestIdleCallback(hydrate, { timeout: 4000 });
+        else setTimeout(hydrate, 2000);
+      };
+      if (document.readyState === "complete") kick();
+      else window.addEventListener("load", kick);
+      // 2.7：給觸控滑動呼叫（dir = 1 下一張、-1 上一張），沿用同一個 i 與 show()
+      window.__heroGo = function (dir) {
+        i = (i + dir + slides.length) % slides.length;
+        show(i);
+      };
+      function show(n) {
+        hydrate();
+        slides.forEach((s, idx) => {
+          s.style.opacity = idx === n ? "0.85" : "0";
+          s.classList.toggle("hero-slide-active", idx === n);
+        });
+        dots.forEach((d, idx) => {
+          d.classList.toggle("hero-dot-active", idx === n);
+        });
+      }
+      // Respect prefers-reduced-motion: skip auto-rotation entirely.
+      // CSS already kills the crossfade (transition-duration 0.01ms), but
+      // we also stop the JS interval so the user doesn't see the slide
+      // content swap underneath their reading. Dot click still works.
+      const prefersReduced = window.matchMedia(
+        "(prefers-reduced-motion: reduce)",
+      ).matches;
+      if (!prefersReduced) {
+        setInterval(() => {
+          i = (i + 1) % slides.length;
+          show(i);
+        }, 15000);
+      }
+      dots.forEach((dot, idx) => {
+        dot.addEventListener("click", () => {
+          i = idx;
+          show(i);
+        });
+      });
+    })();
+  </script>
+
+  <script is:inline>
+    (function () {
+      var hero = document.querySelector("[data-home-hero]");
+      if (!hero) return;
+      var sx = 0;
+      var sy = 0;
+      var tracking = false;
+      hero.addEventListener(
+        "touchstart",
+        function (e) {
+          if (e.touches.length !== 1) {
+            tracking = false;
+            return;
+          }
+          sx = e.touches[0].clientX;
+          sy = e.touches[0].clientY;
+          tracking = true;
+        },
+        { passive: true },
+      );
+      hero.addEventListener(
+        "touchend",
+        function (e) {
+          if (!tracking) return;
+          tracking = false;
+          if (typeof window.__heroGo !== "function") return;
+          var t = e.changedTouches[0];
+          var dx = t.clientX - sx;
+          var dy = t.clientY - sy;
+          // 橫向位移 ≥ 50px，且明顯大於直向位移，才算左右滑
+          if (Math.abs(dx) < 50 || Math.abs(dx) < Math.abs(dy) * 1.5) return;
+          window.__heroGo(dx < 0 ? 1 : -1);
+        },
+        { passive: true },
+      );
+    })();
+  </script>
+
+  <!-- Top metadata strip -->
+  <div
+    class="absolute top-0 left-0 right-0 z-20 px-6 md:px-12 pt-6 md:pt-8 flex items-start justify-between text-cream-100/85 font-sans text-[10px] uppercase tracking-[0.4em]"
+  >
+    <div class="hidden md:block text-right text-cream-100/70">
+      {t("home.story_kicker")}
+    </div>
+  </div>
+
+  <!-- Main content (stagger reveal via .hero-text) -->
+  <div
+    class="relative z-10 h-full grid grid-cols-12 items-center px-6 md:px-12 max-w-7xl mx-auto"
+  >
+    <div class="col-span-12 md:col-span-9 hero-text">
+      <p
+        class="text-[10px] uppercase tracking-[0.5em] text-terra-300 mb-5 md:mb-7 font-sans"
+      >
+        {t("home.hero_kicker")}
+      </p>
+      <h1
+        class="text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-serif font-light mb-5 md:mb-7 leading-[0.98] tracking-[-0.03em] text-balance text-cream-50"
+      >
+        {heroTitle}
+      </h1>
+      <p
+        class="text-lg md:text-xl lg:text-2xl text-cream-100/85 font-serif italic font-light mb-9 md:mb-12 leading-snug max-w-2xl"
+      >
+        {heroSubtitle}
+      </p>
+      <div class="flex flex-col sm:flex-row gap-3 sm:gap-4">
+        <a
+          href={localizedPath(locale, "/products")}
+          class="group inline-flex items-center justify-center gap-2 px-7 md:px-9 py-3.5 md:py-4 bg-terra-500 text-cream-50 font-sans text-sm tracking-wide rounded-sm hover:bg-terra-700 transition-all duration-700 hover:gap-3 magnetic"
+        >
+          {t("home.hero_cta_shop")}
+          <span
+            aria-hidden="true"
+            class="transition-transform group-hover:translate-x-0.5">→</span
+          >
+        </a>
+        <a
+          href={localizedPath(locale, "/quiz")}
+          class="inline-flex items-center justify-center gap-2 px-7 md:px-9 py-3.5 md:py-4 border border-cream-100/50 text-cream-50 font-sans text-sm tracking-wide rounded-sm hover:bg-cream-50/10 hover:border-cream-100 transition-all duration-700"
+        >
+          {t("home.hero_cta_quiz")}
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom: slide dots + scroll indicator -->
+  <div
+    class="absolute bottom-0 left-0 right-0 z-20 px-6 md:px-12 pb-6 md:pb-8 flex items-end justify-between text-cream-100/85"
+  >
+    <div
+      class="flex items-center gap-2.5"
+      role="group"
+      aria-label="Hero slides"
+    >
+      {
+        slides.map((_, i) => (
+          <button
+            type="button"
+            data-hero-dot
+            class={`hero-dot ${i === 0 ? "hero-dot-active" : ""}`}
+            aria-label={`Slide ${i + 1}`}
+          />
+        ))
+      }
+    </div>
+    <a
+      href="#below-hero"
+      class="hidden md:flex flex-col items-center gap-1.5 text-cream-100/65 hover:text-cream-50 transition-colors"
+      aria-label="Scroll down"
+    >
+      <span class="text-[10px] uppercase tracking-[0.4em] font-sans"
+        >Scroll</span
+      >
+      <svg
+        class="w-4 h-4 scroll-indicator"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+        stroke-width="1.5"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+      </svg>
+    </a>
+  </div>
+</section>
+
+<!-- invisible anchor target for hero scroll indicator -->
+<a id="below-hero" aria-hidden="true" class="block h-0"></a>
+
+<!-- 2. Two craft paths (5/7 + 7/5 asymmetric) + inline Find Yours CTA at bottom -->
+<section data-home-paths class="py-section relative">
+  <div class="relative max-w-6xl mx-auto px-6">
+    <RevealOnScroll>
+      <div class="mb-12 max-w-xl">
+        <p
+          class="text-[10px] uppercase tracking-[0.4em] text-forest-600 font-sans mb-3"
+        >
+          {t("home.categories_kicker")}
+        </p>
+        <h2
+          class="text-3xl md:text-4xl font-serif font-light text-forest-800 leading-[1.05] tracking-tight"
+        >
+          {t("home.categories_title")}
+        </h2>
+      </div>
+    </RevealOnScroll>
+
+    <div class="grid grid-cols-12 gap-5 md:gap-6 items-start">
+      {
+        homeCategories.map((c, i) => {
+          // 兩張一排：偶數列「窄、寬」，奇數列「寬、窄」；每排第二張往下錯開
+          const second = i % 2 === 1;
+          const wide = (Math.floor(i / 2) % 2 === 0) === second;
+          return (
+            <RevealOnScroll
+              delay={second ? 150 : 0}
+              class={`col-span-12 ${wide ? "md:col-span-7" : "md:col-span-5"}${second ? " md:mt-16" : ""}`}
+            >
+              <a
+                href={localizedPath(locale, `/products?cat=${c.code}`)}
+                class="group relative block aspect-[4/5] overflow-hidden bg-forest-100 rounded-sm hover-lift"
+              >
+                {c.src && (
+                  <img
+                    decoding="async"
+                    src={c.src}
+                    srcset={`${c.small ?? c.src} 480w, ${c.src} 800w`}
+                    sizes="(max-width: 767px) 50vw, 700px"
+                    alt={c.alt}
+                    class="w-full h-full object-cover cinematic group-hover:scale-[1.06] transition-transform duration-[1400ms] ease-out"
+                    loading="lazy"
+                  />
+                )}
+                <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/55 to-transparent" />
+                <div class="absolute bottom-0 left-0 right-0 p-7 text-cream-50">
+                  {c.kicker && (
+                    <p class="text-[10px] uppercase tracking-[0.4em] text-terra-300 mb-2 font-sans [text-shadow:0_1px_6px_rgba(0,0,0,0.6)]">
+                      {c.kicker}
+                    </p>
+                  )}
+                  <h3 class="text-2xl md:text-3xl font-serif font-light mb-2 leading-tight text-white [text-shadow:0_1px_8px_rgba(0,0,0,0.6)]">
+                    {c.title}
+                  </h3>
+                  {c.desc && (
+                    <p class="text-sm text-white/95 mb-3 font-sans leading-relaxed max-w-sm [text-shadow:0_1px_6px_rgba(0,0,0,0.6)]">
+                      {c.desc}
+                    </p>
+                  )}
+                  <span class="text-xs text-terra-300 border-b border-terra-300/40 pb-0.5 group-hover:border-terra-300 transition-colors tracking-wide font-sans">
+                    {t("home.cat_explore")} →
+                  </span>
+                </div>
+              </a>
+            </RevealOnScroll>
+          );
+        })
+      }
+    </div>
+
+    <!-- Find yours — 2 quiz cards -->
+    <div class="mt-20 pt-12 border-t border-forest-100">
+      <RevealOnScroll>
+        <div class="text-center mb-10 max-w-xl mx-auto">
+          <p
+            class="text-[10px] uppercase tracking-[0.4em] text-forest-600 font-sans mb-3"
+          >
+            {t("home.cta_kicker")}
+          </p>
+          <h2
+            class="text-3xl md:text-4xl font-serif font-light text-forest-800 leading-[1.05] tracking-tight mb-4"
+          >
+            {t("home.cta_title")}
+          </h2>
+          <p class="text-text-secondary leading-relaxed font-sans">
+            {t("home.cta_desc")}
+          </p>
+        </div>
+      </RevealOnScroll>
+
+      <div
+        class="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6 max-w-4xl mx-auto"
+      >
+        {
+          quizCards.map((q, i) => (
+            <RevealOnScroll delay={i % 2 === 1 ? 120 : 0}>
+              <a
+                href={q.href}
+                class="group block h-full p-7 md:p-9 bg-bg-base border border-forest-100 hover:border-forest-300 rounded-card transition-all duration-500 hover:shadow-soft-lg hover-lift"
+              >
+                <div class="flex items-center gap-2.5 mb-4">
+                  <svg
+                    viewBox="0 0 24 24"
+                    class="w-5 h-5 text-terra-500"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.4"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    aria-hidden="true"
+                  >
+                    {q.icon === "jewelry" && (
+                      <path d="M12 3 C 7 11, 4 17, 8 21 L 16 21 C 20 17, 17 11, 12 3 Z" />
+                    )}
+                    {q.icon === "incense" && (
+                      <>
+                        <path d="M12 3 Q 10 7 12 11 Q 14 15 12 19" />
+                        <path d="M8 5 Q 6.5 8 8 11" />
+                        <path d="M16 5 Q 17.5 8 16 11" />
+                      </>
+                    )}
+                    {q.icon === "generic" && (
+                      <path d="M12 4 C 8 9, 8 15, 12 20 C 16 15, 16 9, 12 4 Z" />
+                    )}
+                  </svg>
+                  <span class="text-[10px] uppercase tracking-[0.4em] text-terra-500 font-sans">
+                    {q.kicker}
+                  </span>
+                </div>
+                <h3 class="text-2xl md:text-3xl font-serif font-light text-forest-800 mb-3 leading-tight">
+                  {q.heading}
+                </h3>
+                {q.desc && (
+                  <p class="text-text-secondary mb-4 leading-relaxed font-sans">
+                    {q.desc}
+                  </p>
+                )}
+                {q.meta && (
+                  <p class="text-xs text-text-muted font-sans mb-6 tracking-wide">
+                    {q.meta}
+                  </p>
+                )}
+                <span class="inline-flex items-center gap-1.5 text-sm text-forest-700 font-sans tracking-wide group-hover:gap-2.5 transition-all">
+                  {q.btn}
+                  <span aria-hidden="true">→</span>
+                </span>
+              </a>
+            </RevealOnScroll>
+          ))
+        }
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 3. Recent highlights — 3 small cards in single row, compact -->
+<section data-home-featured class="py-section relative">
+  <div class="relative max-w-6xl mx-auto px-6">
+    <RevealOnScroll>
+      <div
+        class="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-3"
+      >
+        <div>
+          <p
+            class="text-[10px] uppercase tracking-[0.4em] text-forest-600 font-sans mb-3"
+          >
+            {t("home.featured_kicker")}
+          </p>
+          <h2
+            class="text-3xl md:text-4xl font-serif font-light text-forest-800 leading-[1.05] tracking-tight"
+          >
+            {t("home.featured_title")}
+          </h2>
+        </div>
+        <a
+          href={localizedPath(locale, "/products")}
+          class="text-xs text-forest-700 hover:text-terra-500 transition-colors border-b border-forest-200 pb-1 self-start md:self-auto tracking-wide font-sans link-underline"
+        >
+          {t("home.featured_view_all")} →
+        </a>
+      </div>
+    </RevealOnScroll>
+
+    {
+      featured.results.length === 0 ? (
+        <p class="text-center text-forest-600 py-8 font-light">
+          {t("home.featured_empty")}
+        </p>
+      ) : (
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
+          {featured.results[0] && (
+            <RevealOnScroll class="h-full">
+              <ProductCard
+                slug={featured.results[0].slug}
+                name={featured.results[0].name ?? featured.results[0].slug}
+                shortDescription={
+                  featured.results[0].short_description ?? undefined
+                }
+                category={featured.results[0].category}
+                imageUrl={firstImage(featured.results[0].image_urls)}
+                priceFrom={
+                  featured.results[0].min_price
+                    ? formatPrice(
+                        featured.results[0].min_price ?? 0,
+                        featured.results[0].min_currency ?? "CNY",
+                        locale,
+                      )
+                    : undefined
+                }
+                variant="compact"
+              />
+            </RevealOnScroll>
+          )}
+          {featured.results[1] && (
+            <RevealOnScroll delay={100} class="h-full">
+              <ProductCard
+                slug={featured.results[1].slug}
+                name={featured.results[1].name ?? featured.results[1].slug}
+                shortDescription={
+                  featured.results[1].short_description ?? undefined
+                }
+                category={featured.results[1].category}
+                imageUrl={firstImage(featured.results[1].image_urls)}
+                priceFrom={
+                  featured.results[1].min_price
+                    ? formatPrice(
+                        featured.results[1].min_price ?? 0,
+                        featured.results[1].min_currency ?? "CNY",
+                        locale,
+                      )
+                    : undefined
+                }
+                variant="compact"
+              />
+            </RevealOnScroll>
+          )}
+          {featured.results[2] && (
+            <RevealOnScroll delay={200} class="h-full">
+              <ProductCard
+                slug={featured.results[2].slug}
+                name={featured.results[2].name ?? featured.results[2].slug}
+                shortDescription={
+                  featured.results[2].short_description ?? undefined
+                }
+                category={featured.results[2].category}
+                imageUrl={firstImage(featured.results[2].image_urls)}
+                priceFrom={
+                  featured.results[2].min_price
+                    ? formatPrice(
+                        featured.results[2].min_price ?? 0,
+                        featured.results[2].min_currency ?? "CNY",
+                        locale,
+                      )
+                    : undefined
+                }
+                variant="compact"
+              />
+            </RevealOnScroll>
+          )}
+        </div>
+      )
+    }
+  </div>
+</section>
+
+<!-- Footer removed — now rendered globally by Layout.astro via <Footer /> -->

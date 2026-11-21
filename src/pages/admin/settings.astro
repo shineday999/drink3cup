@@ -1,0 +1,152 @@
+---
+import { env } from "cloudflare:workers";
+
+// /admin/settings — 網站名稱 / 首頁副標題 / 主題 / 次主題（4 個欄位 × 4 種語言）
+// 純文字標籤，管理員自由填寫。前台 layout 用 current locale，缺值 fallback zh-Hans。
+// 首頁橫幅管理已獨立成「首页横幅」頁籤（/admin/banners）。
+import AdminLayout from "../../layouts/AdminLayout.astro";
+import { createT } from "../../i18n/t";
+import zhHansMessages from "../../i18n/messages/zh-Hans.json";
+
+const messages = zhHansMessages as Record<string, unknown>;
+const t = createT(messages);
+
+interface SettingRow {
+  key: string;
+  locale: string;
+  value: string;
+}
+
+const rows = env?.DB
+  ? await env.DB.prepare(
+      "SELECT key, locale, value FROM site_settings",
+    ).all<SettingRow>()
+  : { results: [] as SettingRow[] };
+
+// valueMap[key][locale] = 目前的文字
+const valueMap: Record<string, Record<string, string>> = {
+  site_name: {},
+  hero_subtitle: {},
+  theme: {},
+  sub_theme: {},
+};
+for (const r of rows.results ?? []) {
+  if (r.key in valueMap) {
+    const sub = valueMap[r.key];
+    if (sub) sub[r.locale] = r.value;
+  }
+}
+
+const LOCALES = [
+  { code: "zh-Hans", label: "中文 (简体)" },
+  { code: "en", label: "English" },
+  { code: "ms-MY", label: "Bahasa Melayu" },
+  { code: "id-ID", label: "Bahasa Indonesia" },
+] as const;
+
+const KEY_SECTIONS = [
+  {
+    key: "site_name",
+    label: t("admin.settings.section.site_name"),
+    hint: t("admin.settings.hint.site_name"),
+  },
+  {
+    key: "hero_subtitle",
+    label: t("admin.settings.section.hero_subtitle"),
+    hint: t("admin.settings.hint.hero_subtitle"),
+  },
+  {
+    key: "theme",
+    label: t("admin.settings.section.theme"),
+    hint: t("admin.settings.hint.theme"),
+  },
+  {
+    key: "sub_theme",
+    label: t("admin.settings.section.sub_theme"),
+    hint: t("admin.settings.hint.sub_theme"),
+  },
+];
+
+const saved = Astro.url.searchParams.get("saved") === "1";
+const inputClass =
+  "w-full px-3 py-2 border border-text-muted/30 rounded-md bg-bg-base text-sm";
+const gridCols = "lg:grid-cols-[9rem_repeat(4,minmax(0,1fr))]";
+---
+
+<AdminLayout title={t("admin.settings.title")} active="settings">
+  <p class="text-sm text-text-secondary mb-4 max-w-3xl">
+    {t("admin.settings.subtitle")}
+  </p>
+
+  {
+    saved && (
+      <div
+        role="status"
+        class="mb-4 bg-success/10 border border-success/30 text-success px-4 py-2.5 rounded text-sm"
+      >
+        {t("admin.settings.saved")}
+      </div>
+    )
+  }
+
+  <form method="POST" action="/api/admin/settings" class="space-y-4">
+    <section
+      class="bg-bg-card border border-text-muted/20 rounded-card p-4 sm:p-5"
+    >
+      <!-- 欄位說明：桌面版當作表頭，一次看到四個欄位各自的用途 -->
+      <div class={`hidden lg:grid ${gridCols} gap-3 pb-3`}>
+        <div></div>
+        {
+          KEY_SECTIONS.map(({ label, hint }) => (
+            <div>
+              <p class="text-sm font-medium">{label}</p>
+              <p class="mt-0.5 text-xs leading-snug text-text-muted">{hint}</p>
+            </div>
+          ))
+        }
+      </div>
+
+      {
+        LOCALES.map(({ code, label: localeLabel }) => (
+          <div
+            class={`grid grid-cols-1 sm:grid-cols-2 ${gridCols} items-start gap-3 border-t border-text-muted/15 py-3`}
+          >
+            <div class="sm:col-span-2 lg:col-span-1 lg:pt-2">
+              <p class="text-sm font-medium">{localeLabel}</p>
+              <p class="font-mono text-xs text-text-muted">{code}</p>
+            </div>
+            {KEY_SECTIONS.map(({ key, label }) => (
+              <div>
+                <label
+                  class="mb-1 block text-xs text-text-muted lg:sr-only"
+                  for={`${key}__${code}`}
+                >
+                  {label}
+                </label>
+                <input
+                  id={`${key}__${code}`}
+                  name={`${key}__${code}`}
+                  type="text"
+                  value={valueMap[key]?.[code] ?? ""}
+                  class={inputClass}
+                />
+              </div>
+            ))}
+          </div>
+        ))
+      }
+    </section>
+
+    <div
+      class="sticky bottom-0 z-10 -mx-4 flex items-center gap-3 border-t border-text-muted/15 bg-cream-50/95 px-4 py-3 backdrop-blur sm:mx-0 sm:px-0"
+    >
+      <button
+        type="submit"
+        class="px-6 py-2.5 bg-forest-700 text-bg-base rounded-md font-medium hover:bg-forest-900 transition-colors"
+      >
+        {t("admin.common.save")}
+      </button>
+      <span class="text-xs text-text-muted">空白栏位不会覆盖已有的文字</span>
+    </div>
+  </form>
+</AdminLayout>

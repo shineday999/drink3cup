@@ -1,0 +1,272 @@
+---
+import Layout from "@layouts/Layout.astro";
+import { env } from "cloudflare:workers";
+import Button from "@components/Button.astro";
+import { createT } from "../i18n/t";
+import { localizedPath, defaultLocale, type Locale } from "../i18n/config";
+import { readCart } from "../lib/cart";
+import { formatPrice } from "../lib/format";
+
+const locale = (Astro.locals.locale ?? defaultLocale) as Locale;
+const messages = (Astro.locals.messages ?? {}) as Record<string, unknown>;
+const t = createT(messages);
+
+const cookieHeader = Astro.request.headers.get("cookie");
+const items = readCart(cookieHeader);
+
+// 修正 SQL 聚合:一個 (slug, sku) 一個 row,只抓 USD 價(轉 CNY 顯示),
+// GROUP BY p.slug, pv.sku 防 product_variants 多 variant 拆多 row
+// + cart.cny subtotal 對齊 checkout。
+// 修正前:`MIN(pp.amount) AS min_amount` + `GROUP BY p.slug` 丟失 sku。
+const enriched =
+  env?.DB && items.length > 0
+    ? await env.DB.prepare(
+        `SELECT p.slug, pt.name, pv.sku, pv.stock, MIN(pp.amount) AS amount, pp.currency,
+              pv.image_urls AS variant_images,
+              (SELECT pv2.image_urls FROM product_variants pv2 WHERE pv2.product_id = p.id LIMIT 1) AS image_urls
+       FROM products p
+       LEFT JOIN product_translations pt ON pt.product_id = p.id AND pt.locale = ?
+       LEFT JOIN product_variants pv ON pv.product_id = p.id
+       LEFT JOIN product_prices pp ON pp.variant_id = pv.id AND pp.currency = 'CNY'
+       WHERE p.slug IN (${items.map(() => "?").join(",")})
+       GROUP BY p.slug, pv.sku`,
+      )
+        .bind(locale, ...items.map((i) => i.slug))
+        .all()
+    : { results: [] as Array<Record<string, unknown>> };
+
+// 修正 qty lookup:用 Map keyed by (slug::sku) 而不是 Array.find 取第一個匹配,
+// 多筆同 slug 不同 variant 才不會 qty 漏算 / sku 撞一起。
+const keyMap = new Map<string, { qty: number; slug: string; sku: string }>();
+for (const it of items) {
+  const k = `${it.slug}::${it.sku ?? ""}`;
+  const ex = keyMap.get(k);
+  if (ex) ex.qty += it.qty;
+  else keyMap.set(k, { qty: it.qty, slug: it.slug, sku: it.sku ?? "" });
+}
+
+// SQL GROUP BY (slug, sku) 會把 product 全部 variant 展開,但 cart 只 add 過其中一兩個,
+// 沒在 cart 內的 variant 不該出現在 cart 頁。filter 出真正在 keyMap 內的 row。
+const visible = enriched.results.filter((row) => {
+  const k = `${row.slug}::${row.sku ?? ""}`;
+  return keyMap.has(k);
+});
+
+const subtotalCents = visible.reduce((sum, row) => {
+  const k = `${row.slug}::${row.sku ?? ""}`;
+  const qty = keyMap.get(k)!.qty;
+  return sum + ((row.amount as number) ?? 0) * qty;
+}, 0);
+
+function firstImage(json: unknown): string | undefined {
+  if (typeof json !== "string" || !json) return undefined;
+  try {
+    const urls = JSON.parse(json) as string[];
+    return Array.isArray(urls) && urls.length > 0 ? urls[0] : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+void locale;
+void t;
+---
+
+<Layout
+  title={`${t("cart.page_title")} — ${t("common.site_name")}`}
+  description={t("cart.page_description")}
+>
+  <div data-cart-page class="max-w-4xl mx-auto px-6 py-section">
+    <h1 class="text-display-sm font-serif text-text-primary mb-8">
+      {t("cart.title")}
+    </h1>
+
+    {
+      items.length === 0 ? (
+        <div class="text-center py-12 text-text-muted">
+          <p class="text-lg mb-4">{t("cart.empty")}</p>
+          <Button href={localizedPath(locale, "/products")}>
+            {t("cart.continue_shopping") ?? t("common.view_more")}
+          </Button>
+        </div>
+      ) : (
+        <div class="space-y-4">
+          {visible.map((row) => {
+            const k = `${row.slug}::${row.sku ?? ""}`;
+            const qty = keyMap.get(k)!.qty;
+            const lineCents = (row.amount as number) ?? 0;
+            const stock =
+              typeof row.stock === "number"
+                ? row.stock
+                : Number.POSITIVE_INFINITY;
+            const thumb =
+              firstImage(row.variant_images) ?? firstImage(row.image_urls);
+            const label = (row.name as string) ?? (row.slug as string);
+            return (
+              <div data-cart-row>
+                <div
+                  data-cart-card
+                  class="bg-bg-card border border-text-muted/20 rounded-card p-4 flex items-center justify-between"
+                >
+                  <div class="flex items-start gap-3 min-w-0">
+                    {thumb ? (
+                      <a
+                        href={localizedPath(locale, `/products/${row.slug}`)}
+                        data-cart-thumb
+                        class="block w-16 h-16 sm:w-20 sm:h-20 shrink-0 overflow-hidden rounded-lg bg-bg-base"
+                      >
+                        <img
+                          src={thumb}
+                          alt={label}
+                          width="80"
+                          height="80"
+                          loading="lazy"
+                          decoding="async"
+                          class="w-full h-full object-cover"
+                        />
+                      </a>
+                    ) : (
+                      <div
+                        data-cart-thumb
+                        aria-hidden="true"
+                        class="w-16 h-16 sm:w-20 sm:h-20 shrink-0 rounded-lg bg-bg-base"
+                      />
+                    )}
+                    <div class="min-w-0">
+                      <div class="font-medium">
+                        {(row.name as string) ?? (row.slug as string)}
+                      </div>
+                      <div class="text-xs text-text-muted mt-1">
+                        {(row.sku as string) ? (
+                          <span class="font-mono bg-bg-base px-2 py-0.5 rounded border border-text-muted/30 mr-2">
+                            {row.sku}
+                          </span>
+                        ) : null}
+                        <span data-cart-qtytext>qty {qty}</span>
+                      </div>
+                      <div data-cart-stepper>
+                        <form method="POST" action="/api/cart/update">
+                          <input
+                            type="hidden"
+                            name="slug"
+                            value={row.slug as string}
+                          />
+                          <input
+                            type="hidden"
+                            name="sku"
+                            value={(row.sku as string) ?? ""}
+                          />
+                          <input
+                            type="hidden"
+                            name="qty"
+                            value={String(qty - 1)}
+                          />
+                          <button
+                            type="submit"
+                            disabled={qty <= 1}
+                            aria-label={`${t("common.quantity")} −`}
+                          >
+                            −
+                          </button>
+                        </form>
+                        <span data-cart-qty>{qty}</span>
+                        <form method="POST" action="/api/cart/update">
+                          <input
+                            type="hidden"
+                            name="slug"
+                            value={row.slug as string}
+                          />
+                          <input
+                            type="hidden"
+                            name="sku"
+                            value={(row.sku as string) ?? ""}
+                          />
+                          <input
+                            type="hidden"
+                            name="qty"
+                            value={String(qty + 1)}
+                          />
+                          <button
+                            type="submit"
+                            disabled={qty >= stock}
+                            aria-label={`${t("common.quantity")} +`}
+                          >
+                            +
+                          </button>
+                        </form>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="text-right">
+                    <div class="font-mono">
+                      {formatPrice(lineCents * qty, "CNY", locale)}
+                    </div>
+                    <div
+                      data-cart-remove-inline
+                      class="flex gap-2 justify-end mt-1"
+                    >
+                      <form
+                        method="POST"
+                        action="/api/cart/remove"
+                        class="inline"
+                      >
+                        <input
+                          type="hidden"
+                          name="slug"
+                          value={row.slug as string}
+                        />
+                        <input
+                          type="hidden"
+                          name="sku"
+                          value={(row.sku as string) ?? ""}
+                        />
+                        <button class="text-xs text-error hover:underline">
+                          {t("cart.remove")}
+                        </button>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+                <form data-cart-del method="POST" action="/api/cart/remove">
+                  <input type="hidden" name="slug" value={row.slug as string} />
+                  <input
+                    type="hidden"
+                    name="sku"
+                    value={(row.sku as string) ?? ""}
+                  />
+                  <button type="submit">{t("cart.remove")}</button>
+                </form>
+              </div>
+            );
+          })}
+
+          <div data-cart-bar class="space-y-4">
+            <div class="border-t border-text-muted/20 pt-4 flex justify-between items-center">
+              <div class="text-lg font-serif">
+                {t("cart.subtotal") ?? "Subtotal"}:
+              </div>
+              <div class="text-2xl font-mono font-medium">
+                {formatPrice(subtotalCents, "CNY", locale)}
+              </div>
+            </div>
+
+            <Button
+              href={localizedPath(locale, "/checkout")}
+              variant="primary"
+              size="lg"
+              class="w-full"
+            >
+              {t("cart.checkout") ?? "Proceed to checkout"}
+            </Button>
+          </div>
+
+          <form method="POST" action="/api/cart/clear" class="text-center">
+            <button class="text-xs text-text-muted hover:text-error hover:underline">
+              {t("cart.clear") ?? "Clear cart"}
+            </button>
+          </form>
+        </div>
+      )
+    }
+  </div>
+</Layout>

@@ -1,0 +1,423 @@
+---
+// AdminLayout — 後台共用外殼
+// 導覽依網址路徑自動判斷所在群組，頁面不必再傳 active：
+//   概览 · 商品 · 订单 · 内容（文章／评论）· 设置（站点／首页横幅／分类图片／汇率／常见问题）
+// 所有「參數」類頁面集中在「设置」群組，以頁籤切換。
+// 認證由 middleware 處理（session JWT cookie）。
+import "../styles/global.css";
+import { createT } from "../i18n/t";
+import { defaultLocale, type Locale } from "../i18n/config";
+import zhHansMessages from "../i18n/messages/zh-Hans.json";
+import ChangePasswordModal from "../components/admin/ChangePasswordModal.astro";
+
+interface Props {
+  title: string;
+  /** 舊頁面仍會傳入；現在改由網址判斷，保留只為了相容 */
+  active?: string;
+}
+
+const { title } = Astro.props;
+const pwError = Astro.url.searchParams.get("pw_error");
+const pwSaved = Astro.url.searchParams.get("password_changed") === "1";
+const locale = (Astro.locals.locale ?? defaultLocale) as Locale;
+const t = createT(zhHansMessages as Record<string, unknown>);
+const admin = Astro.locals.admin;
+
+// 網站標題跟著 siteSettings.siteName 變動
+const siteName: string =
+  Astro.locals.siteSettings?.siteName[locale] ??
+  Astro.locals.siteSettings?.siteName["zh-Hans"] ??
+  Astro.locals.siteSettings?.siteName["en"] ??
+  "cnamber-store";
+
+interface NavChild {
+  label: string;
+  href: string;
+  match: string[];
+}
+interface NavGroup {
+  key: string;
+  label: string;
+  href: string;
+  icon: string;
+  match: string[];
+  children?: NavChild[];
+}
+
+const NAV: NavGroup[] = [
+  {
+    key: "dashboard",
+    label: "概览",
+    href: "/admin",
+    icon: "home",
+    match: ["/admin"],
+  },
+  {
+    key: "products",
+    label: "商品",
+    href: "/admin/products",
+    icon: "box",
+    match: ["/admin/products"],
+  },
+  {
+    key: "orders",
+    label: "订单",
+    href: "/admin/orders",
+    icon: "receipt",
+    match: ["/admin/orders"],
+  },
+  {
+    key: "content",
+    label: "内容",
+    href: "/admin/posts",
+    icon: "doc",
+    match: ["/admin/posts", "/admin/reviews"],
+    children: [
+      { label: "文章", href: "/admin/posts", match: ["/admin/posts"] },
+      { label: "评论", href: "/admin/reviews", match: ["/admin/reviews"] },
+    ],
+  },
+  {
+    key: "settings",
+    label: "设置",
+    href: "/admin/settings",
+    icon: "cog",
+    match: [
+      "/admin/settings",
+      "/admin/banners",
+      "/admin/category-images",
+      "/admin/rates",
+      "/admin/faqs",
+    ],
+    children: [
+      { label: "站点", href: "/admin/settings", match: ["/admin/settings"] },
+      { label: "首页横幅", href: "/admin/banners", match: ["/admin/banners"] },
+      {
+        label: "分类图片",
+        href: "/admin/category-images",
+        match: ["/admin/category-images"],
+      },
+      { label: "汇率", href: "/admin/rates", match: ["/admin/rates"] },
+      { label: "常见问题", href: "/admin/faqs", match: ["/admin/faqs"] },
+    ],
+  },
+];
+
+const path = Astro.url.pathname.replace(/\/+$/, "") || "/";
+const hit = (rule: string): boolean =>
+  rule === "/admin"
+    ? path === "/admin"
+    : path === rule || path.startsWith(rule + "/");
+const currentGroup = NAV.find((g) => g.match.some(hit));
+const currentChild = currentGroup?.children?.find((c) => c.match.some(hit));
+
+const icons: Record<string, string> = {
+  home: '<path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/>',
+  box: '<path d="M21 8l-9-5-9 5 9 5 9-5z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/>',
+  receipt:
+    '<path d="M6 3h12v18l-3-2-3 2-3-2-3 2V3z"/><path d="M9 8h6M9 12h6"/>',
+  doc: '<path d="M7 3h8l4 4v14H7z"/><path d="M15 3v4h4"/><path d="M10 12h6M10 16h6"/>',
+  cog: '<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/>',
+};
+const initial = (admin?.email ?? "?").slice(0, 1).toUpperCase();
+---
+
+<!doctype html>
+<html lang={locale}>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title} · {siteName} admin</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  </head>
+  <body class="min-h-screen bg-cream-50 font-sans text-text-primary">
+    <a
+      href="#adm-main"
+      class="sr-only focus:not-sr-only focus:fixed focus:left-3 focus:top-3 focus:z-50 focus:rounded focus:bg-forest-900 focus:px-3 focus:py-2 focus:text-bg-base"
+    >
+      跳到主要内容
+    </a>
+
+    <!-- 桌面版：左側固定側邊欄 -->
+    <aside
+      class="hidden lg:flex fixed inset-y-0 left-0 z-40 w-56 flex-col bg-forest-900 text-bg-base"
+      aria-label="后台导航"
+    >
+      <div class="px-5 pt-5 pb-4 border-b border-bg-base/10">
+        <div class="font-serif text-lg leading-tight">{siteName}</div>
+        <div
+          class="mt-1 text-[0.65rem] uppercase tracking-[0.15em] text-accent-300"
+        >
+          {t("admin.common.admin_badge")}
+        </div>
+      </div>
+      <nav class="flex-1 overflow-y-auto px-3 py-4">
+        <ul class="space-y-1">
+          {
+            NAV.map((g) => (
+              <li>
+                <a
+                  href={g.href}
+                  aria-current={
+                    currentGroup?.key === g.key ? "page" : undefined
+                  }
+                  class={`flex items-center gap-3 rounded-md px-3 py-2.5 text-sm transition-colors ${
+                    currentGroup?.key === g.key
+                      ? "bg-bg-base/15 text-bg-base font-medium"
+                      : "text-bg-base/70 hover:bg-bg-base/10 hover:text-bg-base"
+                  }`}
+                >
+                  <svg
+                    viewBox="0 0 24 24"
+                    width="18"
+                    height="18"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.7"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    aria-hidden="true"
+                    set:html={icons[g.icon]}
+                  />
+                  <span>{g.label}</span>
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
+      <div class="border-t border-bg-base/10 px-5 py-4 text-sm">
+        <a href="/" class="text-bg-base/70 hover:text-bg-base"
+          >{t("admin.common.view_site")} ↗</a
+        >
+      </div>
+    </aside>
+
+    <div class="lg:pl-56">
+      <!-- 頂部欄 -->
+      <header
+        class="sticky top-0 z-30 border-b border-text-muted/15 bg-cream-50/90 backdrop-blur"
+      >
+        <div class="flex items-center gap-3 px-4 sm:px-6 h-14">
+          <!-- 手機版：漢堡選單 -->
+          <details class="adm-menu relative lg:hidden">
+            <summary
+              class="flex h-10 w-10 cursor-pointer list-none items-center justify-center rounded-md hover:bg-forest-900/5 [&::-webkit-details-marker]:hidden"
+              aria-label="打开导航"
+            >
+              <svg
+                viewBox="0 0 24 24"
+                width="22"
+                height="22"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+                aria-hidden="true"
+              >
+                <path d="M4 7h16M4 12h16M4 17h16"></path>
+              </svg>
+            </summary>
+            <nav
+              class="absolute left-0 top-12 z-50 w-56 rounded-card border border-text-muted/20 bg-bg-base p-2 shadow-lg"
+              aria-label="后台导航"
+            >
+              <ul class="space-y-0.5">
+                {
+                  NAV.map((g) => (
+                    <li>
+                      <a
+                        href={g.href}
+                        aria-current={
+                          currentGroup?.key === g.key ? "page" : undefined
+                        }
+                        class={`flex items-center gap-3 rounded-md px-3 py-2.5 text-sm ${
+                          currentGroup?.key === g.key
+                            ? "bg-forest-900 text-bg-base"
+                            : "text-text-primary hover:bg-forest-900/5"
+                        }`}
+                      >
+                        <svg
+                          viewBox="0 0 24 24"
+                          width="18"
+                          height="18"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="1.7"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          aria-hidden="true"
+                          set:html={icons[g.icon]}
+                        />
+                        <span>{g.label}</span>
+                      </a>
+                    </li>
+                  ))
+                }
+              </ul>
+            </nav>
+          </details>
+          <span class="font-serif text-base lg:hidden">{siteName}</span>
+
+          <!-- 桌面版：目前位置 -->
+          <p class="hidden lg:block text-sm text-text-muted">
+            {currentGroup?.label ?? "后台"}
+            {currentChild && <span> / {currentChild.label}</span>}
+          </p>
+
+          <div class="ml-auto flex items-center gap-2">
+            <a
+              href="/admin/products/new"
+              class="inline-flex items-center gap-1.5 rounded-md bg-forest-700 px-3 py-2 text-sm text-bg-base hover:bg-forest-900 transition-colors"
+            >
+              <span aria-hidden="true">＋</span>
+              <span class="hidden sm:inline">新增商品</span>
+              <span class="sm:hidden sr-only">新增商品</span>
+            </a>
+
+            <details class="adm-user relative">
+              <summary
+                class="flex h-10 w-10 cursor-pointer list-none items-center justify-center rounded-full bg-forest-900 text-sm font-medium text-bg-base [&::-webkit-details-marker]:hidden"
+                aria-label="账号菜单"
+              >
+                {initial}
+              </summary>
+              <div
+                class="absolute right-0 top-12 z-50 w-64 rounded-card border border-text-muted/20 bg-bg-base p-3 shadow-lg text-sm"
+              >
+                <p class="truncate font-medium">{admin?.email}</p>
+                <p class="mt-1">
+                  <span
+                    class="rounded bg-accent-700 px-2 py-0.5 text-xs text-bg-base"
+                    >{admin?.role}</span
+                  >
+                </p>
+                <div
+                  class="mt-3 border-t border-text-muted/15 pt-2 space-y-0.5"
+                >
+                  <button
+                    type="button"
+                    class="block w-full rounded px-2 py-2 text-left hover:bg-forest-900/5"
+                    data-change-password-trigger
+                    aria-haspopup="dialog"
+                  >
+                    {t("admin.change_password.trigger_label")}
+                  </button>
+                  <a
+                    href="/"
+                    class="block rounded px-2 py-2 hover:bg-forest-900/5"
+                    >{t("admin.common.view_site")} ↗</a
+                  >
+                  <form method="POST" action="/api/admin/logout">
+                    <button
+                      type="submit"
+                      class="block w-full rounded px-2 py-2 text-left hover:bg-forest-900/5"
+                    >
+                      {t("admin.common.signout")}
+                    </button>
+                  </form>
+                </div>
+              </div>
+            </details>
+          </div>
+        </div>
+
+        <!-- 子頁籤：同一群組的頁面（例如「设置」裡的參數頁）集中在這裡切換 -->
+        {
+          currentGroup?.children && (
+            <nav
+              class="px-4 sm:px-6 -mt-px"
+              aria-label={`${currentGroup.label}分页`}
+            >
+              <ul class="flex gap-1 overflow-x-auto whitespace-nowrap">
+                {currentGroup.children.map((c) => (
+                  <li class="shrink-0">
+                    <a
+                      href={c.href}
+                      aria-current={
+                        currentChild?.href === c.href ? "page" : undefined
+                      }
+                      class={`block border-b-2 px-3 py-2.5 text-sm transition-colors ${
+                        currentChild?.href === c.href
+                          ? "border-accent-500 font-medium text-text-primary"
+                          : "border-transparent text-text-muted hover:text-text-primary"
+                      }`}
+                    >
+                      {c.label}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          )
+        }
+      </header>
+
+      <main
+        id="adm-main"
+        class="adm-main mx-auto max-w-6xl px-4 sm:px-6 py-5 sm:py-6"
+      >
+        <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
+          <h1 class="font-serif text-2xl leading-tight">{title}</h1>
+          <div class="flex items-center gap-2"><slot name="actions" /></div>
+        </div>
+        <slot />
+      </main>
+
+      <footer
+        class="mx-auto max-w-6xl px-4 sm:px-6 py-4 text-xs text-text-muted border-t border-text-muted/15"
+      >
+        {t("admin.footer.tagline", { siteName })}
+      </footer>
+    </div>
+
+    <ChangePasswordModal
+      currentPath={Astro.url.pathname}
+      error={pwError}
+      saved={pwSaved}
+    />
+
+    <style is:global>
+      /* 後台整體排版收緊：各頁沿用的大間距與大標題在這裡統一縮小（個別頁面之後再逐頁精簡） */
+      .adm-main h2.font-serif.text-xl {
+        font-size: 1.125rem;
+        line-height: 1.4;
+      }
+      .adm-main .space-y-8 > :not([hidden]) ~ :not([hidden]) {
+        margin-top: 1.25rem;
+      }
+      .adm-main .space-y-6 > :not([hidden]) ~ :not([hidden]) {
+        margin-top: 1rem;
+      }
+    </style>
+
+    <script is:inline>
+      // 選單點外面或按 Esc 就收起
+      (function () {
+        var menus = document.querySelectorAll(
+          "details.adm-menu, details.adm-user",
+        );
+        document.addEventListener("click", function (e) {
+          Array.prototype.forEach.call(menus, function (d) {
+            if (d.open && !d.contains(e.target)) d.open = false;
+          });
+        });
+        document.addEventListener("keydown", function (e) {
+          if (e.key !== "Escape") return;
+          Array.prototype.forEach.call(menus, function (d) {
+            d.open = false;
+          });
+        });
+        // 開「改密碼」視窗前先把帳號選單收起來
+        var pw = document.querySelector("[data-change-password-trigger]");
+        if (pw) {
+          pw.addEventListener("click", function () {
+            Array.prototype.forEach.call(menus, function (d) {
+              d.open = false;
+            });
+          });
+        }
+      })();
+    </script>
+  </body>
+</html>

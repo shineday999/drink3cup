@@ -1,0 +1,279 @@
+---
+import { env } from "cloudflare:workers";
+
+// /admin/banners — 首頁橫幅管理（「设置」群組的「首页横幅」頁籤）
+// 上傳、啟用／停用、編輯說明與排序、換手機版圖片、刪除。
+// 對應的 API：/api/admin/banners（新增）、/api/admin/banners/[id]（PATCH／DELETE，以 _method 覆寫）。
+import AdminLayout from "../../../layouts/AdminLayout.astro";
+import { createT } from "../../../i18n/t";
+import zhHansMessages from "../../../i18n/messages/zh-Hans.json";
+
+const t = createT(zhHansMessages as Record<string, unknown>);
+
+interface Banner {
+  id: string;
+  image_url: string;
+  mobile_image_url: string | null;
+  alt_text: string | null;
+  sort_order: number;
+  active: number;
+}
+
+const banners = env?.DB
+  ? await env.DB.prepare(
+      "SELECT id, image_url, mobile_image_url, alt_text, sort_order, active FROM hero_banners ORDER BY sort_order ASC, created_at DESC",
+    ).all<Banner>()
+  : { results: [] as Banner[] };
+
+const list = banners.results ?? [];
+const activeCount = list.filter((b) => b.active === 1).length;
+const fileClass =
+  "w-full text-sm file:mr-3 file:py-1.5 file:px-3 file:border-0 file:bg-forest-700 file:text-bg-base file:rounded file:cursor-pointer";
+const inputClass =
+  "w-full px-3 py-2 border border-text-muted/30 rounded-md bg-bg-base text-sm";
+const accept = "image/jpeg,image/png,image/webp,image/gif";
+---
+
+<AdminLayout title={t("admin.banners.title")} active="settings">
+  <p class="mb-4 text-sm text-text-muted">
+    {t("admin.banners.dimension_label")} 1920×1080 ・ 共 {list.length} 张，启用 {
+      activeCount
+    } 张
+  </p>
+
+  <details
+    class="mb-5 rounded-card border border-text-muted/20 bg-bg-card"
+    open={list.length === 0}
+  >
+    <summary
+      class="flex cursor-pointer list-none items-center gap-2 px-4 py-3 text-sm font-medium [&::-webkit-details-marker]:hidden"
+    >
+      <span aria-hidden="true">＋</span>
+      {t("admin.banners.upload")}
+    </summary>
+    <form
+      method="POST"
+      action="/api/admin/banners"
+      enctype="multipart/form-data"
+      class="grid gap-3 border-t border-text-muted/15 px-4 pb-4 pt-3 sm:grid-cols-2"
+    >
+      <div>
+        <label class="mb-1 block text-sm font-medium" for="b-image"
+          >{t("admin.banners.upload_image")}</label
+        >
+        <input
+          id="b-image"
+          name="image"
+          type="file"
+          accept={accept}
+          required
+          class={fileClass}
+        />
+      </div>
+      <div>
+        <label class="mb-1 block text-sm font-medium" for="b-mobile"
+          >{t("admin.banners.upload_mobile_image")}</label
+        >
+        <input
+          id="b-mobile"
+          name="mobile_image"
+          type="file"
+          accept={accept}
+          class={fileClass}
+        />
+        <p class="mt-1 text-xs text-text-muted">
+          {t("admin.banners.mobile_hint")}
+        </p>
+      </div>
+      <div>
+        <label class="mb-1 block text-sm font-medium" for="b-alt"
+          >{t("admin.banners.alt_text")}</label
+        >
+        <input id="b-alt" name="alt_text" type="text" class={inputClass} />
+      </div>
+      <div class="grid grid-cols-2 items-end gap-3">
+        <div>
+          <label class="mb-1 block text-sm font-medium" for="b-sort"
+            >{t("admin.banners.sort_order")}</label
+          >
+          <input
+            id="b-sort"
+            name="sort_order"
+            type="number"
+            value="0"
+            class={inputClass}
+          />
+        </div>
+        <label class="inline-flex items-center gap-2 pb-2 text-sm">
+          <input type="checkbox" name="active" value="1" checked />
+          <span>{t("admin.banners.active")}</span>
+        </label>
+      </div>
+      <div class="sm:col-span-2">
+        <button
+          type="submit"
+          class="px-4 py-2 bg-forest-700 text-bg-base rounded-md hover:bg-forest-900 transition-colors"
+        >
+          {t("admin.banners.upload")}
+        </button>
+      </div>
+    </form>
+  </details>
+
+  {
+    list.length === 0 ? (
+      <p class="text-sm text-text-muted">{t("admin.banners.empty")}</p>
+    ) : (
+      <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+        {list.map((b) => (
+          <article class="flex flex-col overflow-hidden rounded-card border border-text-muted/20 bg-bg-card">
+            <div class="relative aspect-video bg-forest-100">
+              <img
+                loading="lazy"
+                decoding="async"
+                src={b.image_url}
+                alt={b.alt_text ?? ""}
+                class="h-full w-full object-cover"
+              />
+              <span
+                class={`absolute left-2 top-2 rounded px-2 py-0.5 text-xs text-bg-base ${
+                  b.active === 1 ? "bg-forest-700" : "bg-text-muted"
+                }`}
+              >
+                {b.active === 1 ? "启用中" : "已停用"}
+              </span>
+              {b.mobile_image_url && (
+                <img
+                  loading="lazy"
+                  decoding="async"
+                  src={b.mobile_image_url}
+                  alt=""
+                  title={t("admin.banners.mobile_label")}
+                  class="absolute bottom-2 right-2 h-14 w-14 rounded border-2 border-bg-base object-cover"
+                />
+              )}
+            </div>
+
+            <div class="flex-1 px-3 py-2.5 text-sm">
+              <p class="truncate">{b.alt_text ?? "—"}</p>
+              <p class="text-xs text-text-muted">
+                {t("admin.banners.sort_order")} {b.sort_order}
+              </p>
+            </div>
+
+            <div class="flex items-center gap-4 border-t border-text-muted/15 px-3 py-2 text-sm">
+              <form method="POST" action={`/api/admin/banners/${b.id}`}>
+                <input type="hidden" name="_method" value="PATCH" />
+                <input type="hidden" name="alt_text" value={b.alt_text ?? ""} />
+                <input type="hidden" name="sort_order" value={b.sort_order} />
+                <input
+                  type="hidden"
+                  name="active"
+                  value={b.active === 1 ? "0" : "1"}
+                />
+                <button type="submit" class="text-accent-700 hover:underline">
+                  {b.active === 1
+                    ? t("admin.banners.deactivate")
+                    : t("admin.banners.activate")}
+                </button>
+              </form>
+              <button
+                type="button"
+                class="ml-auto text-error hover:underline"
+                data-banner-id={b.id}
+              >
+                {t("admin.banners.delete")}
+              </button>
+            </div>
+
+            <details class="border-t border-text-muted/15 px-3 py-2 text-sm">
+              <summary class="cursor-pointer list-none text-xs text-text-secondary [&::-webkit-details-marker]:hidden">
+                编辑说明、排序、手机版图片 ▾
+              </summary>
+              <form
+                method="POST"
+                action={`/api/admin/banners/${b.id}`}
+                enctype="multipart/form-data"
+                class="mt-3 space-y-3"
+              >
+                <input type="hidden" name="_method" value="PATCH" />
+                <input type="hidden" name="active" value={b.active} />
+                <div class="grid grid-cols-3 gap-2">
+                  <div class="col-span-2">
+                    <label class="mb-1 block text-xs text-text-muted">
+                      {t("admin.banners.alt_text")}
+                    </label>
+                    <input
+                      name="alt_text"
+                      type="text"
+                      value={b.alt_text ?? ""}
+                      class={inputClass}
+                    />
+                  </div>
+                  <div>
+                    <label class="mb-1 block text-xs text-text-muted">
+                      {t("admin.banners.sort_order")}
+                    </label>
+                    <input
+                      name="sort_order"
+                      type="number"
+                      value={b.sort_order}
+                      class={inputClass}
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label class="mb-1 block text-xs text-text-muted">
+                    {b.mobile_image_url
+                      ? t("admin.banners.replace_mobile")
+                      : "+ Mobile"}
+                  </label>
+                  <input
+                    name="mobile_image"
+                    type="file"
+                    accept={accept}
+                    class="w-full text-xs"
+                  />
+                </div>
+                {b.mobile_image_url && (
+                  <label class="inline-flex items-center gap-1.5 text-xs">
+                    <input type="checkbox" name="clear_mobile" value="1" />
+                    <span>{t("admin.banners.clear_mobile")}</span>
+                  </label>
+                )}
+                <button
+                  type="submit"
+                  class="block rounded-md bg-forest-700 px-3 py-1.5 text-xs text-bg-base hover:bg-forest-900"
+                >
+                  {t("admin.common.save")}
+                </button>
+              </form>
+            </details>
+          </article>
+        ))}
+      </div>
+    )
+  }
+
+  <script is:inline>
+    (function () {
+      var confirmText = "确定删除该横幅？图片会从 R2 一并移除";
+      document.querySelectorAll("[data-banner-id]").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          var id = btn.getAttribute("data-banner-id");
+          if (!id) return;
+          if (!window.confirm(confirmText)) return;
+          var f = document.createElement("form");
+          f.method = "POST";
+          f.action = "/api/admin/banners/" + id;
+          var m = document.createElement("input");
+          m.name = "_method";
+          m.value = "DELETE";
+          f.appendChild(m);
+          document.body.appendChild(f);
+          f.submit();
+        });
+      });
+    })();
+  </script>
+</AdminLayout>

@@ -1,0 +1,9 @@
+UPDATE product_variants SET image_urls = '["https://picsum.photos/seed/cnamber-baltic-pendant/800/800"]' WHERE sku = 'BAL-PEN-S';
+UPDATE product_variants SET image_urls = '["https://picsum.photos/seed/cnamber-baltic-pendant/800/800"]' WHERE sku = 'BAL-PEN-M';
+UPDATE product_variants SET image_urls = '["https://picsum.photos/seed/cnamber-blue-bracelet/800/800"]' WHERE sku = 'DOM-BRA-STD';
+UPDATE product_variants SET image_urls = '["https://picsum.photos/seed/cnamber-burmese-earrings/800/800"]' WHERE sku = 'BUR-EAR-STD';
+UPDATE product_variants SET image_urls = '["https://picsum.photos/seed/cnamber-fushun-ring/800/800"]' WHERE sku = 'FUS-RIN-55';
+UPDATE product_variants SET image_urls = '["https://picsum.photos/seed/cnamber-fushun-ring/800/800"]' WHERE sku = 'FUS-RIN-60';
+UPDATE product_variants SET image_urls = '["https://picsum.photos/seed/cnamber-yunnan-incense/800/800"]' WHERE sku = 'YUN-INC-BOX';
+UPDATE product_variants SET image_urls = '["https://picsum.photos/seed/cnamber-sandalwood-balm/800/800"]' WHERE sku = 'SAN-BAL-5g';
+UPDATE product_variants SET image_urls = '["https://picsum.photos/seed/cnamber-hinoki-oil/800/800"]' WHERE sku = 'HIN-OIL-10ML';
