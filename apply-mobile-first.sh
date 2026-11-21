@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Mobile-First RWD installer for cnamber-store (Astro + Tailwind)
+# Mobile-First RWD installer for mycafe (Astro + Tailwind)
 # 用法: 放到專案根目錄後執行  bash apply-mobile-first.sh
 set -euo pipefail
 

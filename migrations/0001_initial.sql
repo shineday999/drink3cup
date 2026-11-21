@@ -1,4 +1,4 @@
--- cnamber-store D1 schema — initial migration
+-- mycafe D1 schema — initial migration
 -- 計劃書 §5 D1 資料模型(13 表)
 
 CREATE TABLE IF NOT EXISTS products (

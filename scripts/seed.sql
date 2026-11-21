@@ -1,4 +1,4 @@
--- cnamber-store seed data — Phase 5 demo products
+-- mycafe seed data — Phase 5 demo products
 -- 用法:wrangler d1 execute DB --local --file=./scripts/seed.sql
 --       wrangler d1 execute DB --remote --file=./scripts/seed.sql(上線後)
 

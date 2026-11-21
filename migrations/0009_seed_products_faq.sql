@@ -1,4 +1,4 @@
--- cnamber-store products.faq default seed
+-- mycafe products.faq default seed
 -- 2026-10-04 Wave 36 Phase 2.4.c: 4 Q&A × 4 locale JSON template for all active products
 UPDATE products SET faq = '{
   "zh-Hant": [

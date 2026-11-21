@@ -1,4 +1,4 @@
--- cnamber-store: hero_banners table for admin-managed home page banner slideshow
+-- mycafe: hero_banners table for admin-managed home page banner slideshow
 -- 2026-10-02 Wave 26: front-end admin banner editor + 15s fade in/out slideshow
 
 CREATE TABLE IF NOT EXISTS hero_banners (

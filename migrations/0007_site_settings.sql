@@ -1,4 +1,4 @@
--- cnamber-store site_settings: admin-managed key+locale text rows
+-- mycafe site_settings: admin-managed key+locale text rows
 -- 2026-10-02 Wave 28.7: site_name (4 locale) + theme + sub_theme (4 locale each)
 -- INSERT OR IGNORE 對 prod 已有 site_name rows idempotent。
 

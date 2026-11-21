@@ -1,4 +1,4 @@
--- cnamber-store blog seed — 3 篇 sample 文章,4 語翻譯
+-- mycafe blog seed — 3 篇 sample 文章,4 語翻譯
 -- 用法:wrangler d1 execute DB --local --file=./scripts/seed-blog.sql
 --       wrangler d1 execute DB --remote --file=./scripts/seed-blog.sql(上線)
 

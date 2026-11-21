@@ -5,7 +5,7 @@
 // 寄成功就 UPDATE welcome_sent_at = now(),dedupe 防重寄。
 //
 // Usage:  node scripts/send-newsletter-welcome.mjs
-//         (需在 cnamber-store 專案根目錄跑,NODE_PATH 指到 nodemailer 模組)
+//         (需在 mycafe 專案根目錄跑,NODE_PATH 指到 nodemailer 模組)
 //
 // Why batch (非 realtime):
 //   - CF Pages Workers 不能跑 raw SMTP(免費方案無 TCP socket)
@@ -82,7 +82,7 @@ function siteNameFor(locale) {
     siteNameMap[locale] ??
     siteNameMap["zh-Hant"] ??
     siteNameMap["en"] ??
-    "cnamber-store"
+    "mycafe"
   );
 }
 
@@ -100,34 +100,34 @@ const bodies = {
 感謝訂閱 ${n}。我們每季會寄一封慢信,分享新作、調香實驗,以及森林系手作工作室的日常。
 
 若您願意,也可以從我們的風格測驗開始,讓我們更了解您喜歡的氣味:
-https://cnamber.ccwu.cc/quiz
+https://mycafe.de5.net/quiz
 
 —— ${n} · 森林系手作
-https://cnamber.ccwu.cc/`,
+https://mycafe.de5.net/`,
   en: (e, n) =>
     `Hello ${e},
 
 Thanks for subscribing to ${n}. We send one slow letter each season — new work, scent experiments, and quiet notes from the studio.
 
 If you'd like, you can also start with our style quiz so we can learn the scents you love:
-https://cnamber.ccwu.cc/quiz
+https://mycafe.de5.net/quiz
 
 — ${n} · forest handcraft
-https://cnamber.ccwu.cc/`,
+https://mycafe.de5.net/`,
   "ms-MY": (e, n) =>
     `Helo ${e},
 
 Terima kasih kerana melanggan ${n}. Kami akan mengirim satu surat perlahan setiap musim — karya baru, eksperimen wangian, dan catatan tenang dari studio.
 
 — ${n} · kraf hutan
-https://cnamber.ccwu.cc/`,
+https://mycafe.de5.net/`,
   "id-ID": (e, n) =>
     `Halo ${e},
 
 Terima kasih telah berlangganan ${n}. Kami mengirim satu surat perlahan setiap musim — karya baru, eksperimen wewangian, dan catatan tenang dari studio.
 
 — ${n} · kerajinan hutan
-https://cnamber.ccwu.cc/`,
+https://mycafe.de5.net/`,
 };
 
 const subs = d1(
