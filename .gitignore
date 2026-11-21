@@ -48,3 +48,7 @@ coverage/
 # Local screenshots (Claude generated, not in repo)
 screenshots/
 tmp/
+.env.*
+*.pem
+*.key
+__pycache__/
