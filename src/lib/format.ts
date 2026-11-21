@@ -15,11 +15,11 @@ export type RateTable = Record<string, number>;
 
 export const DEFAULT_RATES_PER_CNY: RateTable = {
   TWD: 1,
-  USD: 0.138889,
-  MYR: 0.638889,
-  IDR: 2180.56,
-  AED: 0.509722,
-  SAR: 0.520833,
+  USD: 0.03125,
+  MYR: 0.14375,
+  IDR: 490.626,
+  AED: 0.114687,
+  SAR: 0.117187,
 };
 
 let ratesPerCny: RateTable = { ...DEFAULT_RATES_PER_CNY };
