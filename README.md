@@ -33,3 +33,5 @@ pnpm build    # 建置
 ## 授權
 
 Copyright (c) 2026 喝三杯咖啡. All Rights Reserved.
+
+接手與協作請先讀 [docs/HANDOVER.md](docs/HANDOVER.md)。
