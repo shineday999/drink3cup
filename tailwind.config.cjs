@@ -10,11 +10,11 @@ module.exports = {
           200: "#BFB89E",
           300: "#9A9175",
           400: "#73704D",
-          500: "#4F5C36",
-          600: "#3D4828",
-          700: "#2D3520",
-          800: "#1F2615",
-          900: "#161A0F",
+          500: "#64452e",
+          600: "#4e3422",
+          700: "#39281c",
+          800: "#291c12",
+          900: "#1c130d",
         },
         cream: {
           50: "#FAF7EE",
@@ -33,8 +33,8 @@ module.exports = {
           700: "var(--color-accent-700)",
         },
         bamboo: {
-          400: "#6F9353",
-          500: "#4F7A38",
+          400: "#a06c46",
+          500: "#815231",
         },
         stone: {
           400: "#8B8275",
@@ -78,8 +78,8 @@ module.exports = {
         card: "4px",
       },
       boxShadow: {
-        soft: "0 2px 24px rgba(31, 38, 21, 0.06)",
-        "soft-lg": "0 8px 48px rgba(31, 38, 21, 0.1)",
+        soft: "0 2px 24px rgba(41, 28, 18, 0.06)",
+        "soft-lg": "0 8px 48px rgba(41, 28, 18, 0.1)",
       },
       borderColor: {
         DEFAULT: "var(--color-text-primary)",

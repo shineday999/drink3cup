@@ -63,7 +63,7 @@ html {
   border: 1px solid rgba(115, 112, 77, 0.12);
 }
 .glass-dark {
-  background: rgba(31, 38, 21, 0.45);
+  background: rgba(41, 28, 18, 0.45);
   backdrop-filter: blur(20px) saturate(110%);
   -webkit-backdrop-filter: blur(20px) saturate(110%);
   border: 1px solid rgba(255, 255, 255, 0.08);
@@ -72,9 +72,9 @@ html {
 /* === Light theme CSS vars (取代舊 primary) === */
 :root {
   /* Forest 主色 */
-  --color-primary-900: #161a0f;
-  --color-primary-700: #2d3520;
-  --color-primary-500: #4f5c36;
+  --color-primary-900: #1c130d;
+  --color-primary-700: #39281c;
+  --color-primary-500: #64452e;
   --color-primary-300: #9a9175;
 
   /* Cream 背景(取代舊 bg-base) */
@@ -83,7 +83,7 @@ html {
   --color-bg-elevated: #ffffff;
 
   /* 文字 */
-  --color-text-primary: #1f2615;
+  --color-text-primary: #291c12;
   --color-text-secondary: #4a4538;
   --color-text-muted: #5a5246;
 
@@ -93,7 +93,7 @@ html {
   --color-accent-300: #d29e7b;
 
   /* 狀態 */
-  --color-success: #4f7a38;
+  --color-success: #815231;
   --color-warning: #a45e3d;
   --color-error: #834630;
 }
@@ -141,7 +141,7 @@ h6 {
   width: 100%;
   padding: 1.3rem 0.875rem 0.5rem;
   background: var(--color-bg-base);
-  border: 1px solid rgba(31, 38, 21, 0.18);
+  border: 1px solid rgba(41, 28, 18, 0.18);
   border-radius: 4px;
   font-size: 1rem;
   color: var(--color-text-primary);
@@ -211,7 +211,7 @@ h6 {
 }
 .hover-lift:hover {
   transform: translateY(-4px);
-  box-shadow: 0 14px 44px rgba(31, 38, 21, 0.12);
+  box-shadow: 0 14px 44px rgba(41, 28, 18, 0.12);
 }
 
 /* Magnetic — gentle scale on hover */
@@ -350,7 +350,7 @@ h6 {
    subtle dark glow separates cream text from busy backgrounds. */
 .hero-text h1,
 .hero-text p {
-  text-shadow: 0 2px 24px rgba(22, 26, 15, 0.45);
+  text-shadow: 0 2px 24px rgba(28, 19, 13, 0.45);
 }
 
 /* Focus-visible global: WCAG 2.4.7 baseline for ALL interactive
@@ -362,7 +362,7 @@ h6 {
   input:focus-visible,
   select:focus-visible,
   textarea:focus-visible {
-    outline: 2px solid rgba(34, 60, 35, 0.55);
+    outline: 2px solid rgba(65, 44, 29, 0.55);
     outline-offset: 2px;
     border-radius: 2px;
   }
@@ -446,8 +446,8 @@ body {
 }
 header[data-scrolled="true"].glass {
   background: rgba(255, 255, 255, 0.96);
-  border-bottom-color: rgba(34, 60, 35, 0.08);
-  box-shadow: 0 2px 16px rgba(22, 26, 15, 0.06);
+  border-bottom-color: rgba(65, 44, 29, 0.08);
+  box-shadow: 0 2px 16px rgba(28, 19, 13, 0.06);
 }
 
 /* fix-mobile-bottom-overlap */

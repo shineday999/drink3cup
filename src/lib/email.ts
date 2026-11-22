@@ -85,12 +85,12 @@ export function orderConfirmationEmail(
   const subject = `預訂單確認 #${safe(orderId)}`;
   const html = `
     <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-      <h2 style="color: #1A2E1A; font-family: Georgia, serif;">感謝您的預訂</h2>
+      <h2 style="color: #322216; font-family: Georgia, serif;">感謝您的預訂</h2>
       <p>${safe(customerName)} 您好,</p>
       <p>我們已收到您的預訂單 <strong>${safe(orderId)}</strong>。</p>
       <p>${safe(itemsSummary)}</p>
       <p>客服將在 1-2 個工作天內與您聯絡,確認運費與付款方式。</p>
-      <hr style="border: none; border-top: 1px solid #DCE5DC; margin: 24px 0;" />
+      <hr style="border: none; border-top: 1px solid #e7dfda; margin: 24px 0;" />
       <p style="color: #8A938A; font-size: 12px;">
         喝三杯咖啡 · 精品咖啡 · weider@0061qwen.cc.cd
       </p>
@@ -110,9 +110,9 @@ export function contactNotificationEmail(
   const safeMessage = safe(message).replace(/\n/g, "<br>");
   const html = `
     <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-      <h2 style="color: #1A2E1A;">新訊息</h2>
+      <h2 style="color: #322216;">新訊息</h2>
       <p><strong>${safe(name)}</strong> (${safe(email)}) 留言:</p>
-      <blockquote style="border-left: 3px solid #C9925B; padding-left: 12px; color: #4A5748;">
+      <blockquote style="border-left: 3px solid #C9925B; padding-left: 12px; color: #5b4e44;">
         ${safeMessage}
       </blockquote>
       <p style="color: #8A938A; font-size: 12px;">Reply directly to this email to respond.</p>
@@ -146,9 +146,9 @@ export function welcomeNewsletterEmail(
   const body = bodies[locale] ?? bodies["zh-Hant"] ?? { html: "", text: "" };
   const html = `
     <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-      <h2 style="color: #1A2E1A; font-family: Georgia, serif;">${safeName}</h2>
+      <h2 style="color: #322216; font-family: Georgia, serif;">${safeName}</h2>
       ${body.html}
-      <hr style="border: none; border-top: 1px solid #DCE5DC; margin: 24px 0;" />
+      <hr style="border: none; border-top: 1px solid #e7dfda; margin: 24px 0;" />
       <p style="color: #8A938A; font-size: 12px;">
         ${safeName} · 精品咖啡知識與產品 · weider@0061qwen.cc.cd
       </p>
