@@ -1,0 +1,103 @@
+---
+import Layout from "@layouts/Layout.astro";
+import RevealOnScroll from "@components/RevealOnScroll.astro";
+import AccordionInit from "@components/AccordionInit.astro";
+import ContinueReading from "@components/ContinueReading.astro";
+import BreadcrumbSchema from "@components/BreadcrumbSchema.astro";
+import { createT } from "../i18n/t";
+import { localizedPath, defaultLocale, type Locale } from "../i18n/config";
+
+const locale = (Astro.locals.locale ?? defaultLocale) as Locale;
+const messages = (Astro.locals.messages ?? {}) as Record<string, unknown>;
+const t = createT(messages);
+
+const items = [
+  ["materials.amber_baltic_title", "materials.amber_baltic_desc"],
+  ["materials.amber_burma_title", "materials.amber_burma_desc"],
+  ["materials.amber_dominican_title", "materials.amber_dominican_desc"],
+  ["materials.amber_fushun_title", "materials.amber_fushun_desc"],
+  ["materials.amber_sicily_title", "materials.amber_sicily_desc"],
+  ["materials.agarwood_title", "materials.agarwood_desc"],
+] as const;
+
+const breadcrumbItems = [
+  { name: t("nav.home"), url: "/" },
+  { name: t("nav.story"), url: "/story" },
+  { name: t("nav.materials"), url: "/origins" },
+];
+---
+
+<Layout
+  title={`${t("materials.title")} — ${t("common.site_name")}`}
+  description={t("materials.intro")}
+>
+  <Fragment slot="head">
+    <BreadcrumbSchema items={breadcrumbItems} />
+  </Fragment>
+  <article class="max-w-5xl mx-auto px-6 py-section">
+    <RevealOnScroll>
+      <header class="mb-16 text-center">
+        <p
+          class="text-[10px] uppercase tracking-[0.4em] text-forest-600 font-sans mb-4"
+        >
+          {t("materials.kicker")}
+        </p>
+        <h1
+          class="text-display-sm md:text-display-md font-serif text-text-primary mb-4 leading-[1.08]"
+        >
+          {t("materials.title")}
+        </h1>
+        <p class="text-text-secondary italic max-w-xl mx-auto">
+          {t("materials.intro")}
+        </p>
+      </header>
+    </RevealOnScroll>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+      {
+        items.map(([titleKey, descKey], i) => (
+          <RevealOnScroll delay={i * 60} class="h-full">
+            <article
+              data-mat-card
+              class="h-full p-6 md:p-7 bg-bg-card border border-forest-100 hover:border-forest-300 rounded-card transition-all duration-500 hover:shadow-soft"
+            >
+              <details data-acc open>
+                <summary>
+                  <h3 class="font-serif text-xl md:text-2xl font-light text-forest-800 mb-3 leading-tight">
+                    {t(titleKey)}
+                  </h3>
+                </summary>
+                <p class="text-sm text-text-secondary leading-relaxed font-sans">
+                  {t(descKey)}
+                </p>
+              </details>
+            </article>
+          </RevealOnScroll>
+        ))
+      }
+    </div>
+  </article>
+  <div class="max-w-5xl mx-auto px-6 pb-section">
+    <ContinueReading
+      heading={t("continue.heading")}
+      links={[
+        {
+          href: localizedPath(locale, "/beans"),
+          label: t("continue.materials_next_1_label"),
+          desc: t("continue.materials_next_1_desc"),
+        },
+        {
+          href: localizedPath(locale, "/brewing"),
+          label: t("continue.materials_next_2_label"),
+          desc: t("continue.materials_next_2_desc"),
+        },
+        {
+          href: localizedPath(locale, "/story"),
+          label: t("continue.materials_next_3_label"),
+          desc: t("continue.materials_next_3_desc"),
+        },
+      ]}
+    />
+  </div>
+  <AccordionInit />
+</Layout>

@@ -14,10 +14,10 @@ const STATIC_PATHS = [
   "/products",
   "/story",
   "/vision",
-  "/craft",
-  "/materials",
-  "/amber",
-  "/incense",
+  "/roasting",
+  "/origins",
+  "/beans",
+  "/brewing",
   "/blog",
   "/quiz",
   "/contact",
@@ -48,7 +48,7 @@ export const GET: APIRoute = async (ctx) => {
       const isBlog = path === "/blog";
       const isAbout = path === "/about";
       // Wave 38: amber/incense 是主要 category landing,跟 /products 同 priority
-      const isAmberOrIncense = path === "/amber" || path === "/incense";
+      const isAmberOrIncense = path === "/beans" || path === "/brewing";
       urls.push({
         loc: `${SITE_URL}${localized}`,
         lastmod: today,

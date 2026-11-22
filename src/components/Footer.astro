@@ -14,10 +14,10 @@ const sections = [
     title: t("footer.section_shop"),
     links: [
       { label: t("footer.link_all"), href: localizedPath(locale, "/products") },
-      { label: t("footer.link_amber"), href: localizedPath(locale, "/amber") },
+      { label: t("footer.link_amber"), href: localizedPath(locale, "/beans") },
       {
         label: t("footer.link_incense"),
-        href: localizedPath(locale, "/incense"),
+        href: localizedPath(locale, "/brewing"),
       },
       { label: t("footer.link_quiz"), href: localizedPath(locale, "/quiz") },
     ],
@@ -30,10 +30,13 @@ const sections = [
         label: t("footer.link_vision"),
         href: localizedPath(locale, "/vision"),
       },
-      { label: t("footer.link_craft"), href: localizedPath(locale, "/craft") },
+      {
+        label: t("footer.link_craft"),
+        href: localizedPath(locale, "/roasting"),
+      },
       {
         label: t("footer.link_materials"),
-        href: localizedPath(locale, "/materials"),
+        href: localizedPath(locale, "/origins"),
       },
       { label: t("footer.link_blog"), href: localizedPath(locale, "/blog") },
     ],
