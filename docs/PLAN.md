@@ -59,14 +59,14 @@
 | S05b | 🤖    | 語系改為只有繁體中文:`zh-Hans`→`zh-Hant`;移除 en/ms-MY/id-ID 語系檔與程式分支;刪除語言切換器與未使用的翻譯元件/API;`/zh-Hant/*` 301 轉到無前綴網址;後台新增商品不再要求英文說明(英文名稱保留,僅用於產生網址)                                                      | ✅   | Claude |
 | S05c | 🤖/👤 | **幣別改為新台幣 TWD**(需先確認 D6)。目前價格以人民幣 CNY 為基準(`lib/format.ts`、`lib/rates.ts`、`exchange_rates.per_cny`、`product_prices` 的 CNY 列、後台「售價(人民幣)」字樣、`schemas/product.ts`)。評估是否直接把基準幣別換成 TWD、移除匯率換算與匯率後台頁 | ✅   |        |
 | S05d | 🤖    | 後台介面文字簡體→繁體(後台頁面與 API 錯誤訊息寫死為簡體,非語系檔;可用 OpenCC 轉換後人工校對)。含 `admin/**`、`lib/admin-products.ts`、`lib/auth.ts` 等                                                                                                            | ✅   |        |
-| S06  | 🤖    | 路由與分類改名:amber→`beans`、incense→`brewing`、materials→`origins`、craft→`roasting`;問答改為 `quiz/brew-method`、`quiz/taste`;更新 `categories.ts`、`category-kind.ts`、`quiz.ts`、`MobileNav` 等                                                              | ⬜   |        |
+| S06  | 🤖    | 路由與分類改名:amber→`beans`、incense→`brewing`、materials→`origins`、craft→`roasting`;問答改為 `quiz/brew-method`、`quiz/taste`;更新 `categories.ts`、`category-kind.ts`、`quiz.ts`、`MobileNav` 等                                                              | ✅   | Claude |
 
 ### C 階段 — 內容(一步一種語言)
 
 | ID   | 標籤 | 步驟                                                                                                                                   | 狀態 | 負責人 |
 | ---- | ---- | -------------------------------------------------------------------------------------------------------------------------------------- | ---- | ------ |
 | S07  | 🤖   | 重寫 `zh-Hant.json`(咖啡內容;需先完成 S05b,並處理 `site_name`、`hero_title`、`faq_a2_a`、後台 `brand` 等舊品牌鍵)                      | ⬜   |        |
-| S10  | 🤖   | 品牌頁:story、beans、brewing、origins、roasting、vision、more、about                                                                   | ⬜   |        |
+| S10  | 🤖   | 品牌頁:story、beans、brewing、origins、roasting、vision、more、about                                                                   | ✅   | Claude |
 | S11  | 🤖   | 知識文章種子(產地、水洗 vs 日曬、研磨度、V60、義式、保存)                                                                              | ⬜   |        |
 | S12  | 🤖   | 資料庫種子:新 `scripts/seed*.sql`、商品 FAQ、migrations 0007/0009/0011/0014 的站名與分類                                               | ✅   |        |
 | S13  | 🤖   | 更換 `public/images/**`(舊圖屬舊品牌),僅用自有或有授權的照片                                                                           | ⬜   |        |
@@ -95,6 +95,8 @@
 | S24 | 🤖/👤 | 手機/桌面最終 QA:表單、後台登入、Email                                                                                                                                                                                                                       | ⬜   |        |
 
 ## 紀錄
+
+- 2026-11-22 Claude:完成 S06(測驗改咖啡口味題,網址為 `/quiz/beans`、`/quiz/brewing`,舊網址 301;資料庫分類代碼改為 `beans`/`brewing`,migration 0020)與 S10(品牌頁文案重寫)。
 
 - 2026-11-21 Claude:嘗試建立 repo,沙盒沒有 GitHub 憑證,無法代建/推送。已改寫 S17/S18 交接說明與鐵則 4(Private 首次推送可例外)。
 
