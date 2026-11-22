@@ -3,7 +3,7 @@
 //   - Phase 1: static pages × 4 locales (48 URLs)
 //   - Wave 37: append D1 products (active) × 4 locales + blog posts (published) × 4 locales
 import type { APIRoute } from "astro";
-import { locales, localizedPath } from "../i18n/config";
+import { defaultLocale, locales, localizedPath } from "../i18n/config";
 import { getDB } from "../lib/db";
 
 const SITE_URL = "https://mycafe.de5.net";
@@ -108,12 +108,36 @@ export const GET: APIRoute = async (ctx) => {
     console.error("sitemap: D1 query failed, falling back to static-only", err);
   }
 
+  // 每個網址附上各語言版本(hreflang alternate)
+  const altLinks = (loc: string): string => {
+    let path = loc.slice(SITE_URL.length) || "/";
+    for (const l of locales) {
+      if (l === defaultLocale) continue;
+      if (path === `/${l}`) {
+        path = "/";
+        break;
+      }
+      if (path.startsWith(`/${l}/`)) {
+        path = path.slice(l.length + 1);
+        break;
+      }
+    }
+    const alts = locales.map(
+      (l) =>
+        `\n    <xhtml:link rel="alternate" hreflang="${l}" href="${SITE_URL}${localizedPath(l, path)}"/>`,
+    );
+    alts.push(
+      `\n    <xhtml:link rel="alternate" hreflang="x-default" href="${SITE_URL}${localizedPath(defaultLocale, path)}"/>`,
+    );
+    return alts.join("");
+  };
+
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
 ${urls
   .map(
     (u) =>
-      `  <url>\n    <loc>${u.loc}</loc>\n    <lastmod>${u.lastmod}</lastmod>\n    <changefreq>${u.changefreq}</changefreq>\n    <priority>${u.priority}</priority>\n  </url>`,
+      `  <url>\n    <loc>${u.loc}</loc>\n    <lastmod>${u.lastmod}</lastmod>\n    <changefreq>${u.changefreq}</changefreq>\n    <priority>${u.priority}</priority>${altLinks(u.loc)}\n  </url>`,
   )
   .join("\n")}
 </urlset>

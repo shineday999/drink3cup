@@ -36,6 +36,8 @@ const cleanPath =
 
 // Wave 28.7: site_name + theme + sub_theme from D1 site_settings via middleware.
 
+const canonicalUrl = `${siteUrl}${localizedPath(currentLocale, cleanPath)}`;
+
 const hreflangUrls = locales.map((l) => ({
   lang: localeHreflang[l],
   href: `${siteUrl}${localizedPath(l, cleanPath)}`,
@@ -89,7 +91,7 @@ const nav = [
     />
 
     <!-- Wave 32 SEO: self-referential canonical (x-default hreflang points to default-locale version) -->
-    <link rel="canonical" href={`${siteUrl}${Astro.url.pathname}`} />
+    <link rel="canonical" href={canonicalUrl} />
 
     <!-- Wave 32.2 Phase 2.1: JSON-LD structured data (Organization + WebSite) for AI / SEO / rich results -->
     <script
@@ -121,7 +123,7 @@ const nav = [
       property="og:image"
       content={ogImage.startsWith("http") ? ogImage : `${siteUrl}${ogImage}`}
     />
-    <meta property="og:url" content={`${siteUrl}${Astro.url.pathname}`} />
+    <meta property="og:url" content={canonicalUrl} />
     <meta
       property="og:locale"
       content={{

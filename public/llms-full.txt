@@ -1,85 +1,54 @@
-# 喝三杯咖啡 / 喝三杯咖啡 (完整版)
+# 喝三杯咖啡 (Three Cups Coffee)(完整版)
 
-> 森林系琥珀飾品與東方香品電商,把森林穿戴在身上。預訂制手動接單,4 語國際化(zh-Hant / en / ms-MY / id-ID)。
+> 精品咖啡知識,以及咖啡豆與沖煮器具的預訂。預訂制:填表後一到兩個工作天內回覆。支援 zh-Hant(預設)、en、ms-MY、id-ID。
 
 ## 品牌摘要
 
-mycafe 是一間位於 APAC 的小型琥珀飾品與東方香品工作室。所有商品為手工製作或選品,預訂制下單,1-2 個工作天內 email 聯絡確認運送與付款選項。沒有自動即時付款流程,沒有人為的催促,沒有人造的折扣活動。
+喝三杯咖啡以「一杯醒腦、一杯陪伴、一杯放鬆」為名,從產地挑選豆子,以適合的烘焙與沖煮,把一杯好咖啡慢慢送到你手上。網站同時提供咖啡知識文章,以及咖啡豆與沖煮器具的預訂。
 
-森林以南的手寫敘事,風格為文青 + 禪意,慢、靜、留白。所有文案都經過 4 語言的人工翻譯;作品自己說話。
+## 商品線
 
-## 完整產品線
+### 咖啡豆
+- 單品:衣索比亞 耶加雪菲(水洗)、哥倫比亞 薇拉(水洗)、台灣 阿里山(淺焙)
+- 配方:喝三杯 招牌配方豆
+- 詳見: /beans、/products?cat=beans
 
-### 琥珀飾品
-- 5 種琥珀來源:波羅的海、緬甸、多明尼加、撫順、西西里
-- 從原石到圓潤,手作打磨,每件商品附材料與工時說明
-- 詳見: /amber
+### 沖煮器具
+- 濾杯、手沖壺、磨豆機、電子秤
+- 詳見: /brewing、/products?cat=brewing
 
-### 東方香品
-- 沉香、檀香、楠木,以及混合配方
-- 從木屑到一縷煙,講究呼吸的節奏
-- 詳見: /incense
+## 頁面與閱讀順序
 
-### 關於這裡
-- /about — 這個角落留下的是作品，不是人;森林、琥珀、香、慢
-
-### 完整目錄
-- /products — 含 2 條產品線所有商品
-- /products?cat=jewelry — 琥珀飾品分類
-- /products?cat=incense — 東方香品分類
-
-## 故事線(閱讀順序建議)
-
-1. /story — 森林,在手中(起源)
-2. /vision — 森林以南的哲學(慢、靜、留白)
-3. /craft — 手作的過程(刀磨、火候、等待)
-4. /materials — 材料的來歷(琥珀、沉香、檀香)
-5. /amber — 戴在身上的琥珀(產品線敘述)
-6. /incense — 讓空氣記住的香(產品線敘述)
+1. /story — 品牌故事
+2. /vision — 品牌願景
+3. /roasting — 烘焙
+4. /origins — 產地與材料
+5. /beans — 咖啡豆
+6. /brewing — 沖煮器具
+7. /blog — 日誌(咖啡知識)
+8. /about — 關於
+9. /contact — 聯絡
 
 ## 互動工具
 
-- /quiz — 5 題互動測驗,根據答案推薦 1 件商品
-- /contact — 聯絡表單
+- /quiz — 依口味與沖煮習慣推薦咖啡豆(/quiz/beans)或沖煮器具(/quiz/brewing)
 
-## 國際化(4 個 locale)
+## 預訂方式
 
-每個 URL 都可加 locale prefix,預設 zh-Hant:
-- zh-Hant (預設): https://mycafe.de5.net/
-- en: https://mycafe.de5.net/en/
-- ms-MY: https://mycafe.de5.net/ms-MY/
-- id-ID: https://mycafe.de5.net/id-ID/
+商品頁加入購物車並提交預訂單後,我們會在一到兩個工作天內回信,提供付款方式與運送資訊。價格以新台幣(NT$)為基準,其他語言頁面會顯示換算後的參考價格。
 
-`hreflang` 標籤在每個頁面都有正確標注,`x-default` 指向預設 locale。
+## 國際化(4 個語言)
 
-## 常見問題
+- zh-Hant(預設): https://mycafe.de5.net/
+- en: https://mycafe.de5.net/en
+- ms-MY: https://mycafe.de5.net/ms-MY
+- id-ID: https://mycafe.de5.net/id-ID
 
-### 預訂制是什麼?
-商品頁有「預訂」按鈕,下單後 1-2 個工作天內我們會 email 聯絡確認運送與付款選項。沒有自動即時付款,沒有人為的催促。
-
-### 為什麼不標價?
-每件商品都附材料與工時說明,標價以最終報價為準。預訂制下單後報價。
-
-### 國際運送?
-預訂確認後報價。APAC 主要市場(台灣、香港、新加坡、馬來西亞、印尼)為主,其他地區另議。
-
-### 退換貨?
-預訂制商品出貨前可取消,出貨後 7 天內如有瑕疵可換貨,詳情見 /contact。
-
-### 為什麼這麼安靜?
-文風刻意留白——慢的字,慢的句,慢的段落。閱讀也慢慢來,不催,不堆砌。
+每個頁面都有 hreflang 標註,x-default 指向預設語言;sitemap.xml 也列出各語言版本。其中 en、ms-MY、id-ID 的介面文字由模型翻譯,尚待母語者校對。
 
 ## 技術
 
-- 框架: Astro 4 + Cloudflare Pages SSR
-- 資料庫: Cloudflare D1 (SQLite)
-- 圖片: Cloudflare R2
-- AI 友好: 14 個 AI crawler 全部 allow,JSON-LD 結構化資料,llms.txt 索引
-- 預訂制 API: /api/orders
-- sitemap: /sitemap.xml (44 URL)
-- robots: /robots.txt (14 AI bots allowed)
-
-## 聯絡
-
-- /contact — 站內聯絡表單
-- 預訂制下單: 任何 /products 頁面的「預訂」按鈕
+- Astro SSR + Cloudflare Pages / D1 / R2
+- JSON-LD 結構化資料(Organization、WebSite、Product、BreadcrumbList、FAQPage)
+- sitemap: /sitemap.xml
+- robots: /robots.txt
