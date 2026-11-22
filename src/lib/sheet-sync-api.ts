@@ -28,7 +28,7 @@ export interface ImportResult {
   slug: string;
   ok: boolean;
   action?: "created" | "updated" | "unchanged";
-  warning?: string;
+  warning?: string | undefined;
   error?: string;
 }
 
@@ -88,7 +88,9 @@ export async function exportRows(slugs?: string[]): Promise<SyncRow[]> {
           description: string | null;
         }>()
     ).results ?? [];
-  const trMap = new Map(trans.map((t) => [`${t.product_id}|${t.locale}`, t]));
+  const trMap = new Map(
+    trans.map((t) => [`${t.product_id}|${t.locale}`, t] as const),
+  );
 
   const prices =
     (
