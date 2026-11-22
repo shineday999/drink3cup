@@ -4,7 +4,9 @@
 import {
   defaultLocale,
   localeFromPath,
+  localeNames,
   localizedPath,
+  locales,
   type Locale,
 } from "../i18n/config";
 import { createT } from "../i18n/t";
@@ -158,6 +160,39 @@ const icons: Record<string, string> = {
     <span class="m-brand-text">{siteName}</span>
   </a>
   <p class="m-title" aria-live="polite">{serverTitle}</p>
+  <details class="m-lang">
+    <summary aria-label={t("common.language")}>
+      <svg
+        viewBox="0 0 24 24"
+        width="22"
+        height="22"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.8"
+        stroke-linecap="round"
+        aria-hidden="true"
+      >
+        <circle cx="12" cy="12" r="9"></circle>
+        <path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"></path>
+      </svg>
+    </summary>
+    <ul>
+      {
+        locales.map((l) => (
+          <li>
+            <a
+              href={localizedPath(l, cleanPath)}
+              hreflang={l}
+              data-locale={l}
+              aria-current={l === locale ? "true" : undefined}
+            >
+              {localeNames[l]}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </details>
 </header>
 
 <nav class="m-tabbar" aria-label="Primary">
@@ -199,6 +234,16 @@ const icons: Record<string, string> = {
 </nav>
 
 <script>
+  // 1) 點語言連結時寫入 mycafe_locale,避免 middleware 讀到舊 cookie
+  document.addEventListener("click", (e) => {
+    const a = (e.target as HTMLElement | null)?.closest<HTMLAnchorElement>(
+      "a[data-locale]",
+    );
+    if (!a) return;
+    const secure = location.protocol === "https:" ? "; secure" : "";
+    document.cookie = `mycafe_locale=${a.dataset.locale}; path=/; max-age=2592000; samesite=lax${secure}`;
+  });
+
   // 2) 子畫面：填入標題、返回鍵優先用站內上一頁
   const header = document.querySelector<HTMLElement>(
     '.m-header[data-state="sub"]',

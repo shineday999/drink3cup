@@ -41,6 +41,11 @@ export function setRates(next: RateTable): void {
 export const LOCALE_CURRENCY: Record<string, string> = {
   "zh-Hant": "TWD",
   zh: "TWD",
+  en: "USD",
+  "ms-MY": "MYR",
+  ms: "MYR",
+  "id-ID": "IDR",
+  id: "IDR",
 };
 
 export function formatPrice(

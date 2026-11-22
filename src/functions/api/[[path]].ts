@@ -31,7 +31,7 @@ app.get("/api/health", (c) =>
 
 app.get("/api/i18n/:locale", async (c) => {
   const locale = c.req.param("locale");
-  const allowed = ["zh-Hant"];
+  const allowed = ["zh-Hant", "en", "ms-MY", "id-ID"];
   if (!allowed.includes(locale)) {
     return c.json({ error: "unsupported_locale" }, 400);
   }

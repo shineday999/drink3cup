@@ -1,18 +1,49 @@
 ---
-// 目前只有一種語言(繁體中文,預設語言不加網址字首)。
-// 為避免 /zh-Hant/... 與 /... 兩份重複內容,這裡一律 301 轉到無字首網址。
-// 日後新增語言時,再把這支改回真正的語系路由。
-import { isLocale } from "../../i18n/config";
+// 預設語言(zh-Hant)不加網址前綴:/zh-Hant/... 一律 301 到 /...。
+// 其他語言(en、ms-MY、id-ID)以 /<lang>/... 內部 rewrite 到對應頁面,語言由 middleware 依網址設定。
+import { defaultLocale, isLocale } from "../../i18n/config";
 
 const lang = Astro.params.lang ?? "";
-if (!isLocale(lang)) {
-  Astro.response.status = 404;
-  return Astro.rewrite("/404");
-}
-
 const pathParts = Astro.params.path ?? [];
 const joined = Array.isArray(pathParts) ? pathParts.join("/") : pathParts;
 // 防止開放轉址:折疊開頭多餘的 / 與 \,確保只會轉到本站路徑
 const subPath = ("/" + joined).replace(/^[/\\]+/, "/");
-return Astro.redirect(subPath + Astro.url.search, 301);
+
+if (!isLocale(lang)) {
+  Astro.response.status = 404;
+  return Astro.rewrite("/404");
+}
+if (lang === defaultLocale) {
+  return Astro.redirect(subPath + Astro.url.search, 301);
+}
+
+const KNOWN_TOP = new Set([
+  "/",
+  "/products",
+  "/story",
+  "/vision",
+  "/roasting",
+  "/origins",
+  "/beans",
+  "/brewing",
+  "/blog",
+  "/quiz",
+  "/contact",
+  "/about",
+  "/more",
+  "/cart",
+  "/checkout",
+  "/404",
+]);
+const known =
+  KNOWN_TOP.has(subPath) ||
+  subPath.startsWith("/blog/") ||
+  subPath.startsWith("/products/") ||
+  subPath.startsWith("/checkout/") ||
+  subPath.startsWith("/quiz/");
+if (!known) {
+  Astro.response.status = 404;
+  return Astro.rewrite("/404");
+}
+return Astro.rewrite(subPath);
 ---

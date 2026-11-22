@@ -72,6 +72,7 @@
 | S13  | 🤖   | 更換 `public/images/**`(舊圖屬舊品牌),僅用自有或有授權的照片                                                                           | ⬜   |        |
 | S13b | 🤖   | 配色/設計 token 由「森林綠」改為咖啡色系(`tailwind.config.cjs`、`global.css`,class 名稱 `forest-*` 可保留或改名);重新製作 favicon/圖示 | ⬜   |        |
 | S14  | 🤖   | SEO:sitemap、`llms.txt`、`llms-full.txt`、結構化資料                                                                                   | ⬜   |        |
+| S26  | 🤖   | 重新啟用 en / ms-MY / id-ID:語言檔(本機模型翻譯,**待母語者校對**)、語言切換器、`/<lang>/...` 路由、幣別對應                            | ✅   | Claude |
 
 ### D 階段 — 驗證
 
@@ -95,6 +96,8 @@
 | S24 | 🤖/👤 | 手機/桌面最終 QA:表單、後台登入、Email                                                                                                                                                                                                                       | ⬜   |        |
 
 ## 紀錄
+
+- 2026-11-22 Claude:完成 S26(推翻 S05b 的「只做繁中」):語言檔由本機模型翻譯,尚未人工校對;後台仍只有繁中。
 
 - 2026-11-22 Claude:完成 S06(測驗改咖啡口味題,網址為 `/quiz/beans`、`/quiz/brewing`,舊網址 301;資料庫分類代碼改為 `beans`/`brewing`,migration 0020)與 S10(品牌頁文案重寫)。
 

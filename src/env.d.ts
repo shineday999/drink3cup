@@ -15,7 +15,7 @@ declare namespace App {
       subTheme: Partial<Record<string, string>>;
       heroSubtitle: Partial<Record<string, string>>;
     };
-    locale: "zh-Hant";
+    locale: import("./i18n/config").Locale;
     messages: Record<string, unknown>;
     admin?: {
       email: string;

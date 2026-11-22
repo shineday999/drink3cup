@@ -3,7 +3,7 @@ import zhHant from "../i18n/messages/zh-Hant.json";
 
 // 首頁「手作路線」分類卡片（site_categories）：標題 / 簡介 各語言一份，圖片仍放 site_images（key = cat_<code>）。
 // 表由程式自動建立，不需手動 migration。
-export const CATEGORY_LOCALES = ["zh-Hant"] as const;
+export const CATEGORY_LOCALES = ["zh-Hant", "en", "ms-MY", "id-ID"] as const;
 
 export const CODE_RE = /^[a-z0-9][a-z0-9-]{0,29}$/;
 

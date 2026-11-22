@@ -3,6 +3,7 @@ import MobileNav from "../components/MobileNav.astro";
 import "../styles/mobile.css";
 // Layout — 全站共用 layout (2026-10-01: Awwwards-tier header with main nav)
 import "../styles/global.css";
+import LocaleSwitcher from "@components/LocaleSwitcher.astro";
 import Footer from "@components/Footer.astro";
 import { createT } from "../i18n/t";
 import {
@@ -109,7 +110,7 @@ const nav = [
         "@type": "WebSite",
         name: siteName,
         url: siteUrl,
-        inLanguage: ["zh-Hant"],
+        inLanguage: [...locales],
       })}
     />
 
@@ -121,7 +122,15 @@ const nav = [
       content={ogImage.startsWith("http") ? ogImage : `${siteUrl}${ogImage}`}
     />
     <meta property="og:url" content={`${siteUrl}${Astro.url.pathname}`} />
-    <meta property="og:locale" content="zh_TW" />
+    <meta
+      property="og:locale"
+      content={{
+        "zh-Hant": "zh_TW",
+        en: "en_US",
+        "ms-MY": "ms_MY",
+        "id-ID": "id_ID",
+      }[currentLocale]}
+    />
 
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
@@ -406,6 +415,7 @@ const nav = [
               <line x1="4" y1="16" x2="20" y2="16"></line>
             </svg>
           </button>
+          <LocaleSwitcher />
         </div>
       </div>
     </header>
@@ -474,6 +484,10 @@ const nav = [
           })
         }
       </nav>
+
+      <div class="p-6 flex justify-center border-t border-forest-700/40">
+        <LocaleSwitcher />
+      </div>
     </div>
 
     <main id="main-content" tabindex="-1">
