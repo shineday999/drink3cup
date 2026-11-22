@@ -104,14 +104,14 @@
     "start": "開始",
     "recommend": "為你挑一件",
     "retake": "再問一次",
-    "jewelry": {
+    "beans": {
       "title": "選一包咖啡豆",
-      "desc": "口味、沖煮方式、烘焙度、預算——幫你挑出最適合的那一包咖啡豆。",
-      "face_shape": "你的臉型?",
-      "skin_tone": "你的膚色色調?",
-      "personality": "你的個性偏向?",
-      "occasion": "主要場合?",
-      "material": "材質偏好?"
+      "desc": "烘焙度、風味、沖煮方式、酸度、產地——幫你挑出最適合的那一包咖啡豆。",
+      "roast": "偏好的烘焙度?",
+      "flavor": "喜歡哪一種風味?",
+      "method": "平常怎麼沖?",
+      "acidity": "能接受的酸度?",
+      "origin": "想喝哪個產地?"
     },
     "tea": {
       "title": "選一杯茶",
@@ -122,14 +122,14 @@
       "tea_time": "通常什麼時候喝?",
       "brew": "習慣怎麼沖泡?"
     },
-    "incense": {
+    "brewing": {
       "title": "選一款器具",
-      "desc": "目前的困擾與期望——讓我們為你調出適合的香。",
-      "concerns": "目前有哪些困擾?(可複選)",
-      "goals": "想達到的目的?(可複選)",
-      "format": "香品形式?",
-      "timing": "使用時段?",
-      "scent": "香味偏好?"
+      "desc": "想添購什麼、沖煮方式、經驗與預算——幫你挑出適合的沖煮器具。",
+      "gear": "想添購哪一類?",
+      "method": "主要沖煮方式?",
+      "level": "沖煮經驗?",
+      "budget": "預算範圍?",
+      "cups": "一次沖幾人份?"
     },
     "result": {
       "title": "也許是這幾件",
@@ -174,73 +174,64 @@
         "cold": "冷泡",
         "any": "都可以"
       },
-      "face": {
-        "oval": "橢圓形",
-        "round": "圓形",
-        "square": "方形",
-        "long": "長形",
-        "heart": "心形",
-        "diamond": "鑽形"
+      "beans_roast": {
+        "light_roast": "淺焙(明亮、果酸)",
+        "medium_roast": "中焙(平衡、焦糖)",
+        "dark_roast": "深焙(厚實、苦甜)"
       },
-      "skin": {
-        "cool": "冷調(藍紫底)",
-        "warm": "暖調(黃橙底)",
-        "neutral": "中性"
+      "beans_flavor": {
+        "fruity": "莓果、柑橘的果香",
+        "floral": "茉莉般的花香",
+        "chocolate": "巧克力、可可",
+        "nutty": "堅果、穀物",
+        "caramel": "焦糖、蜂蜜的甜"
       },
-      "personality": {
-        "calm": "沉靜內斂",
-        "free": "自由奔放",
-        "mysterious": "神秘深邃",
-        "fresh": "清新自然",
-        "classic": "經典優雅"
+      "beans_method": {
+        "pour_over": "手沖濾杯",
+        "espresso": "義式濃縮",
+        "immersion": "法壓、浸泡",
+        "cold_brew": "冷萃",
+        "any": "都可以"
       },
-      "occasion": {
-        "daily": "日常通勤",
-        "formal": "正式場合",
-        "outdoor": "戶外自然",
-        "gift": "紀念贈禮"
+      "beans_acidity": {
+        "acid_low": "低酸,圓潤順口",
+        "acid_mid": "適中,微微明亮",
+        "acid_high": "高酸,喜歡跳動感"
       },
-      "material": {
-        "pure_amber": "純琥珀",
-        "amber_wood": "琥珀 + 木",
-        "amber_metal": "琥珀 + 金屬",
+      "beans_origin": {
+        "ethiopia": "衣索比亞",
+        "colombia": "哥倫比亞",
+        "taiwan": "台灣",
+        "blend": "綜合配方",
         "any": "不拘"
       },
-      "concern": {
-        "anxiety": "焦慮失眠",
-        "fatigue": "工作疲憊",
-        "mood": "心情低落",
-        "stale_space": "空間沉悶",
-        "calm": "尋找平靜",
-        "focus": "提振專注"
+      "brewing_gear": {
+        "dripper": "濾杯",
+        "kettle": "手沖壺",
+        "grinder": "磨豆機",
+        "scale": "電子秤",
+        "server": "分享壺"
       },
-      "goal": {
-        "relax": "放鬆",
-        "sleep": "入睡",
-        "meditate": "冥想",
-        "energize": "提神",
-        "purify": "淨化空間",
-        "focus": "提升專注"
+      "brewing_method": {
+        "pour_over": "手沖",
+        "espresso": "義式",
+        "immersion": "浸泡(法壓、聰明杯)",
+        "cold_brew": "冷萃"
       },
-      "format": {
-        "stick": "線香",
-        "balm": "香膏",
-        "oil": "精油",
-        "burner": "薰香器具"
+      "brewing_level": {
+        "beginner": "剛入門",
+        "intermediate": "有些經驗",
+        "advanced": "進階玩家"
       },
-      "timing": {
-        "morning": "早晨",
-        "afternoon": "午後",
-        "evening": "傍晚",
-        "bedtime": "睡前",
-        "all_day": "全天"
+      "brewing_budget": {
+        "budget_low": "NT$1,000 以下",
+        "budget_mid": "NT$1,000–3,000",
+        "budget_high": "NT$3,000 以上"
       },
-      "scent": {
-        "woody": "木質調",
-        "floral": "花香調",
-        "herbal": "草本調",
-        "resin": "琥珀/樹脂",
-        "any": "不拘"
+      "brewing_cups": {
+        "solo": "自己一人",
+        "pair": "兩人份",
+        "group": "三人以上"
       }
     },
     "next": "下一步"

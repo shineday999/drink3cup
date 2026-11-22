@@ -9,11 +9,15 @@ import { kindOf } from "../../../lib/category-kind";
 export const POST: APIRoute = async (ctx) => {
   const form = await ctx.request.formData();
   const type = String(form.get("type") ?? "");
-  if (type !== "jewelry" && type !== "incense" && type !== "tea") {
+  if (type !== "beans" && type !== "brewing" && type !== "tea") {
     return new Response("Invalid quiz type", { status: 400 });
   }
 
-  // 商品分類程式碼：jewelry / incense 固定；tea 用後臺「分類圖片」裡那個茶葉分類的實際程式碼
+  // 商品分類程式碼:beans / brewing 同時涵蓋舊代碼 jewelry / incense(S06 分類改名前後通用);tea 用後臺「分類圖片」裡那個茶葉分類的實際程式碼
+  const LEGACY: Record<string, string[]> = {
+    beans: ["beans", "jewelry"],
+    brewing: ["brewing", "incense"],
+  };
   let category: string = type;
   if (type === "tea") {
     category = "";
@@ -40,6 +44,8 @@ export const POST: APIRoute = async (ctx) => {
     if (!category) return new Response("Invalid category", { status: 400 });
   }
 
+  const cats = LEGACY[type] ?? [category];
+
   // Collect answers
   const answers: Record<string, string | string[]> = {};
   for (const [key, val] of form.entries()) {
@@ -59,10 +65,10 @@ export const POST: APIRoute = async (ctx) => {
         `SELECT p.id, p.slug, pt.name, p.tags
            FROM products p
            LEFT JOIN product_translations pt ON pt.product_id = p.id AND pt.locale = ?
-           WHERE p.category = ? AND p.status = 'active'
+           WHERE p.category IN (${cats.map(() => "?").join(",")}) AND p.status = 'active'
            LIMIT 50`,
       )
-        .bind(ctx.locals.locale, category)
+        .bind(ctx.locals.locale, ...cats)
         .all<{
           id: string;
           slug: string;

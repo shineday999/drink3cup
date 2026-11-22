@@ -193,7 +193,7 @@ interface QuizCard {
 const quizCards: QuizCard[] = homeCategories.map((c) => {
   if (c.code === "jewelry") {
     return {
-      href: localizedPath(locale, "/quiz/jewelry"),
+      href: localizedPath(locale, "/quiz/beans"),
       icon: "jewelry",
       kicker: c.title,
       heading: String(t("home.cta_quiz_jewelry")),
@@ -204,7 +204,7 @@ const quizCards: QuizCard[] = homeCategories.map((c) => {
   }
   if (c.code === "incense") {
     return {
-      href: localizedPath(locale, "/quiz/incense"),
+      href: localizedPath(locale, "/quiz/brewing"),
       icon: "incense",
       kicker: c.title,
       heading: String(t("home.cta_quiz_incense")),

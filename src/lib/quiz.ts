@@ -1,27 +1,7 @@
 // Quiz 邏輯 — 規則式推薦(計劃書 §6)
 // Phase 3 簡化版:用 product 的 tags 與 quiz answers 比對加權
 
-export type QuizType = "jewelry" | "incense" | "tea";
-
-export interface JewelryAnswers {
-  face_shape: "oval" | "round" | "square" | "long" | "heart" | "diamond";
-  skin_tone: "cool" | "warm" | "neutral";
-  personality: "calm" | "free" | "mysterious" | "fresh" | "classic";
-  occasion: "daily" | "formal" | "outdoor" | "gift";
-  material: "pure_amber" | "amber_wood" | "amber_metal" | "any";
-}
-
-export interface IncenseAnswers {
-  concerns: Array<
-    "anxiety" | "fatigue" | "mood" | "stale_space" | "calm" | "focus"
-  >;
-  goals: Array<
-    "relax" | "sleep" | "meditate" | "energize" | "purify" | "focus"
-  >;
-  format: "stick" | "balm" | "oil" | "burner";
-  timing: "morning" | "afternoon" | "evening" | "bedtime" | "all_day";
-  scent: "woody" | "floral" | "herbal" | "resin" | "any";
-}
+export type QuizType = "beans" | "brewing" | "tea";
 
 export interface QuizStep {
   id: string;
@@ -29,116 +9,122 @@ export interface QuizStep {
   options: Array<{ value: string; labelKey: string }>;
 }
 
-export const JEWELRY_STEPS: QuizStep[] = [
+export const BEANS_STEPS: QuizStep[] = [
   {
-    id: "face_shape",
-    titleKey: "quiz.jewelry.face_shape",
+    id: "roast",
+    titleKey: "quiz.beans.roast",
     options: [
-      { value: "oval", labelKey: "quiz.option.face.oval" },
-      { value: "round", labelKey: "quiz.option.face.round" },
-      { value: "square", labelKey: "quiz.option.face.square" },
-      { value: "long", labelKey: "quiz.option.face.long" },
-      { value: "heart", labelKey: "quiz.option.face.heart" },
-      { value: "diamond", labelKey: "quiz.option.face.diamond" },
+      { value: "light_roast", labelKey: "quiz.option.beans_roast.light_roast" },
+      {
+        value: "medium_roast",
+        labelKey: "quiz.option.beans_roast.medium_roast",
+      },
+      { value: "dark_roast", labelKey: "quiz.option.beans_roast.dark_roast" },
     ],
   },
   {
-    id: "skin_tone",
-    titleKey: "quiz.jewelry.skin_tone",
+    id: "flavor",
+    titleKey: "quiz.beans.flavor",
     options: [
-      { value: "cool", labelKey: "quiz.option.skin.cool" },
-      { value: "warm", labelKey: "quiz.option.skin.warm" },
-      { value: "neutral", labelKey: "quiz.option.skin.neutral" },
+      { value: "fruity", labelKey: "quiz.option.beans_flavor.fruity" },
+      { value: "floral", labelKey: "quiz.option.beans_flavor.floral" },
+      { value: "chocolate", labelKey: "quiz.option.beans_flavor.chocolate" },
+      { value: "nutty", labelKey: "quiz.option.beans_flavor.nutty" },
+      { value: "caramel", labelKey: "quiz.option.beans_flavor.caramel" },
     ],
   },
   {
-    id: "personality",
-    titleKey: "quiz.jewelry.personality",
+    id: "method",
+    titleKey: "quiz.beans.method",
     options: [
-      { value: "calm", labelKey: "quiz.option.personality.calm" },
-      { value: "free", labelKey: "quiz.option.personality.free" },
-      { value: "mysterious", labelKey: "quiz.option.personality.mysterious" },
-      { value: "fresh", labelKey: "quiz.option.personality.fresh" },
-      { value: "classic", labelKey: "quiz.option.personality.classic" },
+      { value: "pour_over", labelKey: "quiz.option.beans_method.pour_over" },
+      { value: "espresso", labelKey: "quiz.option.beans_method.espresso" },
+      { value: "immersion", labelKey: "quiz.option.beans_method.immersion" },
+      { value: "cold_brew", labelKey: "quiz.option.beans_method.cold_brew" },
+      { value: "any", labelKey: "quiz.option.beans_method.any" },
     ],
   },
   {
-    id: "occasion",
-    titleKey: "quiz.jewelry.occasion",
+    id: "acidity",
+    titleKey: "quiz.beans.acidity",
     options: [
-      { value: "daily", labelKey: "quiz.option.occasion.daily" },
-      { value: "formal", labelKey: "quiz.option.occasion.formal" },
-      { value: "outdoor", labelKey: "quiz.option.occasion.outdoor" },
-      { value: "gift", labelKey: "quiz.option.occasion.gift" },
+      { value: "acid_low", labelKey: "quiz.option.beans_acidity.acid_low" },
+      { value: "acid_mid", labelKey: "quiz.option.beans_acidity.acid_mid" },
+      { value: "acid_high", labelKey: "quiz.option.beans_acidity.acid_high" },
     ],
   },
   {
-    id: "material",
-    titleKey: "quiz.jewelry.material",
+    id: "origin",
+    titleKey: "quiz.beans.origin",
     options: [
-      { value: "pure_amber", labelKey: "quiz.option.material.pure_amber" },
-      { value: "amber_wood", labelKey: "quiz.option.material.amber_wood" },
-      { value: "amber_metal", labelKey: "quiz.option.material.amber_metal" },
-      { value: "any", labelKey: "quiz.option.material.any" },
+      { value: "ethiopia", labelKey: "quiz.option.beans_origin.ethiopia" },
+      { value: "colombia", labelKey: "quiz.option.beans_origin.colombia" },
+      { value: "taiwan", labelKey: "quiz.option.beans_origin.taiwan" },
+      { value: "blend", labelKey: "quiz.option.beans_origin.blend" },
+      { value: "any", labelKey: "quiz.option.beans_origin.any" },
     ],
   },
 ];
 
-export const INCENSE_STEPS: QuizStep[] = [
+export const BREWING_STEPS: QuizStep[] = [
   {
-    id: "concerns",
-    titleKey: "quiz.incense.concerns",
+    id: "gear",
+    titleKey: "quiz.brewing.gear",
     options: [
-      { value: "anxiety", labelKey: "quiz.option.concern.anxiety" },
-      { value: "fatigue", labelKey: "quiz.option.concern.fatigue" },
-      { value: "mood", labelKey: "quiz.option.concern.mood" },
-      { value: "stale_space", labelKey: "quiz.option.concern.stale_space" },
-      { value: "calm", labelKey: "quiz.option.concern.calm" },
-      { value: "focus", labelKey: "quiz.option.concern.focus" },
+      { value: "dripper", labelKey: "quiz.option.brewing_gear.dripper" },
+      { value: "kettle", labelKey: "quiz.option.brewing_gear.kettle" },
+      { value: "grinder", labelKey: "quiz.option.brewing_gear.grinder" },
+      { value: "scale", labelKey: "quiz.option.brewing_gear.scale" },
+      { value: "server", labelKey: "quiz.option.brewing_gear.server" },
     ],
   },
   {
-    id: "goals",
-    titleKey: "quiz.incense.goals",
+    id: "method",
+    titleKey: "quiz.brewing.method",
     options: [
-      { value: "relax", labelKey: "quiz.option.goal.relax" },
-      { value: "sleep", labelKey: "quiz.option.goal.sleep" },
-      { value: "meditate", labelKey: "quiz.option.goal.meditate" },
-      { value: "energize", labelKey: "quiz.option.goal.energize" },
-      { value: "purify", labelKey: "quiz.option.goal.purify" },
-      { value: "focus", labelKey: "quiz.option.goal.focus" },
+      { value: "pour_over", labelKey: "quiz.option.brewing_method.pour_over" },
+      { value: "espresso", labelKey: "quiz.option.brewing_method.espresso" },
+      { value: "immersion", labelKey: "quiz.option.brewing_method.immersion" },
+      { value: "cold_brew", labelKey: "quiz.option.brewing_method.cold_brew" },
     ],
   },
   {
-    id: "format",
-    titleKey: "quiz.incense.format",
+    id: "level",
+    titleKey: "quiz.brewing.level",
     options: [
-      { value: "stick", labelKey: "quiz.option.format.stick" },
-      { value: "balm", labelKey: "quiz.option.format.balm" },
-      { value: "oil", labelKey: "quiz.option.format.oil" },
-      { value: "burner", labelKey: "quiz.option.format.burner" },
+      { value: "beginner", labelKey: "quiz.option.brewing_level.beginner" },
+      {
+        value: "intermediate",
+        labelKey: "quiz.option.brewing_level.intermediate",
+      },
+      { value: "advanced", labelKey: "quiz.option.brewing_level.advanced" },
     ],
   },
   {
-    id: "timing",
-    titleKey: "quiz.incense.timing",
+    id: "budget",
+    titleKey: "quiz.brewing.budget",
     options: [
-      { value: "morning", labelKey: "quiz.option.timing.morning" },
-      { value: "afternoon", labelKey: "quiz.option.timing.afternoon" },
-      { value: "evening", labelKey: "quiz.option.timing.evening" },
-      { value: "bedtime", labelKey: "quiz.option.timing.bedtime" },
-      { value: "all_day", labelKey: "quiz.option.timing.all_day" },
+      {
+        value: "budget_low",
+        labelKey: "quiz.option.brewing_budget.budget_low",
+      },
+      {
+        value: "budget_mid",
+        labelKey: "quiz.option.brewing_budget.budget_mid",
+      },
+      {
+        value: "budget_high",
+        labelKey: "quiz.option.brewing_budget.budget_high",
+      },
     ],
   },
   {
-    id: "scent",
-    titleKey: "quiz.incense.scent",
+    id: "cups",
+    titleKey: "quiz.brewing.cups",
     options: [
-      { value: "woody", labelKey: "quiz.option.scent.woody" },
-      { value: "floral", labelKey: "quiz.option.scent.floral" },
-      { value: "herbal", labelKey: "quiz.option.scent.herbal" },
-      { value: "resin", labelKey: "quiz.option.scent.resin" },
-      { value: "any", labelKey: "quiz.option.scent.any" },
+      { value: "solo", labelKey: "quiz.option.brewing_cups.solo" },
+      { value: "pair", labelKey: "quiz.option.brewing_cups.pair" },
+      { value: "group", labelKey: "quiz.option.brewing_cups.group" },
     ],
   },
 ];

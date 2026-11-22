@@ -1,11 +1,13 @@
 // 後臺商品共用邏輯：自動編號、價格換算、標籤預設、圖片處理、新增與上架檢查
 // 注意：這裡不 import "./db"（它會載入 cloudflare:workers），方便在 Node 內單元測試。
-import { JEWELRY_STEPS, INCENSE_STEPS, TEA_STEPS, type QuizStep } from "./quiz";
+import { BEANS_STEPS, BREWING_STEPS, TEA_STEPS, type QuizStep } from "./quiz";
 import type { QuizKind } from "./category-kind";
 
 // ---------- 分類 / 子分類 ----------
 export const CATEGORIES = ["jewelry", "incense"] as const;
 export type Category = (typeof CATEGORIES)[number];
+
+export type TagKind = QuizKind | Category;
 
 export function isCategory(v: string): v is Category {
   return (CATEGORIES as readonly string[]).includes(v);
@@ -37,13 +39,15 @@ function toGroups(steps: QuizStep[]): TagGroup[] {
   }));
 }
 
-export const TAG_GROUPS: Record<QuizKind, TagGroup[]> = {
-  jewelry: toGroups(JEWELRY_STEPS),
-  incense: toGroups(INCENSE_STEPS),
+export const TAG_GROUPS: Record<TagKind, TagGroup[]> = {
+  beans: toGroups(BEANS_STEPS),
+  brewing: toGroups(BREWING_STEPS),
+  jewelry: toGroups(BEANS_STEPS),
+  incense: toGroups(BREWING_STEPS),
   tea: toGroups(TEA_STEPS),
 };
 
-export function allowedTags(category: QuizKind): Set<string> {
+export function allowedTags(category: TagKind): Set<string> {
   const set = new Set<string>();
   for (const g of TAG_GROUPS[category])
     for (const o of g.options) set.add(o.value);
@@ -59,7 +63,7 @@ export function splitTags(raw: string): string[] {
 
 /** 勾選的標籤只收該分類的預設值；extra 是舊資料裡預設清單以外的標籤，原樣保留。 */
 export function buildTags(
-  category: QuizKind,
+  category: TagKind,
   checked: string[],
   extra: string[] = [],
 ): string {

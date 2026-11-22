@@ -10,7 +10,9 @@ const locale = (Astro.locals.locale ?? defaultLocale) as Locale;
 const messages = (Astro.locals.messages ?? {}) as Record<string, unknown>;
 const t = createT(messages);
 
-const type = Astro.url.searchParams.get("type") ?? "jewelry";
+const rawType = Astro.url.searchParams.get("type") ?? "beans";
+const type =
+  rawType === "jewelry" ? "beans" : rawType === "incense" ? "brewing" : rawType;
 const idsParam = Astro.url.searchParams.get("ids") ?? "";
 const scoresParam = Astro.url.searchParams.get("scores") ?? "";
 
@@ -74,11 +76,11 @@ void locale;
         class="text-sm uppercase tracking-[0.3em] text-accent-700 font-sans mb-3"
       >
         {
-          type === "jewelry"
-            ? t("quiz.jewelry.title")
+          type === "beans"
+            ? t("quiz.beans.title")
             : type === "tea"
               ? t("quiz.tea.title")
-              : t("quiz.incense.title")
+              : t("quiz.brewing.title")
         }
       </p>
       <h1
