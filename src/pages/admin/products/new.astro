@@ -33,8 +33,8 @@ const t = createT(zhHansMessages as Record<string, unknown>);
 
 // 分類選項 = 「分類圖片」頁的分類（程式碼 + 簡體中文標題），不再寫死兩個
 const LEGACY_LABEL: Record<string, string> = {
-  jewelry: String(t("admin.category_images.slot_jewelry")),
-  incense: String(t("admin.category_images.slot_incense")),
+  beans: String(t("admin.category_images.slot_jewelry")),
+  brewing: String(t("admin.category_images.slot_incense")),
 };
 let siteCategories: SiteCategory[] = [];
 try {
@@ -412,7 +412,7 @@ const card =
       var subSel = document.getElementById("np-sub");
       function curCat() {
         var c = form.querySelector('input[name="category"]:checked');
-        return c ? c.value : "jewelry";
+        return c ? c.value : "beans";
       }
       function applyCat() {
         var cat = curCat();

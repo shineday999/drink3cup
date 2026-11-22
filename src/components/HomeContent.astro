@@ -76,21 +76,21 @@ const [siteImgRes, siteCatRes, featuredRes, bannerRes] = await Promise.all([
 
 // 後臺「分類圖片」：沒上傳（或資料表還不存在）時沿用靜態預設圖
 const catImages = {
-  jewelry: {
+  beans: {
     src: "/images/banners/cat-jewelry.jpg",
     small: "/images/banners/cat-jewelry-480.jpg",
   },
-  incense: {
+  brewing: {
     src: "/images/banners/cat-incense.jpg",
     small: "/images/banners/cat-incense-480.jpg",
   },
 };
 for (const r of siteImgRes?.results ?? []) {
   const slot =
-    r.key === "cat_jewelry"
-      ? "jewelry"
-      : r.key === "cat_incense"
-        ? "incense"
+    r.key === "cat_beans"
+      ? "beans"
+      : r.key === "cat_brewing"
+        ? "brewing"
         : null;
   if (slot && r.url) {
     catImages[slot] = { src: r.url, small: r.url_small || r.url };
@@ -112,13 +112,13 @@ const LEGACY_CAT_KEYS: Record<
   string,
   { kicker: string; title: string; desc: string; alt: string }
 > = {
-  jewelry: {
+  beans: {
     kicker: "nav.amber",
     title: "home.cat_amber_title",
     desc: "home.cat_amber_desc",
     alt: "home.cat_amber_alt",
   },
-  incense: {
+  brewing: {
     kicker: "nav.incense",
     title: "home.cat_incense_title",
     desc: "home.cat_incense_desc",
@@ -135,8 +135,8 @@ let homeCatRows: Array<{
   titles: Record<string, string>;
   descs: Record<string, string>;
 }> = [
-  { code: "jewelry", titles: {}, descs: {} },
-  { code: "incense", titles: {}, descs: {} },
+  { code: "beans", titles: {}, descs: {} },
+  { code: "brewing", titles: {}, descs: {} },
 ];
 const homeCatImages: Record<string, { src: string; small: string }> = {};
 if (siteCatRes) {
@@ -183,7 +183,7 @@ const homeCategories: HomeCategory[] = homeCatRows.map((c) => {
 // 只有 jewelry / incense 有測驗；自訂分類的卡片連到該分類的商品列表。
 interface QuizCard {
   href: string;
-  icon: "jewelry" | "incense" | "generic";
+  icon: "beans" | "brewing" | "generic";
   kicker: string;
   heading: string;
   desc: string;
@@ -191,10 +191,10 @@ interface QuizCard {
   btn: string;
 }
 const quizCards: QuizCard[] = homeCategories.map((c) => {
-  if (c.code === "jewelry") {
+  if (c.code === "beans") {
     return {
       href: localizedPath(locale, "/quiz/beans"),
-      icon: "jewelry",
+      icon: "beans",
       kicker: c.title,
       heading: String(t("home.cta_quiz_jewelry")),
       desc: String(t("home.cta_jewelry_desc")),
@@ -202,10 +202,10 @@ const quizCards: QuizCard[] = homeCategories.map((c) => {
       btn: String(t("home.cta_jewelry_btn")),
     };
   }
-  if (c.code === "incense") {
+  if (c.code === "brewing") {
     return {
       href: localizedPath(locale, "/quiz/brewing"),
-      icon: "incense",
+      icon: "brewing",
       kicker: c.title,
       heading: String(t("home.cta_quiz_incense")),
       desc: String(t("home.cta_incense_desc")),
@@ -666,10 +666,10 @@ const slides = bannerRows.results.map((b) => ({
                     stroke-linejoin="round"
                     aria-hidden="true"
                   >
-                    {q.icon === "jewelry" && (
+                    {q.icon === "beans" && (
                       <path d="M12 3 C 7 11, 4 17, 8 21 L 16 21 C 20 17, 17 11, 12 3 Z" />
                     )}
-                    {q.icon === "incense" && (
+                    {q.icon === "brewing" && (
                       <>
                         <path d="M12 3 Q 10 7 12 11 Q 14 15 12 19" />
                         <path d="M8 5 Q 6.5 8 8 11" />

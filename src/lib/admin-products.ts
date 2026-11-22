@@ -4,7 +4,7 @@ import { BEANS_STEPS, BREWING_STEPS, TEA_STEPS, type QuizStep } from "./quiz";
 import type { QuizKind } from "./category-kind";
 
 // ---------- 分類 / 子分類 ----------
-export const CATEGORIES = ["jewelry", "incense"] as const;
+export const CATEGORIES = ["beans", "brewing"] as const;
 export type Category = (typeof CATEGORIES)[number];
 
 export type TagKind = QuizKind | Category;
@@ -19,8 +19,8 @@ function isAllowedCategory(v: string, validCodes?: readonly string[]): boolean {
 }
 
 export const SUBCATEGORIES: Record<Category, readonly string[]> = {
-  jewelry: ["necklace", "bracelet", "earring", "ring"],
-  incense: ["stick", "balm", "oil"],
+  beans: ["necklace", "bracelet", "earring", "ring"],
+  brewing: ["stick", "balm", "oil"],
 };
 
 // ---------- 標籤預設（來源：測驗各題的答案值，「為我推薦」靠它們比對） ----------
@@ -42,8 +42,6 @@ function toGroups(steps: QuizStep[]): TagGroup[] {
 export const TAG_GROUPS: Record<TagKind, TagGroup[]> = {
   beans: toGroups(BEANS_STEPS),
   brewing: toGroups(BREWING_STEPS),
-  jewelry: toGroups(BEANS_STEPS),
-  incense: toGroups(BREWING_STEPS),
   tea: toGroups(TEA_STEPS),
 };
 
@@ -218,7 +216,7 @@ export interface NewProductValues {
   tags: string[];
 }
 
-export function emptyNewProduct(defaultCategory = "jewelry"): NewProductValues {
+export function emptyNewProduct(defaultCategory = "beans"): NewProductValues {
   return {
     category: defaultCategory,
     subcategory: "",
@@ -326,7 +324,7 @@ export async function createProduct(
   const priceBase = (fen / 100).toFixed(2);
   const stock = parseInt(v.stock, 10);
   const weight = v.weight ? Math.round(Number(v.weight)) : null;
-  // 標籤預設跟著測驗種類走（jewelry / incense / tea）；沒有測驗的自訂分類沒有標籤
+  // 標籤預設跟著測驗種類走（beans / brewing / tea）；沒有測驗的自訂分類沒有標籤
   const kind =
     kinds?.[v.category] ?? (isCategory(v.category) ? v.category : null);
   const tags = kind ? buildTags(kind, v.tags) : "";

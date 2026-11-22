@@ -1,5 +1,5 @@
 -- mycafe 咖啡種子資料(示範內容,可於後台修改)
--- 分類代碼沿用現有路由:jewelry = 咖啡豆、incense = 沖煮器具(S06 再改名為 beans / brewing)
+-- 分類代碼:beans = 咖啡豆、brewing = 沖煮器具
 
 -- ===== 清除舊資料 =====
 DELETE FROM reviews;
@@ -13,13 +13,13 @@ DELETE FROM posts;
 
 -- ===== 商品 =====
 INSERT INTO products (id, category, subcategory, slug, status, created_at, updated_at) VALUES
-  ('prod_eth_yirgacheffe', 'jewelry', 'single-origin', 'ethiopia-yirgacheffe-washed', 'active', strftime('%s','now'), strftime('%s','now')),
-  ('prod_col_huila',       'jewelry', 'single-origin', 'colombia-huila-washed',        'active', strftime('%s','now'), strftime('%s','now')),
-  ('prod_tw_alishan',      'jewelry', 'single-origin', 'taiwan-alishan-light-roast',   'active', strftime('%s','now'), strftime('%s','now')),
-  ('prod_blend_house',     'jewelry', 'blend',         'three-cups-house-blend',       'active', strftime('%s','now'), strftime('%s','now')),
-  ('prod_v60',             'incense', 'dripper',       'v60-pour-over-dripper-02',     'active', strftime('%s','now'), strftime('%s','now')),
-  ('prod_kettle',          'incense', 'kettle',        'gooseneck-kettle-600ml',       'active', strftime('%s','now'), strftime('%s','now')),
-  ('prod_grinder',         'incense', 'grinder',       'manual-coffee-grinder',        'active', strftime('%s','now'), strftime('%s','now'));
+  ('prod_eth_yirgacheffe', 'beans', 'single-origin', 'ethiopia-yirgacheffe-washed', 'active', strftime('%s','now'), strftime('%s','now')),
+  ('prod_col_huila',       'beans', 'single-origin', 'colombia-huila-washed',        'active', strftime('%s','now'), strftime('%s','now')),
+  ('prod_tw_alishan',      'beans', 'single-origin', 'taiwan-alishan-light-roast',   'active', strftime('%s','now'), strftime('%s','now')),
+  ('prod_blend_house',     'beans', 'blend',         'three-cups-house-blend',       'active', strftime('%s','now'), strftime('%s','now')),
+  ('prod_v60',             'brewing', 'dripper',       'v60-pour-over-dripper-02',     'active', strftime('%s','now'), strftime('%s','now')),
+  ('prod_kettle',          'brewing', 'kettle',        'gooseneck-kettle-600ml',       'active', strftime('%s','now'), strftime('%s','now')),
+  ('prod_grinder',         'brewing', 'grinder',       'manual-coffee-grinder',        'active', strftime('%s','now'), strftime('%s','now'));
 
 INSERT INTO product_translations (product_id, locale, name, description, short_description, story) VALUES
   ('prod_eth_yirgacheffe', 'zh-Hant', '衣索比亞 耶加雪菲 水洗 G1', '來自耶加雪菲的水洗處理豆,花香與柑橘酸質明亮,尾韻乾淨帶茶感。建議手沖,水溫 90–92°C。', '花香柑橘、乾淨明亮的水洗豆', '耶加雪菲位於衣索比亞南部高海拔產區,被視為咖啡的故鄉之一。'),

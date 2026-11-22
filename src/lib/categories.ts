@@ -48,10 +48,10 @@ export function cleanTextMap(
 
 // 飾品 / 香品卡片原本寫在語言檔裡的說明文字；後臺簡介還是空的時候，一次性填進去讓後臺可以維護。
 const LEGACY_DESCS: Record<string, Record<string, string>> = {
-  jewelry: {
+  beans: {
     "zh-Hant": zhHant.home.cat_amber_desc,
   },
-  incense: {
+  brewing: {
     "zh-Hant": zhHant.home.cat_incense_desc,
   },
 };
@@ -112,7 +112,7 @@ export async function ensureCategoryTable(db: DB): Promise<void> {
     await db
       .prepare(
         `INSERT OR IGNORE INTO site_categories (code, sort_order, titles, descs, updated_at)
-         VALUES ('jewelry', 1, '{}', '{}', ?), ('incense', 2, '{}', '{}', ?)`,
+         VALUES ('beans', 1, '{}', '{}', ?), ('brewing', 2, '{}', '{}', ?)`,
       )
       .bind(now, now)
       .run();

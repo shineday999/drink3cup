@@ -43,8 +43,8 @@ const sortOptions = (
 
 // 分類標籤與標題：讀後臺「分類圖片」的分類（含新增的），不再寫死兩個
 const LEGACY_CHIP: Record<string, string> = {
-  jewelry: String(t("products.filter_jewelry")),
-  incense: String(t("products.filter_incense")),
+  beans: String(t("products.filter_jewelry")),
+  brewing: String(t("products.filter_incense")),
 };
 let siteCats: Array<{ code: string; label: string }> = [];
 try {
@@ -66,8 +66,8 @@ try {
 }
 if (siteCats.length === 0) {
   siteCats = [
-    { code: "jewelry", label: LEGACY_CHIP.jewelry ?? "jewelry" },
-    { code: "incense", label: LEGACY_CHIP.incense ?? "incense" },
+    { code: "beans", label: LEGACY_CHIP.beans ?? "beans" },
+    { code: "brewing", label: LEGACY_CHIP.brewing ?? "brewing" },
   ];
 }
 const headingText = siteCats.map((c) => c.label).join(" · ");

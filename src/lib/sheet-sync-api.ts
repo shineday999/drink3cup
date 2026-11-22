@@ -34,13 +34,13 @@ export interface ImportResult {
 
 // 分類:資料庫代碼 ⇄ 表格顯示名稱(S06 路由改名後,只需改這裡)
 const CATEGORY_LABELS: Record<string, string> = {
-  jewelry: "咖啡豆",
-  incense: "沖煮器具",
+  beans: "咖啡豆",
+  brewing: "沖煮器具",
 };
 const CATEGORY_ALIASES: Record<string, string> = {
-  beans: "jewelry",
-  brewing: "incense",
-  equipment: "incense",
+  jewelry: "beans",
+  incense: "brewing",
+  equipment: "brewing",
 };
 
 function categoryFromInput(v: string): string | null {
@@ -203,7 +203,7 @@ export async function importRow(
         )
         .bind(
           productId,
-          category ?? "jewelry",
+          category ?? "beans",
           slug,
           status ?? "draft",
           now,

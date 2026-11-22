@@ -177,7 +177,7 @@ const notice = {
 };
 const productCategory = isCategory(product.category)
   ? product.category
-  : "jewelry";
+  : "beans";
 const currentTags = splitTags(product.tags ?? "");
 const presetTags = new Set(CATEGORIES.flatMap((c) => [...allowedTags(c)]));
 const extraTags = currentTags.filter((tk) => !presetTags.has(tk));
@@ -292,10 +292,10 @@ const inputField =
               name="category"
               class="w-full px-3 py-2 border border-text-muted/30 rounded-md bg-bg-base"
             >
-              <option value="jewelry" selected={product.category === "jewelry"}
+              <option value="beans" selected={product.category === "beans"}
                 >{t("admin.products_detail.option_jewelry")}</option
               >
-              <option value="incense" selected={product.category === "incense"}
+              <option value="brewing" selected={product.category === "brewing"}
                 >{t("admin.products_detail.option_incense")}</option
               >
             </select>

@@ -29,7 +29,7 @@ export const POST: APIRoute = async (ctx) => {
   const slug = String(form.get("slug") ?? "");
   const tags = String(form.get("tags") ?? "").trim();
 
-  if (!category || !slug || !["jewelry", "incense"].includes(category)) {
+  if (!category || !slug || !["beans", "brewing"].includes(category)) {
     return new Response("Invalid input", { status: 400 });
   }
 
