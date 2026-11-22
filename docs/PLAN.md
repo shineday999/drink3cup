@@ -111,3 +111,4 @@
   `grep -rIlE "cnamber|牛馬|牛马|OxHorse|oxsupport|ccwu|0061qwen|shineday999|琥珀|amber|香品|incense" --exclude-dir=.git --exclude=pnpm-lock.yaml .`
 - 商品與分類邏輯在 `src/lib/categories.ts`、`category-kind.ts`、`quiz.ts`。
 - 2026-11-21 Claude:完成 S05c(新台幣)、S05d(後台繁體)、S12(咖啡種子資料,4 語言)、S19–S23(D1、Pages 自動部署、網域、後台帳號)。
+- 2026-11-21 Claude:新增商品試算表雙向同步(網站端 /api/sync/products + Apps Script),說明見 docs/PRODUCT-SHEET-SYNC.md。
