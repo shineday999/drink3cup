@@ -27,7 +27,7 @@
   "ai": { "binding": "AI" },
   "vars": {
     "SITE_URL": "https://mycafe.de5.net",
-    "EMAIL_FROM": "MyCafe <hello@mycafe.de5.net>",
-    "EMAIL_REPLY_TO": "hello@mycafe.de5.net",
+    "EMAIL_FROM": "喝三杯咖啡 <weider@0061qwen.cc.cd>",
+    "EMAIL_REPLY_TO": "weider@0061qwen.cc.cd",
   },
 }
