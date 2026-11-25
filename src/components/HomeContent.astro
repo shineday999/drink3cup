@@ -8,7 +8,6 @@ import RevealOnScroll from "@components/RevealOnScroll.astro";
 import { createT } from "../i18n/t";
 import { formatPrice } from "../lib/format";
 import { parseTextMap } from "../lib/categories";
-import { kindOf } from "../lib/category-kind";
 import { localizedPath, defaultLocale, type Locale } from "../i18n/config";
 
 const locale = (Astro.locals.locale ?? defaultLocale) as Locale;
@@ -213,17 +212,6 @@ const quizCards: QuizCard[] = homeCategories.map((c) => {
       btn: String(t("home.cta_incense_btn")),
     };
   }
-  if (kindOf(c.code, c.zhTitle) === "tea") {
-    return {
-      href: localizedPath(locale, `/quiz/tea?cat=${c.code}`),
-      icon: "generic",
-      kicker: c.title,
-      heading: `${String(t("home.cta_pick_prefix"))}${c.title}`,
-      desc: c.desc,
-      meta: String(t("home.cta_meta")),
-      btn: String(t("home.cta_jewelry_btn")),
-    };
-  }
   return {
     href: localizedPath(locale, `/products?cat=${c.code}`),
     icon: "generic",
@@ -337,7 +325,7 @@ const slides = bannerRows.results.map((b) => ({
             data-slide-index={i}
             {...lazyAttr("src", slide.src, i === 0)}
             alt={slide.alt}
-            class={`hero-slide absolute inset-0 w-full h-full object-cover transition-opacity duration-[1800ms] ease-out ${i === 0 ? "opacity-85 hero-slide-active" : "opacity-0"}`}
+            class={`hero-slide absolute inset-0 w-full h-full object-cover transition-opacity duration-[1800ms] ease-out ${i === 0 ? "opacity-100 hero-slide-active" : "opacity-0"}`}
             loading={i === 0 ? "eager" : "lazy"}
             fetchpriority={i === 0 ? "high" : "auto"}
           />
@@ -345,11 +333,11 @@ const slides = bannerRows.results.map((b) => ({
       ))
     }
     <div
-      class="absolute inset-0 bg-gradient-to-br from-forest-900/90 via-forest-900/55 to-forest-900/95"
+      class="absolute inset-0 bg-gradient-to-r from-black/50 via-black/15 to-transparent"
     >
     </div>
     <div
-      class="absolute inset-0 bg-gradient-to-t from-forest-900/80 via-forest-900/30 to-transparent"
+      class="absolute inset-0 bg-gradient-to-t from-black/35 via-transparent to-transparent"
     >
     </div>
   </div>
@@ -473,17 +461,17 @@ const slides = bannerRows.results.map((b) => ({
   >
     <div class="col-span-12 md:col-span-9 hero-text">
       <p
-        class="text-[10px] uppercase tracking-[0.5em] text-terra-300 mb-5 md:mb-7 font-sans"
+        class="text-[10px] uppercase tracking-[0.5em] text-[#f6d2b4] mb-5 md:mb-7 font-sans"
       >
         {t("home.hero_kicker")}
       </p>
       <h1
-        class="text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-serif font-light mb-5 md:mb-7 leading-[0.98] tracking-[-0.03em] text-balance text-cream-50"
+        class="text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-serif font-light mb-5 md:mb-7 leading-[0.98] tracking-[-0.03em] text-balance text-white"
       >
         {heroTitle}
       </h1>
       <p
-        class="text-lg md:text-xl lg:text-2xl text-cream-100/85 font-serif italic font-light mb-9 md:mb-12 leading-snug max-w-2xl"
+        class="text-lg md:text-xl lg:text-2xl text-white font-serif italic font-light mb-9 md:mb-12 leading-snug max-w-2xl"
       >
         {heroSubtitle}
       </p>

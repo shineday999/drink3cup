@@ -66,20 +66,7 @@ async function backfillLegacyDescs(db: DB): Promise<void> {
       .bind(JSON.stringify(descs), now, code)
       .run();
   }
-  await db
-    .prepare(
-      `UPDATE site_categories SET descs = ?, updated_at = ?
-       WHERE (code = 'tea' OR json_extract(titles, '$."zh-Hant"') IN ('茶葉', '茶葉'))
-         AND (descs IS NULL OR descs = '' OR descs = '{}')`,
-    )
-    .bind(JSON.stringify(TEA_DESCS), now)
-    .run();
 }
-
-// 茶葉分類（後臺新增的）：程式碼是 tea，或簡體中文標題是「茶葉 / 茶葉」，且簡介還是空的，就填入這段文字。
-const TEA_DESCS: Record<string, string> = {
-  "zh-Hant": "從山間的晨霧到一盞溫熱,每一片茶葉都記得陽光與雨水。",
-};
 
 export async function ensureCategoryTable(db: DB): Promise<void> {
   await db

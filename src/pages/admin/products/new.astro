@@ -56,7 +56,7 @@ if (siteCategories.length === 0) {
 const categoryOptions = siteCategories.map((c) => ({
   code: c.code,
   label: c.titles["zh-Hant"] || LEGACY_LABEL[c.code] || c.code,
-  kind: kindOf(c.code, c.titles["zh-Hant"]),
+  kind: kindOf(c.code),
 }));
 const kinds = Object.fromEntries(categoryOptions.map((o) => [o.code, o.kind]));
 const categoryCodes = categoryOptions.map((c) => c.code);

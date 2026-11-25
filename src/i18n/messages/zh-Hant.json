@@ -113,15 +113,6 @@
       "acidity": "能接受的酸度?",
       "origin": "想喝哪個產地?"
     },
-    "tea": {
-      "title": "選一杯茶",
-      "desc": "茶類、口感、心情、時辰——讓我們為你挑出最合心意的那一款茶。",
-      "tea_type": "偏愛哪一類茶?",
-      "taste": "口味偏好?",
-      "feeling": "想讓這杯茶帶來什麼感覺?",
-      "tea_time": "通常什麼時候喝?",
-      "brew": "習慣怎麼沖泡?"
-    },
     "brewing": {
       "title": "選一款器具",
       "desc": "想添購什麼、沖煮方式、經驗與預算——幫你挑出適合的沖煮器具。",
@@ -141,39 +132,6 @@
       "badge_fallback": "也許你會喜歡"
     },
     "option": {
-      "tea_type": {
-        "green": "綠茶",
-        "black": "紅茶",
-        "oolong": "烏龍茶",
-        "white": "白茶",
-        "dark": "黑茶 / 普洱",
-        "herbal": "花草茶"
-      },
-      "tea_taste": {
-        "fresh": "清新鮮爽",
-        "mellow": "醇厚飽滿",
-        "floral": "花果香氣",
-        "roasted": "焙火煙燻",
-        "sweet": "回甘甜潤"
-      },
-      "tea_feeling": {
-        "refresh": "提神醒腦",
-        "relax": "放鬆舒緩",
-        "digest": "解膩消食",
-        "warm": "暖身驅寒"
-      },
-      "tea_time": {
-        "morning": "早晨",
-        "afternoon": "午後",
-        "evening": "傍晚",
-        "after_meal": "飯後"
-      },
-      "tea_brew": {
-        "gongfu": "功夫茶具慢慢泡",
-        "mug": "隨手一杯泡",
-        "cold": "冷泡",
-        "any": "都可以"
-      },
       "beans_roast": {
         "light_roast": "淺焙(明亮、果酸)",
         "medium_roast": "中焙(平衡、焦糖)",

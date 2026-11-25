@@ -4,47 +4,21 @@
 import type { APIRoute } from "astro";
 import { env } from "cloudflare:workers";
 import { scoreProducts } from "../../../lib/quiz";
-import { kindOf } from "../../../lib/category-kind";
 
 export const POST: APIRoute = async (ctx) => {
   const form = await ctx.request.formData();
   const type = String(form.get("type") ?? "");
-  if (type !== "beans" && type !== "brewing" && type !== "tea") {
+  if (type !== "beans" && type !== "brewing") {
     return new Response("Invalid quiz type", { status: 400 });
   }
 
-  // 商品分類程式碼:beans / brewing 同時涵蓋舊代碼 jewelry / incense(S06 分類改名前後通用);tea 用後臺「分類圖片」裡那個茶葉分類的實際程式碼
+  // 商品分類程式碼:beans / brewing 同時涵蓋舊代碼 jewelry / incense(S06 分類改名前後通用)
   const LEGACY: Record<string, string[]> = {
     beans: ["beans", "jewelry"],
     brewing: ["brewing", "incense"],
   };
-  let category: string = type;
-  if (type === "tea") {
-    category = "";
-    const wanted = String(form.get("cat") ?? "tea");
-    if (env?.DB) {
-      const rows = await env.DB.prepare(
-        "SELECT code, titles FROM site_categories",
-      )
-        .all<{ code: string; titles: string }>()
-        .catch(() => ({
-          results: [] as Array<{ code: string; titles: string }>,
-        }));
-      for (const r of rows.results ?? []) {
-        let zh: string | undefined;
-        try {
-          zh = (JSON.parse(r.titles) as Record<string, string>)["zh-Hant"];
-        } catch {
-          zh = undefined;
-        }
-        if (r.code === wanted && kindOf(r.code, zh) === "tea")
-          category = r.code;
-      }
-    }
-    if (!category) return new Response("Invalid category", { status: 400 });
-  }
 
-  const cats = LEGACY[type] ?? [category];
+  const cats = LEGACY[type] ?? [type];
 
   // Collect answers
   const answers: Record<string, string | string[]> = {};

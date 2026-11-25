@@ -350,7 +350,16 @@ h6 {
    subtle dark glow separates cream text from busy backgrounds. */
 .hero-text h1,
 .hero-text p {
-  text-shadow: 0 2px 24px rgba(28, 19, 13, 0.45);
+  text-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.6),
+    0 4px 28px rgba(0, 0, 0, 0.5);
+}
+main [data-home-hero] .hero-text h1,
+main [data-home-hero] .hero-text > p:nth-of-type(2) {
+  color: #ffffff;
+}
+main [data-home-hero] .hero-text > p:first-child {
+  color: #f6d2b4;
 }
 
 /* Focus-visible global: WCAG 2.4.7 baseline for ALL interactive

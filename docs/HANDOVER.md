@@ -80,25 +80,25 @@ Google 試算表 `mycafe` 分頁與網站商品雙向同步,約每分鐘一次�
 - 後台管理員帳號(S23)
 - 首頁品牌文案改咖啡並全檔轉繁體(S07 大部分);配色改咖啡色系與新 favicon(S13b)
 - 商品試算表雙向同步
+- S06:路由改名(舊網址 301)、測驗改成咖啡口味題並移除選茶、結果依分數排序
 
 **進行中**
 
-- S06 路由改名:`/amber`→`/beans`、`/incense`→`/brewing`、`/materials`→`/origins`、`/craft`→`/roasting`,舊網址 301 轉址(請以 `git log` 與網站實際網址為準)
+- (目前無;S06 剩資料庫分類代碼改名,見待辦)
 
 **待辦(可認領)**
 
-| 項目                                                                         | 步驟          | 備註                                                             |
-| ---------------------------------------------------------------------------- | ------------- | ---------------------------------------------------------------- |
-| 測驗改成咖啡口味題(`src/lib/quiz.ts`、`src/pages/quiz/*`),目前仍是選琥珀、香 | S06           | 先讀 `quiz.ts`;網址 `/quiz/jewelry`、`/quiz/incense` 要改名      |
-| 資料庫分類代碼改名(`jewelry`/`incense` → `beans`/`brewing`)                  | S06           | 需 migration + 更新 `CATEGORY_LABELS` 與 `category-kind.ts`      |
-| 重建 `en`、`ms-MY`、`id-ID` 語言檔                                           | —             | 目前 `src/i18n/messages` 只有 `zh-Hant.json`;商品資料已有 4 語言 |
-| 品牌頁文案:story、vision、about、more 等                                     | S10           | 文案在 `zh-Hant.json`                                            |
-| 商品與頁面圖片、首頁插圖(目前仍是舊的森林插圖)                               | S13           | 只能用自有或有授權的照片,需擁有者提供                            |
-| SEO:sitemap、`llms.txt`、`llms-full.txt`、結構化資料                         | S14           |                                                                  |
-| 驗收:殘留字樣為 0、手機與桌面 QA、表單與 Email                               | S15、S16、S24 |                                                                  |
-| 寄信(Resend)金鑰與寄件人設定                                                 | S23           | 擁有者                                                           |
-| 確認 R2 bucket `mycafe-images` 已建立並可上傳                                | S19           | 擁有者                                                           |
-| 資料庫內文字(後台設定、橫幅)是否仍有簡體                                     | S05d          | 擁有者在後台檢查,或請協作者寫轉換 migration                      |
+| 項目                                                        | 步驟          | 備註                                                             |
+| ----------------------------------------------------------- | ------------- | ---------------------------------------------------------------- |
+| 資料庫分類代碼改名(`jewelry`/`incense` → `beans`/`brewing`) | S06           | 需 migration + 更新 `CATEGORY_LABELS` 與 `category-kind.ts`      |
+| 重建 `en`、`ms-MY`、`id-ID` 語言檔                          | —             | 目前 `src/i18n/messages` 只有 `zh-Hant.json`;商品資料已有 4 語言 |
+| 品牌頁文案:story、vision、about、more 等                    | S10           | 文案在 `zh-Hant.json`                                            |
+| 商品與頁面圖片、首頁插圖(目前仍是舊的森林插圖)              | S13           | 只能用自有或有授權的照片,需擁有者提供                            |
+| SEO:sitemap、`llms.txt`、`llms-full.txt`、結構化資料        | S14           |                                                                  |
+| 驗收:殘留字樣為 0、手機與桌面 QA、表單與 Email              | S15、S16、S24 |                                                                  |
+| 寄信(Resend)金鑰與寄件人設定                                | S23           | 擁有者                                                           |
+| 確認 R2 bucket `mycafe-images` 已建立並可上傳               | S19           | 擁有者                                                           |
+| 資料庫內文字(後台設定、橫幅)是否仍有簡體                    | S05d          | 擁有者在後台檢查,或請協作者寫轉換 migration                      |
 
 ## 9. 只有擁有者能做的事
 

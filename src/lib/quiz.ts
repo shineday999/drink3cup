@@ -1,7 +1,7 @@
 // Quiz 邏輯 — 規則式推薦(計劃書 §6)
 // Phase 3 簡化版:用 product 的 tags 與 quiz answers 比對加權
 
-export type QuizType = "beans" | "brewing" | "tea";
+export type QuizType = "beans" | "brewing";
 
 export interface QuizStep {
   id: string;
@@ -125,62 +125,6 @@ export const BREWING_STEPS: QuizStep[] = [
       { value: "solo", labelKey: "quiz.option.brewing_cups.solo" },
       { value: "pair", labelKey: "quiz.option.brewing_cups.pair" },
       { value: "group", labelKey: "quiz.option.brewing_cups.group" },
-    ],
-  },
-];
-
-export const TEA_STEPS: QuizStep[] = [
-  {
-    id: "tea_type",
-    titleKey: "quiz.tea.tea_type",
-    options: [
-      { value: "green", labelKey: "quiz.option.tea_type.green" },
-      { value: "black", labelKey: "quiz.option.tea_type.black" },
-      { value: "oolong", labelKey: "quiz.option.tea_type.oolong" },
-      { value: "white", labelKey: "quiz.option.tea_type.white" },
-      { value: "dark", labelKey: "quiz.option.tea_type.dark" },
-      { value: "herbal", labelKey: "quiz.option.tea_type.herbal" },
-    ],
-  },
-  {
-    id: "taste",
-    titleKey: "quiz.tea.taste",
-    options: [
-      { value: "fresh", labelKey: "quiz.option.tea_taste.fresh" },
-      { value: "mellow", labelKey: "quiz.option.tea_taste.mellow" },
-      { value: "floral", labelKey: "quiz.option.tea_taste.floral" },
-      { value: "roasted", labelKey: "quiz.option.tea_taste.roasted" },
-      { value: "sweet", labelKey: "quiz.option.tea_taste.sweet" },
-    ],
-  },
-  {
-    id: "feeling",
-    titleKey: "quiz.tea.feeling",
-    options: [
-      { value: "refresh", labelKey: "quiz.option.tea_feeling.refresh" },
-      { value: "relax", labelKey: "quiz.option.tea_feeling.relax" },
-      { value: "digest", labelKey: "quiz.option.tea_feeling.digest" },
-      { value: "warm", labelKey: "quiz.option.tea_feeling.warm" },
-    ],
-  },
-  {
-    id: "tea_time",
-    titleKey: "quiz.tea.tea_time",
-    options: [
-      { value: "morning", labelKey: "quiz.option.tea_time.morning" },
-      { value: "afternoon", labelKey: "quiz.option.tea_time.afternoon" },
-      { value: "evening", labelKey: "quiz.option.tea_time.evening" },
-      { value: "after_meal", labelKey: "quiz.option.tea_time.after_meal" },
-    ],
-  },
-  {
-    id: "brew",
-    titleKey: "quiz.tea.brew",
-    options: [
-      { value: "gongfu", labelKey: "quiz.option.tea_brew.gongfu" },
-      { value: "mug", labelKey: "quiz.option.tea_brew.mug" },
-      { value: "cold", labelKey: "quiz.option.tea_brew.cold" },
-      { value: "any", labelKey: "quiz.option.tea_brew.any" },
     ],
   },
 ];

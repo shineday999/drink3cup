@@ -45,15 +45,12 @@ const entries: QuizEntry[] = [];
 const seen = new Set<QuizKind>();
 for (const r of rows) {
   const titles = parseTextMap(r.titles);
-  const kind = kindOf(r.code, titles["zh-Hant"]);
+  const kind = kindOf(r.code);
   if (!kind || seen.has(kind)) continue;
   seen.add(kind);
   entries.push({
     kind,
-    href:
-      kind === "tea"
-        ? localizedPath(locale, `/quiz/tea?cat=${r.code}`)
-        : localizedPath(locale, `/quiz/${kind}`),
+    href: localizedPath(locale, `/quiz/${kind}`),
     title: String(t(`quiz.${kind}.title`)),
     desc: String(t(`quiz.${kind}.desc`)),
   });
@@ -63,7 +60,6 @@ for (const r of rows) {
 const ICON_PATH: Record<QuizKind, string> = {
   beans: "M12 3c4 0 7 4 7 9s-3 9-7 9-7-4-7-9 3-9 7-9zm0 0c-2 3 2 6 0 9",
   brewing: "M5 5h14l-4 9H9L5 5zm4 9v3h6v-3M8 21h8",
-  tea: "M4 9h12v4a5 5 0 01-5 5H9a5 5 0 01-5-5V9zm12 1h1.5a2.5 2.5 0 010 5H16M8 3v2m4-2v2",
 };
 ---
 
