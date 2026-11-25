@@ -65,6 +65,12 @@ function firstImage(json: string | null | undefined): string | undefined {
   }
 }
 
+// 資料庫回傳順序不等於推薦順序,依 ids 參數(已依分數由高到低)重排
+const idOrder = idsParam.split(",");
+const sortedResults = [...products.results].sort(
+  (a, b) => idOrder.indexOf(a.id) - idOrder.indexOf(b.id),
+);
+
 const pageTitle = `${t("quiz.result.title")} — ${t("common.site_name")}`;
 void locale;
 ---
@@ -110,7 +116,7 @@ void locale;
           data-quiz-results
           class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12"
         >
-          {products.results.map((p) => {
+          {sortedResults.map((p) => {
             const sc = scoreMap[p.id];
             const isFallback = sc === 0;
             const isStrong = sc !== undefined && sc >= 2;
