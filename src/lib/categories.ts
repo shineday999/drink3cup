@@ -46,7 +46,7 @@ export function cleanTextMap(
   return out;
 }
 
-// 飾品 / 香品卡片原本寫在語言檔裡的說明文字；後臺簡介還是空的時候，一次性填進去讓後臺可以維護。
+// 咖啡豆 / 沖煮器具卡片的預設說明文字(來自語言檔);後臺簡介還是空的時候,一次性填進去讓後臺可以維護。
 const LEGACY_DESCS: Record<string, Record<string, string>> = {
   beans: {
     "zh-Hant": zhHant.home.cat_amber_desc,
@@ -83,17 +83,6 @@ export async function ensureCategoryTable(db: DB): Promise<void> {
   const row = await db
     .prepare("SELECT COUNT(*) AS n FROM site_categories")
     .first<{ n: number }>();
-  // 舊預設名稱「琥珀飾品 / 東方香品」若曾被存進標題，統一改成「飾品 / 香品」（只動完全等於舊名稱的）
-  await db
-    .prepare(
-      `UPDATE site_categories
-         SET titles = json_set(titles, '$."zh-Hant"', CASE json_extract(titles, '$."zh-Hant"')
-               WHEN '琥珀飾品' THEN '飾品' WHEN '琥珀飾品' THEN '飾品'
-               WHEN '東方香品' THEN '香品' WHEN '東方香品' THEN '香品' END)
-       WHERE json_valid(titles)
-         AND json_extract(titles, '$."zh-Hant"') IN ('琥珀飾品','琥珀飾品','東方香品','東方香品')`,
-    )
-    .run();
   if (!row || row.n === 0) {
     const now = Math.floor(Date.now() / 1000);
     await db

@@ -47,7 +47,7 @@ export const GET: APIRoute = async (ctx) => {
       const isProductList = path === "/products";
       const isBlog = path === "/blog";
       const isAbout = path === "/about";
-      // Wave 38: amber/incense 是主要 category landing,跟 /products 同 priority
+      // Wave 38: beans/brewing 是主要 category landing,跟 /products 同 priority
       const isAmberOrIncense = path === "/beans" || path === "/brewing";
       urls.push({
         loc: `${SITE_URL}${localized}`,

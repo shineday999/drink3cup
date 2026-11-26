@@ -1,9 +1,0 @@
-UPDATE product_variants SET image_urls = '["https://picsum.photos/seed/mycafe-baltic-pendant/800/800"]' WHERE sku = 'BAL-PEN-S';
-UPDATE product_variants SET image_urls = '["https://picsum.photos/seed/mycafe-baltic-pendant/800/800"]' WHERE sku = 'BAL-PEN-M';
-UPDATE product_variants SET image_urls = '["https://picsum.photos/seed/mycafe-blue-bracelet/800/800"]' WHERE sku = 'DOM-BRA-STD';
-UPDATE product_variants SET image_urls = '["https://picsum.photos/seed/mycafe-burmese-earrings/800/800"]' WHERE sku = 'BUR-EAR-STD';
-UPDATE product_variants SET image_urls = '["https://picsum.photos/seed/mycafe-fushun-ring/800/800"]' WHERE sku = 'FUS-RIN-55';
-UPDATE product_variants SET image_urls = '["https://picsum.photos/seed/mycafe-fushun-ring/800/800"]' WHERE sku = 'FUS-RIN-60';
-UPDATE product_variants SET image_urls = '["https://picsum.photos/seed/mycafe-yunnan-incense/800/800"]' WHERE sku = 'YUN-INC-BOX';
-UPDATE product_variants SET image_urls = '["https://picsum.photos/seed/mycafe-sandalwood-balm/800/800"]' WHERE sku = 'SAN-BAL-5g';
-UPDATE product_variants SET image_urls = '["https://picsum.photos/seed/mycafe-hinoki-oil/800/800"]' WHERE sku = 'HIN-OIL-10ML';

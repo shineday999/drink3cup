@@ -20,7 +20,7 @@ const db = (await createTestDb()) as unknown as D1Database | null;
 
 function sample(over: Record<string, unknown> = {}) {
   return ProductCreateSchema.parse({
-    category: "jewelry",
+    category: "beans",
     subcategory: "pendant",
     slug: "test-pendant",
     tags: ["calm", "gift"],
@@ -147,7 +147,7 @@ describe.skipIf(!db)("products repository", () => {
         db!,
         sample({
           slug: `item-${i}`,
-          category: i <= 3 ? "jewelry" : "incense",
+          category: i <= 3 ? "beans" : "brewing",
           status: i === 1 ? "active" : "draft",
           variants: [{ sku: `SKU-${i}` }],
           translations: [
@@ -163,10 +163,10 @@ describe.skipIf(!db)("products repository", () => {
       (await listProducts(db!, { pageSize: 2, page: 3 })).items.length,
     ).toBe(1);
     expect((await listProducts(db!, { status: "active" })).total).toBe(1);
-    expect((await listProducts(db!, { category: "incense" })).total).toBe(2);
+    expect((await listProducts(db!, { category: "brewing" })).total).toBe(2);
     expect((await listProducts(db!, { pageSize: 999 })).pageSize).toBe(100);
     expect((await listProducts(db!, { page: -3 })).page).toBe(1);
-    const first = (await listProducts(db!, { category: "incense" })).items[0];
+    const first = (await listProducts(db!, { category: "brewing" })).items[0];
     expect(first?.variant_count).toBe(1);
     expect(first?.name?.startsWith("商品")).toBe(true);
   });
@@ -213,7 +213,7 @@ describe.skipIf(!db)("products repository", () => {
     const p = await getProduct(db!, id);
     expect(p?.status).toBe("active");
     expect(p?.subcategory).toBeNull();
-    expect(p?.category).toBe("jewelry"); // 沒帶 → 不變
+    expect(p?.category).toBe("beans"); // 沒帶 → 不變
     expect(p?.tags).toEqual(["calm", "gift"]);
     expect(p?.translations.map((t) => t.locale)).toEqual(["zh-Hant"]);
     expect(p?.translations[0]?.name).toBe("新名稱");

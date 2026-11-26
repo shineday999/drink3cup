@@ -1,6 +1,6 @@
 ---
 // SVG 漸層抽象樹葉元件 — 用於 Hero 背景與 OG image
-// 計畫書 §4.1 色板:森林綠 + 琥珀金
+// 色板:深色底 + 金色葉脈
 ---
 
 <svg
@@ -16,7 +16,7 @@
       <stop offset="50%" stop-color="#725540" stop-opacity="0.75"></stop>
       <stop offset="100%" stop-color="#ae9786" stop-opacity="0.6"></stop>
     </linearGradient>
-    <linearGradient id="amber-grad" x1="100%" y1="0%" x2="0%" y2="100%">
+    <linearGradient id="gold-grad" x1="100%" y1="0%" x2="0%" y2="100%">
       <stop offset="0%" stop-color="#8C6B3E" stop-opacity="0.4"></stop>
       <stop offset="100%" stop-color="#C9925B" stop-opacity="0.25"></stop>
     </linearGradient>
@@ -26,7 +26,7 @@
     </radialGradient>
   </defs>
 
-  <!-- Base forest gradient -->
+  <!-- Base gradient -->
   <rect width="800" height="800" fill="url(#forest-grad)"></rect>
 
   <!-- Abstract leaf shapes -->
@@ -57,14 +57,14 @@
       cy="200"
       rx="180"
       ry="80"
-      fill="url(#amber-grad)"
+      fill="url(#gold-grad)"
       transform="rotate(-15 600 200)"></ellipse>
     <ellipse
       cx="200"
       cy="550"
       rx="160"
       ry="70"
-      fill="url(#amber-grad)"
+      fill="url(#gold-grad)"
       transform="rotate(20 200 550)"></ellipse>
   </g>
 

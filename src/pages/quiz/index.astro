@@ -15,7 +15,7 @@ const t = createT(messages);
 const pageTitle = `${t("nav.quiz")} — ${t("common.site_name")}`;
 
 // 「選一件」卡片：跟首頁一樣讀後臺分類（site_categories），有測驗的分類才出現卡片
-// （內建 jewelry / incense，以及茶葉 tea）。後臺新增茶葉分類後這裡會自動多一張。
+// （內建 beans / brewing，以及茶葉 tea）。後臺新增茶葉分類後這裡會自動多一張。
 interface QuizEntry {
   kind: QuizKind;
   href: string;

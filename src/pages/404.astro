@@ -2,7 +2,7 @@
 import { env } from "cloudflare:workers";
 
 // 404 — Morning Mist illustration (Wave 10)
-// Eastern ink wash: dawn gradient + drifting mist + pine branch + falling amber leaf.
+// Eastern ink wash: dawn gradient + drifting mist + pine branch + falling leaf.
 // Renders as inline SVG so no asset request + respects prefers-reduced-motion.
 import Layout from "@layouts/Layout.astro";
 import RevealOnScroll from "@components/RevealOnScroll.astro";
@@ -76,7 +76,7 @@ const suggestedProducts = suggested.results ?? [];
                 ></stop>
               </radialGradient>
 
-              <linearGradient id="amber-leaf" x1="0" y1="0" x2="1" y2="1">
+              <linearGradient id="leaf-gold" x1="0" y1="0" x2="1" y2="1">
                 <stop offset="0%" stop-color="#D4A574"></stop>
                 <stop offset="100%" stop-color="#8C6B3E"></stop>
               </linearGradient>
@@ -151,11 +151,11 @@ const suggestedProducts = suggested.results ?? [];
               ></circle>
             </g>
 
-            <!-- Falling amber leaf (slow rotation + descent along an S-curve) -->
+            <!-- Falling leaf (slow rotation + descent along an S-curve) -->
             <g class="leaf-fall">
               <path
                 d="M 0 0 C -10 -5 -12 -14 -5 -18 C 7 -20 16 -11 14 -2 C 12 7 5 9 0 0 Z"
-                fill="url(#amber-leaf)"
+                fill="url(#leaf-gold)"
                 transform="translate(0 0) rotate(-15)"></path>
             </g>
           </svg>

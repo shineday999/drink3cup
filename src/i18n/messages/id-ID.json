@@ -581,7 +581,7 @@
       "label_description": "描述",
       "label_story": "故事（選填）",
       "save_translation": "儲存 {loc}",
-      "no_variants": "暫無規格。請通過 seed.sql 新增（第五階段需規格編輯器）。",
+      "no_variants": "暫無規格。請在後台編輯商品、新增規格。",
       "delete": "刪除商品",
       "delete_confirm": "確定刪除該商品？所有規格、翻譯、評論都會一併刪除。",
       "current_image": "當前封面",
