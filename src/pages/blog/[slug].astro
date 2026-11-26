@@ -3,6 +3,7 @@ import Layout from "@layouts/Layout.astro";
 import { env } from "cloudflare:workers";
 import FaqSchema from "@components/FaqSchema.astro";
 import ArticleSchema from "@components/ArticleSchema.astro";
+import BreadcrumbSchema from "@components/BreadcrumbSchema.astro";
 import { createT } from "../../i18n/t";
 import { defaultLocale, localizedPath, type Locale } from "../../i18n/config";
 
@@ -114,6 +115,13 @@ const postFaqs: { q: string; a: string }[] = (() => {
       image={post.cover_image_url}
       locale={locale}
       siteName={t("common.site_name")}
+    />
+    <BreadcrumbSchema
+      items={[
+        { name: t("nav.home"), url: "/" },
+        { name: t("blog.title"), url: "/blog" },
+        { name: title, url: `/blog/${post.slug}` },
+      ]}
     />
     {postFaqs.length > 0 && <FaqSchema items={postFaqs} />}
   </Fragment>
