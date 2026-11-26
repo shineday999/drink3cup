@@ -809,5 +809,76 @@
     "sort_new": "Newest",
     "sort_price_asc": "Price: Low to High",
     "sort_price_desc": "Price: High to Low"
+  },
+  "faq": {
+    "title": "Coffee Q&A Center",
+    "kicker": "Frequently Asked Questions",
+    "intro": "From selecting beans and roasting to brewing and storage, we give you the answers first, then fill in the details.",
+    "breadcrumb": "Q&A Center",
+    "g1": {
+      "title": "Bean Selection & Origins",
+      "q1": "How should I choose my first bag of coffee beans?",
+      "a1": "Start with the roast level, then the origin. If you prefer bright, fruity notes, go for a light roast. For a balanced, smooth cup, choose a medium roast. If you enjoy bold, bittersweet flavors, a dark roast is the way to go. If you're unsure, start with a medium-roast single-origin bean and adjust based on your taste. You can also take the 'Find your pick' quiz on our website for personalized recommendations.",
+      "q2": "What is the difference between single-origin and blend coffee?",
+      "a2": "Single-origin beans come from one specific region and offer distinct flavor profiles. Blends are a mix of different beans, providing a more stable and balanced taste. Choose single-origin to explore regional characteristics, or blends for a consistent, easy-drinking cup every day.",
+      "q3": "Does the origin affect the taste of coffee?",
+      "a3": "Yes. Altitude, climate, soil, and varietal all contribute to the unique flavors of coffee from different regions. Generally, African coffees often feature floral and citrus acidity, Central and South American coffees lean toward nutty and chocolatey notes, and Asian coffees tend to have herbal and full-bodied textures. These are general trends; specific farms and processing methods will always create variations.",
+      "q4": "What is the difference between washed, natural, and honey process?",
+      "a4": "These terms refer to how the coffee cherry is processed to extract the bean. Washed process yields a clean, bright cup. Natural process results in intense fruity flavors. Honey process offers a sweet, rounded body. In washed processing, the fruit is removed before drying, leading to a cleaner taste. In natural processing, the whole cherry is dried, retaining strong fruit notes. Honey processing leaves some mucilage on the bean during drying, resulting in a profile between the two.",
+      "q5": "What does 'specialty coffee' mean?",
+      "a5": "It generally refers to coffee beans that score 80 points or higher in professional cupping. Trained cuppers evaluate aroma, acidity, body, and aftertaste. The score is just a reference; ultimately, it comes down to whether you enjoy the taste."
+    },
+    "g2": {
+      "title": "Roasting & Flavor",
+      "q1": "How are light, medium, and dark roasts distinguished?",
+      "a1": "The lighter the roast, the more pronounced the acidity and floral/fruity notes. The darker the roast, the more prominent the bittersweet and caramelized flavors. Light roasts highlight origin characteristics, medium roasts balance sweetness and acidity, and dark roasts offer a heavy body with low acidity. There is no 'better' option; it depends on your personal taste and brewing method.",
+      "q2": "Is the acidity in coffee a sign that it has gone bad?",
+      "a2": "Not necessarily. Good acidity feels like the refreshing tang of fruit and is a key part of coffee's flavor. If the taste is sharp, harsh, or has off-flavors, it is likely under-extracted. Try increasing the water temperature, grinding finer, or extending the brew time.",
+      "q3": "Why does my coffee taste so bitter?",
+      "a3": "The most common cause is over-extraction: grinding too fine, using water that is too hot, or brewing for too long. Try grinding coarser, lowering the water temperature by 2 to 3 degrees, or shortening the brew time. If you are using dark roast beans, they are naturally bittersweet; you might prefer switching to a medium roast.",
+      "q4": "Do coffee beans have a 'best before' date?",
+      "a4": "Yes. The flavor is best within 2 weeks to 1 month after roasting, after which the aroma gradually fades. Freshly roasted beans contain more gas; letting them rest for a few days stabilizes the flavor and results in a rounder cup. Check the roast date rather than the expiration date for the most accurate freshness indicator.",
+      "q5": "How do I describe coffee flavors?",
+      "a5": "You can describe coffee from five aspects: aroma, acidity, sweetness, body, and aftertaste. You don't need to memorize technical jargon; use familiar comparisons, such as citrus, chocolate, or nuts. The more you drink and compare, the clearer your palate will become."
+    },
+    "g3": {
+      "title": "Grinding & Brewing",
+      "q1": "How do I choose the right grind size?",
+      "a1": "The shorter the brew time, the finer the grind; the longer the brew time, the coarser the grind. Espresso requires the finest grind, pour-over and drip filters use a medium grind, and French presses and cold brew use the coarsest. Start with the recommended setting, then adjust based on the taste.",
+      "q2": "What is the recommended coffee-to-water ratio for pour-over?",
+      "a2": "A common starting point is 1:15 to 1:16, meaning 1 gram of coffee for 15 to 16 milliliters of water. For example, use 15 grams of coffee with about 240 milliliters of water. Reduce the water for a stronger cup, or increase it for a lighter, cleaner taste.",
+      "q3": "What water temperature should I use for pour-over?",
+      "a3": "For light roasts, use 90–93°C. For medium roasts, use 88–91°C. For dark roasts, use 82–88°C. Higher temperatures extract more, which can lead to bitterness; lower temperatures produce a softer, rounder cup. These are general ranges; adjust to your preference.",
+      "q4": "Why should I bloom my pour-over coffee?",
+      "a4": "Blooming allows the coffee grounds to release gas, leading to more even extraction. Pour in water equal to twice the weight of the coffee, let it sit for about 30 seconds, then continue pouring. Freshly roasted beans will visibly swell during this stage.",
+      "q5": "Can I brew coffee without a pour-over kettle?",
+      "a5": "Yes. French presses, AeroPresses, or drip coffee bags can all produce great coffee. The French press is the simplest to operate, while the AeroPress offers a clean flavor and is easy to learn. Choosing tools that feel comfortable to use is more important than chasing high-end equipment."
+    },
+    "g4": {
+      "title": "Storage & Usage",
+      "q1": "How should I store coffee beans?",
+      "a1": "Keep them in an airtight container, away from light, heat, and moisture. Avoid placing them near stoves or windows. Try to consume them within 2 to 4 weeks of opening. Using bags with one-way valves or airtight jars helps slow down the loss of aroma.",
+      "q2": "Can I store coffee beans in the refrigerator?",
+      "a2": "It is not recommended to move beans in and out of the fridge daily, as condensation can form and affect the flavor. If you buy a large quantity, divide it into small, sealed portions and freeze them. Take out only what you need and do not return it to the freezer.",
+      "q3": "Should I buy whole beans or ground coffee?",
+      "a3": "Whole beans are recommended for the best flavor, as you grind them right before brewing. Ground coffee has a larger surface area exposed to air, causing aromas to dissipate quickly. If you don't have a grinder, ask the shop to grind for you and try to finish it as soon as possible.",
+      "q4": "How much coffee should I buy at once?",
+      "a4": "Buy enough to last 2 to 4 weeks based on your consumption rate. If you drink one cup a day, 200 to 250 grams is a good amount. Leftover beans will gradually lose their flavor over time.",
+      "q5": "Is it normal for coffee beans to look oily after opening?",
+      "a5": "Yes. Dark roast beans often develop surface oils, which does not mean they are bad. As long as there is no rancid smell, off-flavors, or mold, they are safe to drink. Oily beans oxidize faster, so it is best to consume them promptly."
+    },
+    "g5": {
+      "title": "Brewing Equipment",
+      "q1": "What brewing equipment is suitable for beginners?",
+      "a1": "Beginners should start with a dripper, a gooseneck kettle, and a digital scale. These three items form the basic pour-over setup. A digital scale helps maintain a consistent coffee-to-water ratio, ensuring a more consistent taste in every cup.",
+      "q2": "Do I need to buy a coffee grinder?",
+      "a2": "If you drink coffee regularly, it is recommended. The difference in aroma and flavor between freshly ground and pre-ground coffee is significant. Hand grinders are affordable and compact, making them great for beginners. Electric grinders are faster and require less effort, suitable for daily use.",
+      "q3": "What types of drippers are available?",
+      "a3": "Common types include conical, flat-bottom (fan-shaped), and cake drippers. They differ in water flow speed and extraction method. Conical drippers have faster water flow and highlight flavor layers. Flat-bottom and cake drippers have slower flow and produce a more stable taste. Beginners can choose based on their preferred brewing style.",
+      "q4": "Which is better: paper filters or metal filters?",
+      "a4": "Paper filters produce a cleaner cup, while metal filters retain more oils, resulting in a heavier body. Paper filters are convenient but are a consumable item. Metal filters are reusable but require more time to clean.",
+      "q5": "How should I clean my brewing equipment?",
+      "a5": "Rinse with clean water after each use. Periodically wash with warm water and a small amount of neutral detergent. Residual coffee oils can develop off-flavors and affect the next brew. Ensure the dripper and kettle are completely dry before storing."
+    }
   }
 }

@@ -809,5 +809,76 @@
     "sort_new": "Terbaru",
     "sort_price_asc": "Harga rendah ke tinggi",
     "sort_price_desc": "Harga tinggi ke rendah"
+  },
+  "faq": {
+    "title": "Pusat Soalan & Jawapan Kopi",
+    "kicker": "Soalan Lazim",
+    "intro": "Dari pemilihan biji, pembakaran, penyeduhan hingga penyimpanan, kami berikan jawapan utama dahulu, diikuti dengan butiran lanjut.",
+    "breadcrumb": "Pusat Soalan & Jawapan",
+    "g1": {
+      "title": "Pemilihan Biji & Asal-usul",
+      "q1": "Bagaimana cara memilih biji kopi untuk pembelian pertama?",
+      "a1": "Tahap pembakaran dahulu, kemudian asal-usul. Jika anda suka rasa buah yang cerah, pilih pembakaran ringan; jika suka rasa seimbang dan lembut, pilih pembakaran sederhana; jika suka rasa pekat dan pahit-manis, pilih pembakaran gelap. Jika tidak pasti, mulakan dengan biji single-origin berpembakaran sederhana, kemudian laraskan mengikut citarasa. Anda juga boleh menggunakan ujian 'Cari Pilihan Anda' di laman web untuk mendapatkan cadangan dengan menjawab beberapa soalan.",
+      "q2": "Apakah perbezaan antara biji single-origin dan biji campuran (blend)?",
+      "a2": "Biji single-origin berasal dari satu lokasi tunggal dengan ciri rasa yang jelas; biji campuran dicampur dari pelbagai jenis biji untuk rasa yang lebih stabil dan seimbang. Jika ingin mengenali rasa asal-usul, pilih single-origin; jika ingin rasa yang konsisten dan mudah dinikmati setiap hari, biji campuran adalah pilihan yang baik.",
+      "q3": "Adakah asal-usul mempengaruhi rasa kopi?",
+      "a3": "Ya. Ketinggian, iklim, tanah dan varieti menyebabkan kopi dari kawasan berbeza mempunyai rasa yang berbeza. Secara umum, kawasan Afrika sering mempunyai aroma bunga dan keasidan sitrus; Amerika Tengah dan Selatan cenderung ke arah rasa kacang dan coklat; manakala Asia sering mempunyai rasa herba dan tekstur yang tebal. Ini adalah panduan umum, tetapi rasa sebenar masih bergantung pada ladang dan kaedah pemprosesan.",
+      "q4": "Apakah perbezaan antara proses washed, natural dan honey?",
+      "a4": "Ketiganya berbeza dalam cara biji kopi dikeluarkan dari buah: proses washed bersih dan cerah, natural kaya dengan aroma buah, dan honey manis dan lembut. Proses washed membuang daging buah dahulu sebelum dikeringkan, menghasilkan rasa yang bersih; proses natural mengeringkan buah bersama biji, memberikan rasa buah yang ketara; proses honey mengekalkan sebahagian pektin buah sebelum dikeringkan, berada di antara kedua-duanya.",
+      "q5": "Apa maksudnya 'kopi specialty'?",
+      "a5": "Biasanya merujuk kepada biji kopi yang mendapat skor 80 mata ke atas dalam penilaian cawan profesional. Skor diberikan oleh penguji cawan terlatih berdasarkan aroma, keasidan, tekstur, dan aftertaste. Skor hanyalah panduan; yang paling penting adalah sama ada anda menyukainya apabila diminum."
+    },
+    "g2": {
+      "title": "Pembakaran & Rasa",
+      "q1": "Bagaimana perbezaan antara pembakaran ringan, sederhana dan gelap?",
+      "a1": "Semakin ringan pembakaran, semakin jelas keasidan dan aroma bunga/buah; semakin gelap, semakin jelas rasa pahit-manis dan karamel. Pembakaran ringan mengekalkan ciri asal-usul, pembakaran sederhana seimbang antara manis dan masam, manakala pembakaran gelap mempunyai tekstur tebal dan keasidan rendah. Tiada yang lebih baik, ia bergantung pada citarasa dan kaedah penyeduhan anda.",
+      "q2": "Adakah rasa masam dalam kopi bermakna ia sudah rosak?",
+      "a2": "Tidak. Keasidan yang baik seperti kesegaran buah, sebahagian daripada profil rasa kopi. Jika rasanya terlalu tajam atau menusuk dengan bau asing, ia mungkin akibat ekstraksi yang tidak mencukupi. Cuba tingkatkan suhu air, giling lebih halus, atau panjangkan masa penyeduhan.",
+      "q3": "Kenapa kopi saya terasa sangat pahit?",
+      "a3": "Sebab paling umum ialah ekstraksi berlebihan: gilingan terlalu halus, suhu air terlalu tinggi, atau masa penyeduhan terlalu lama. Cuba giling sedikit lebih kasar, kurangkan suhu air 2 hingga 3 darjah, atau pendekkan masa penyeduhan. Jika menggunakan biji berpembakaran gelap, ia memang cenderung pahit-manis; anda juga boleh beralih kepada pembakaran sederhana.",
+      "q4": "Adakah 'tarikh terbaik' untuk biji kopi?",
+      "a4": "Ya. Rasa terbaik adalah dalam tempoh 2 minggu hingga 1 bulan selepas pembakaran, kemudian aroma akan semakin pudar. Biji yang baru dibakar mempunyai lebih banyak gas; biarkan beberapa hari untuk menstabilkan rasa sebelum diseduh, ia akan menjadi lebih lembut. Semasa membeli, lihat tarikh pembakaran, ia lebih tepat daripada tarikh luput.",
+      "q5": "Bagaimana cara menggambarkan rasa kopi?",
+      "a5": "Anda boleh menerangkannya dari lima aspek: aroma, keasidan, kemanisan, tekstur, dan aftertaste. Tidak perlu menghafih istilah profesional, gunakan perbandingan rasa yang anda kenali, seperti sitrus, coklat, atau kacang. Dengan minum dan membandingkan lebih banyak, anda akan semakin faham."
+    },
+    "g3": {
+      "title": "Penggilangan & Penyeduhan",
+      "q1": "Bagaimana cara memilih tahap penggilangan?",
+      "a1": "Semakin pendek masa penyeduhan, semakin halus gilingan; semakin panjang masa penyeduhan, semakin kasar gilingan. Espresso paling halus, pour-over dan filter medium, manakala French press dan cold brew paling kasar. Anda boleh mula dengan tetapan yang disyorkan, kemudian laraskan mengikut rasa.",
+      "q2": "Berapakah nisbah air dan kopi untuk pour-over?",
+      "a2": "Titik permulaan yang biasa ialah 1:15 hingga 1:16, iaitu 1 gram kopi dengan 15 hingga 16 mililiter air. Contohnya, 15 gram kopi dengan kira-kira 240 mililiter air. Jika suka lebih pekat, kurangkan air; jika suka lebih ringan, tambah air.",
+      "q3": "Berapakah suhu air untuk pour-over?",
+      "a3": "Pembakaran ringan: 90 hingga 93 darjah; pembakaran sederhana: 88 hingga 91 darjah; pembakaran gelap: 82 hingga 88 darjah. Suhu lebih tinggi menghasilkan ekstraksi lebih banyak dan cenderung lebih pahit; suhu lebih rendah memberikan rasa yang lebih lembut dan bulat. Ini adalah julat biasa, boleh dilaraskan mengikut citarasa.",
+      "q4": "Kenapa perlu melakukan 'blooming' (perendaman awal) untuk pour-over?",
+      "a4": "Blooming membolehkan kopi mengeluarkan gas terlebih dahulu, menjadikan ekstraksi seterusnya lebih seragam. Caranya ialah tuang air sebanyak dua kali berat kopi, biarkan selama 30 saat, kemudian teruskan menuang air. Biji yang baru dibakar akan mengembang dengan ketara semasa blooming.",
+      "q5": "Bolehkah menyeduh kopi tanpa teko pour-over?",
+      "a5": "Boleh. French press, AeroPress, atau beg kopi filter boleh menghasilkan kopi yang enak. French press paling mudah digunakan, manakala AeroPress memberikan rasa yang bersih dan mudah dipelajari. Pilih alat yang selesa untuk anda, lebih penting daripada mengejar peralatan canggih."
+    },
+    "g4": {
+      "title": "Penyimpanan & Penggunaan",
+      "q1": "Bagaimana cara menyimpan biji kopi?",
+      "a1": "Simpan dalam bekas kedap udara, jauh dari cahaya, di tempat sejuk dan kering. Jangan letakkan berhampiran api atau tingkap. Cuba habiskan dalam masa 2 hingga 4 minggu selepas dibuka. Beg ziplock dengan injap pelepasan satu arah atau bekas kedap boleh membantu mengekalkan aroma.",
+      "q2": "Bolehkah biji kopi disimpan dalam peti sejuk?",
+      "a2": "Tidak disyorkan untuk memasukkan dan mengeluarkan biji kopi dari peti sejuk setiap hari, kerana wap air boleh terbentuk dan mempengaruhi rasa. Jika membeli dalam kuantiti besar, bahagikan kepada pakej kecil, kedap, dan beku. Ambil satu pakej apabila ingin minum, dan jangan letakkan kembali ke dalam peti beku selepas dikeluarkan.",
+      "q3": "Adakah lebih baik membeli biji kopi atau kopi tumbuk?",
+      "a3": "Disyorkan membeli biji kopi dan menggilingnya sebelum minum untuk rasa terbaik. Kopi tumbuk mempunyai permukaan yang lebih luas bersentuhan dengan udara, menyebabkan aroma hilang dengan cepat. Jika tiada penggilang, minta kedai menggilingkan untuk anda dan habiskan secepat mungkin.",
+      "q4": "Berapa banyak biji kopi yang perlu dibeli pada satu masa?",
+      "a4": "Beli jumlah yang boleh dihabiskan dalam masa 2 hingga 4 minggu. Jika minum satu cawan sehari, kira-kira 200 hingga 250 gram adalah sesuai. Biji yang tidak dihabiskan akan kehilangan rasa secara beransur-ansur.",
+      "q5": "Adakah normal jika biji kopi mengeluarkan minyak selepas dibuka?",
+      "a5": "Normal. Biji berpembakaran gelap sering mengeluarkan minyak pada permukaannya, ini tidak bermakna ia rosak. Selama tiada bau minyak tengik, bau asing, atau kulat, ia boleh diminum dengan selamat. Biji yang berminyak lebih mudah teroksida, jadi cuba habiskan secepat mungkin."
+    },
+    "g5": {
+      "title": "Pilihan Peralatan Penyeduhan",
+      "q1": "Peralatan penyeduhan apa yang sesuai untuk pemula?",
+      "a1": "Untuk pemula, disyorkan bermula dengan corong (filter), teko pour-over, dan penimbang digital. Tiga ini adalah set asas untuk pour-over. Penimbang digital membantu menstabilkan nisbah air dan kopi, menjadikan rasa lebih konsisten setiap kali.",
+      "q2": "Adakah perlu membeli penggilang kopi?",
+      "a2": "Jika anda kerap minum kopi, disyorkan untuk membelinya. Perbezaan aroma dan rasa kopi yang digiling segar adalah ketara. Penggilang manual berpatutan dan kecil, sesuai untuk pemula; penggilang elektrik menjimatkan tenaga dan lebih cepat, sesuai untuk penggunaan harian.",
+      "q3": "Apakah jenis corong (filter) yang ada?",
+      "a3": "Jenis yang biasa ialah kon (cone), segi empat (flat bottom), dan kek (cake). Perbezaannya ialah kelajuan aliran air dan kaedah ekstraksi. Corong kon mempunyai aliran air yang lebih cepat dan lapisan rasa yang jelas; corong segi empat dan kek mempunyai aliran air yang lebih perlahan dan rasa yang lebih stabil. Pemula boleh memilih berdasarkan kebiasaan penggunaan.",
+      "q4": "Mana yang lebih baik, kertas filter atau penapis logam?",
+      "a4": "Kertas filter memberikan rasa yang bersih, manakala penapis logam mengekalkan lebih banyak minyak, memberikan tekstur yang lebih tebal. Kertas filter mudah digunakan tetapi merupakan barang habis pakai; penapis logam boleh digunakan semula tetapi memerlukan lebih banyak masa untuk dibersihkan.",
+      "q5": "Bagaimana cara membersihkan peralatan penyeduhan?",
+      "a5": "Bilas dengan air bersih selepas setiap penggunaan, dan basuh secara berkala dengan air suam dan sedikit pencuci neutral. Sisa minyak kopi boleh menyebabkan bau asing dan mempengaruhi rasa penyeduhan seterusnya. Pastikan corong dan teko kering sepenuhnya sebelum disimpan."
+    }
   }
 }

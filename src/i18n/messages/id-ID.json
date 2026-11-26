@@ -809,5 +809,76 @@
     "sort_new": "Terbaru",
     "sort_price_asc": "Harga Terendah",
     "sort_price_desc": "Harga Tertinggi"
+  },
+  "faq": {
+    "title": "Pusat Tanya Jawab Kopi",
+    "kicker": "Pertanyaan Umum",
+    "intro": "Dari memilih biji, sangrai, seduh, hingga penyimpanan, kami berikan jawabannya terlebih dahulu, lalu detailnya.",
+    "breadcrumb": "Pusat Tanya Jawab",
+    "g1": {
+      "title": "Pemilihan Biji & Asal",
+      "q1": "Bagaimana cara memilih kopi untuk pertama kali?",
+      "a1": "Pilih tingkat sangrai terlebih dahulu, baru asal. Jika suka rasa cerah dan fruity, pilih sangrai terang; jika suka seimbang dan halus, pilih sangrai medium; jika suka tebal dan pahit-manis, pilih sangrai gelap. Jika ragu, mulai dari single origin sangrai medium, lalu sesuaikan dengan selera. Anda juga bisa menggunakan kuis 'Pilih Satu' di situs kami untuk mendapatkan rekomendasi.",
+      "q2": "Apa bedanya single origin dan blend?",
+      "a2": "Single origin berasal dari satu wilayah dengan karakter rasa yang jelas; blend dicampur dari berbagai biji untuk rasa yang lebih stabil dan seimbang. Jika ingin mengenal karakter asal, pilih single origin; jika ingin rasa yang konsisten dan mudah dinikmati setiap hari, blend adalah pilihan yang baik.",
+      "q3": "Apakah asal mempengaruhi rasa kopi?",
+      "a3": "Ya. Ketinggian, iklim, tanah, dan varietas membuat kopi dari berbagai wilayah memiliki rasa berbeda. Umumnya, kopi Afrika memiliki aroma bunga dan keasaman sitrus; Amerika Tengah & Selatan cenderung kacang dan cokelat; Asia memiliki nuansa herbal dan tubuh yang tebal. Ini adalah gambaran umum, rasa spesifik tetap bergantung pada kebun dan metode pengolahan.",
+      "q4": "Apa bedanya proses washed, natural, dan honey?",
+      "a4": "Ketiganya berbeda dalam cara biji diambil dari buah: washed bersih dan cerah, natural kaya aroma buah, honey manis dan lembut. Proses washed menghilangkan daging buah sebelum pengeringan, menghasilkan rasa bersih; natural mengeringkan buah utuh, menghasilkan rasa buah yang kuat; honey meninggalkan sebagian lendir buah sebelum pengeringan, berada di antara keduanya.",
+      "q5": "Apa itu 'kopi spesial'?",
+      "a5": "Umumnya merujuk pada biji kopi yang mendapatkan skor 80+ dalam cupping profesional. Skor diberikan oleh cupper terlatih berdasarkan aroma, keasaman, tekstur, dan aftertaste. Skor hanyalah referensi; yang terpenting adalah apakah Anda menyukainya saat diminum."
+    },
+    "g2": {
+      "title": "Sangrai & Rasa",
+      "q1": "Bagaimana membedakan sangrai terang, medium, dan gelap?",
+      "a1": "Semakin terang sangrai, semakin jelas keasaman dan aroma bunga/buah; semakin gelap, semakin jelas rasa pahit-manis dan karamel. Sangrai terang mempertahankan karakter asal, medium seimbang antara asam dan manis, gelap memiliki tubuh tebal dan keasaman rendah. Tidak ada yang lebih baik, tergantung selera dan metode seduh.",
+      "q2": "Apakah rasa asam berarti kopi sudah basi?",
+      "a2": "Tidak. Keasaman yang baik terasa segar seperti buah, bagian dari profil rasa kopi. Jika terasa tajam, menusuk, atau ada rasa asing, kemungkinan besar under-extraction. Coba tingkatkan suhu air, giling lebih halus, atau perpanjang waktu seduh.",
+      "q3": "Mengapa kopi saya terasa sangat pahit?",
+      "a3": "Penyebab paling umum adalah over-extraction: gilingan terlalu halus, suhu air terlalu tinggi, atau waktu seduh terlalu lama. Coba giling lebih kasar, turunkan suhu air 2-3 derajat, atau perpendek waktu seduh. Jika menggunakan biji sangrai gelap, memang cenderung pahit-manis; Anda bisa beralih ke sangrai medium.",
+      "q4": "Apakah biji kopi punya 'masa terbaik'?",
+      "a4": "Ya. Rasa terbaik adalah 2 minggu hingga 1 bulan setelah sangrai, setelah itu aroma akan memudar. Biji yang baru disangrai mengandung banyak gas; diamkan beberapa hari agar rasa stabil sebelum diseduh, hasilnya akan lebih lembut. Saat membeli, perhatikan tanggal sangrai, lebih akurat daripada tanggal kedaluwarsa.",
+      "q5": "Bagaimana mendeskripsikan rasa kopi?",
+      "a5": "Anda bisa mendeskripsikannya dari lima aspek: aroma, keasaman, kemanisan, tekstur, dan aftertaste. Tidak perlu menghafal istilah teknis, gunakan perbandingan rasa yang familiar, seperti jeruk, cokelat, atau kacang. Semakin sering mencicipi dan membandingkan, semakin jelas persepsi Anda."
+    },
+    "g3": {
+      "title": "Penumbukan & Penyeduhan",
+      "q1": "Bagaimana memilih tingkat kehalusan gilingan?",
+      "a1": "Semakin pendek waktu seduh, semakin halus gilingan; semakin panjang waktu seduh, semakin kasar gilingan. Espresso paling halus, pour-over dan filter medium, French press dan cold brew paling kasar. Mulai dari pengaturan yang disarankan, lalu sesuaikan dengan rasa.",
+      "q2": "Berapa rasio kopi dan air untuk pour-over?",
+      "a2": "Titik awal umum adalah 1:15 hingga 1:16, yaitu 1 gram bubuk kopi untuk 15-16 ml air. Misalnya, 15 gram bubuk kopi dengan sekitar 240 ml air. Jika suka lebih pekat, kurangi air; jika suka lebih ringan, tambah air.",
+      "q3": "Berapa suhu air untuk pour-over?",
+      "a3": "Sangrai terang sekitar 90-93°C, medium sekitar 88-91°C, gelap sekitar 82-88°C. Suhu lebih tinggi menghasilkan ekstraksi lebih banyak dan cenderung lebih pahit; suhu lebih rendah menghasilkan rasa lebih lembut dan bulat. Ini adalah rentang umum, sesuaikan dengan selera.",
+      "q4": "Mengapa pour-over perlu blooming?",
+      "a4": "Blooming memungkinkan bubuk kopi mengeluarkan gas terlebih dahulu, sehingga ekstraksi selanjutnya lebih merata. Caranya adalah menuang air sebanyak 2x berat bubuk, diamkan sekitar 30 detik, lalu lanjutkan menuang air. Biji yang baru disangrai akan mengembang secara signifikan saat blooming.",
+      "q5": "Bisa seduh kopi tanpa kettle pour-over?",
+      "a5": "Bisa. French press, AeroPress, atau kopi filter instan bisa menghasilkan kopi yang enak. French press paling mudah dioperasikan, AeroPress memiliki rasa bersih dan mudah dipelajari. Memilih alat yang nyaman digunakan lebih penting daripada mengejar peralatan canggih."
+    },
+    "g4": {
+      "title": "Penyimpanan & Penggunaan",
+      "q1": "Bagaimana cara menyimpan biji kopi?",
+      "a1": "Simpan di tempat kedap udara, terlindung dari cahaya, sejuk, dan kering. Jangan letakkan di dekat kompor atau jendela. Setelah dibuka, usahakan habiskan dalam 2-4 minggu. Gunakan kantong ziplock dengan katup satu arah atau toples kedap udara untuk memperlambat hilangnya aroma.",
+      "q2": "Bisa simpan biji kopi di kulkas?",
+      "a2": "Tidak disarankan jika sering keluar-masuk kulkas, karena kondensasi saat dikeluarkan dapat mempengaruhi rasa. Jika membeli banyak, bagi menjadi paket kecil, segel, dan bekukan. Ambil satu paket saat ingin minum, dan jangan kembalikan ke freezer setelah dikeluarkan.",
+      "q3": "Lebih baik beli biji atau bubuk kopi?",
+      "a3": "Disarankan membeli biji dan menggilingnya sebelum minum untuk rasa terbaik. Bubuk kopi memiliki area kontak dengan udara yang lebih besar, sehingga aroma cepat hilang. Jika tidak punya penggiling, minta toko untuk menggilingkan, dan habiskan secepatnya.",
+      "q4": "Berapa banyak biji kopi yang harus dibeli sekaligus?",
+      "a4": "Beli sesuai kecepatan minum Anda, sekitar 2-4 minggu. Jika minum satu cangkir per hari, 200-250 gram sudah cukup. Biji yang tidak habis akan kehilangan rasa secara bertahap.",
+      "q5": "Apakah normal jika biji kopi mengeluarkan minyak setelah dibuka?",
+      "a5": "Normal. Biji sangrai gelap sering mengeluarkan minyak di permukaan, bukan berarti basi. Selama tidak ada bau minyak tengik, bau asing, atau jamur, aman untuk diminum. Biji yang berminyak lebih mudah teroksidasi, disarankan untuk segera dihabiskan."
+    },
+    "g5": {
+      "title": "Memilih Alat Seduh",
+      "q1": "Alat seduh apa yang cocok untuk pemula?",
+      "a1": "Untuk pemula, disarankan mulai dari dripper, kettle, dan timbangan digital. Ketiganya adalah kombinasi dasar pour-over. Timbangan digital membantu menjaga rasio kopi dan air stabil, sehingga rasa setiap seduhan lebih konsisten.",
+      "q2": "Apakah perlu membeli penggiling kopi?",
+      "a2": "Jika sering minum kopi, disarankan membeli. Perbedaan aroma dan rasa antara gilingan segar dan bubuk siap pakai sangat jelas. Penggiling manual terjangkau dan ringkas, cocok untuk pemula; penggiling listrik menghemat tenaga dan cepat, cocok untuk penggunaan harian.",
+      "q3": "Apa saja jenis dripper?",
+      "a3": "Jenis umum adalah kerucut, datar (fan), dan cake. Perbedaannya ada pada kecepatan aliran air dan metode ekstraksi. Dripper kerucut memiliki aliran lebih cepat dan lapisan rasa yang jelas; dripper datar dan cake memiliki aliran lebih lambat dan rasa lebih stabil. Pemula bisa memilih berdasarkan kebiasaan penggunaan.",
+      "q4": "Mana yang lebih baik, kertas filter atau filter logam?",
+      "a4": "Kertas filter menghasilkan rasa bersih; filter logam mempertahankan lebih banyak minyak, menghasilkan tekstur lebih tebal. Kertas filter praktis tetapi merupakan barang habis pakai; filter logam bisa digunakan berulang kali tetapi membutuhkan waktu lebih lama untuk dibersihkan.",
+      "q5": "Bagaimana cara membersihkan alat seduh?",
+      "a5": "Bilas dengan air bersih setelah setiap penggunaan, dan bersihkan secara berkala dengan air hangat dan sedikit deterjen netral. Sisa minyak kopi dapat menimbulkan bau asing dan mempengaruhi rasa seduhan berikutnya. Pastikan dripper dan kettle benar-benar kering sebelum disimpan."
+    }
   }
 }

@@ -19,6 +19,7 @@ const STATIC_PATHS = [
   "/beans",
   "/brewing",
   "/blog",
+  "/faq",
   "/quiz",
   "/contact",
   "/about",
