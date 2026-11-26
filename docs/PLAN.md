@@ -105,9 +105,9 @@
 | S29 | 🤖   | 品牌定位與用詞重寫:重寫 `zh-Hant.json` 全部前台文字(導覽、首頁、品牌頁、聯絡、結帳、錯誤頁、頁尾),專業、白話、少文青腔;並把語言檔鍵名 amber / incense / materials / craft 改為 beans / brewing / origins / roasting                                      | ✅   | Claude |
 | S30 | 🤖   | 依新用詞重新翻譯 en / ms-MY / id-ID(母語者校對另記)                                                                                                                                                                                                      | ✅   | Claude |
 | S31 | 🤖   | 新增 `/faq` 問答中心:分主題 20–30 題,答案先給結論再補充,附 FAQPage JSON-LD,各語言                                                                                                                                                                        | ✅   | Claude |
-| S32 | 🤖   | 知識文章擴充(接 S11):每篇有摘要、FAQ、更新日期、Article JSON-LD;主題含產地、處理法、烘焙度、研磨、沖煮、保存、器具選購                                                                                                                                   | ✅   |        |
-| S33 | 🤖   | 商品頁:FAQ、Product / Offer 結構化資料、麵包屑、Organization 資訊(不得捏造評價或評分)                                                                                                                                                                    | ✅   |        |
-| S34 | 🤖   | GEO / AEO 收尾:llms.txt、答案式標題與摘要段、hreflang 與結構化資料驗證                                                                                                                                                                                   | ✅   |        |
+| S32 | 🤖   | 知識文章擴充(接 S11):每篇有摘要、FAQ、更新日期、Article JSON-LD;主題含產地、處理法、烘焙度、研磨、沖煮、保存、器具選購                                                                                                                                   | ✅   | Claude |
+| S33 | 🤖   | 商品頁:FAQ、Product / Offer 結構化資料、麵包屑、Organization 資訊(不得捏造評價或評分)                                                                                                                                                                    | ✅   | Claude |
+| S34 | 🤖   | GEO / AEO 收尾:llms.txt、答案式標題與摘要段、hreflang 與結構化資料驗證                                                                                                                                                                                   | ✅   | Claude |
 | S35 | 👤   | 擁有者提供:社群帳號網址(Instagram 等)與門市/聯絡資訊,用於頁尾連結與 Organization sameAs(目前頁尾社群連結是通用網址、小紅書連結為空)                                                                                                                      | ⬜   |        |
 
 ## 紀錄

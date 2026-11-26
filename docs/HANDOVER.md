@@ -118,3 +118,12 @@ Cloudflare 後台操作(D1、R2、Pages、網域、secrets)、Resend 金鑰、�
 - `kindOf` 移除未使用的 `_zhTitle` 參數與 tea 測驗種類,同步修改 admin/products/new.astro、quiz/index.astro 呼叫端
 - 已 build 並 deploy 到 Cloudflare Pages(mycafe)
 - 待辦:到 mycafe.de5.net 確認封面可讀性,必要時再調整遮罩
+
+## 2026-11-26 收工(S30–S34 完成,已部署)
+
+- S30:en / ms-MY / id-ID 重新翻譯(本機模型,待母語者校對)
+- S31:/faq 問答中心(5 主題 25 題、FAQPage JSON-LD、四語言)
+- S32:7 篇知識文章(migration 0023 已套用)、摘要、更新日期、Article 與 Breadcrumb JSON-LD
+- S33:商品頁可見 FAQ(無資料時用通用問答)、Product / Offer / Breadcrumb JSON-LD;無價格不輸出 Offer;無評價或評分
+- S34:llms.txt、llms-full.txt 加入問答與文章;sitemap 含 /faq;hreflang 已驗證
+- 待辦:S35(擁有者提供社群網址與門市資訊,補 Organization sameAs)、母語者校對、S13 照片、S15/S16/S24 驗收
