@@ -67,7 +67,7 @@
 | ---- | ---- | -------------------------------------------------------------------------------------------------------------------------------------- | ---- | ------ |
 | S07  | 🤖   | 重寫 `zh-Hant.json`(咖啡內容;需先完成 S05b,並處理 `site_name`、`hero_title`、`faq_a2_a`、後台 `brand` 等舊品牌鍵)                      | ⬜   |        |
 | S10  | 🤖   | 品牌頁:story、beans、brewing、origins、roasting、vision、more、about                                                                   | ✅   | Claude |
-| S11  | 🤖   | 知識文章種子(產地、水洗 vs 日曬、研磨度、V60、義式、保存)                                                                              | ⬜   |        |
+| S11  | 🤖   | 知識文章種子(產地、水洗 vs 日曬、研磨度、V60、義式、保存)                                                                              | ✅   |        |
 | S12  | 🤖   | 資料庫種子:新 `scripts/seed*.sql`、商品 FAQ、migrations 0007/0009/0011/0014 的站名與分類                                               | ✅   |        |
 | S13  | 🤖   | 更換 `public/images/**`(舊圖屬舊品牌),僅用自有或有授權的照片                                                                           | ⬜   |        |
 | S13b | 🤖   | 配色/設計 token 由「森林綠」改為咖啡色系(`tailwind.config.cjs`、`global.css`,class 名稱 `forest-*` 可保留或改名);重新製作 favicon/圖示 | ⬜   |        |
@@ -105,12 +105,16 @@
 | S29 | 🤖   | 品牌定位與用詞重寫:重寫 `zh-Hant.json` 全部前台文字(導覽、首頁、品牌頁、聯絡、結帳、錯誤頁、頁尾),專業、白話、少文青腔;並把語言檔鍵名 amber / incense / materials / craft 改為 beans / brewing / origins / roasting                                      | ✅   | Claude |
 | S30 | 🤖   | 依新用詞重新翻譯 en / ms-MY / id-ID(母語者校對另記)                                                                                                                                                                                                      | ✅   | Claude |
 | S31 | 🤖   | 新增 `/faq` 問答中心:分主題 20–30 題,答案先給結論再補充,附 FAQPage JSON-LD,各語言                                                                                                                                                                        | ✅   | Claude |
-| S32 | 🤖   | 知識文章擴充(接 S11):每篇有摘要、FAQ、更新日期、Article JSON-LD;主題含產地、處理法、烘焙度、研磨、沖煮、保存、器具選購                                                                                                                                   | ⬜   |        |
+| S32 | 🤖   | 知識文章擴充(接 S11):每篇有摘要、FAQ、更新日期、Article JSON-LD;主題含產地、處理法、烘焙度、研磨、沖煮、保存、器具選購                                                                                                                                   | ✅   |        |
 | S33 | 🤖   | 商品頁:FAQ、Product / Offer 結構化資料、麵包屑、Organization 資訊(不得捏造評價或評分)                                                                                                                                                                    | ⬜   |        |
 | S34 | 🤖   | GEO / AEO 收尾:llms.txt、答案式標題與摘要段、hreflang 與結構化資料驗證                                                                                                                                                                                   | ⬜   |        |
 | S35 | 👤   | 擁有者提供:社群帳號網址(Instagram 等)與門市/聯絡資訊,用於頁尾連結與 Organization sameAs(目前頁尾社群連結是通用網址、小紅書連結為空)                                                                                                                      | ⬜   |        |
 
 ## 紀錄
+
+- 2026-11-26 Claude:完成 S32(含 S11):新增 7 篇知識文章(產地、處理法、烘焙度、研磨、手沖、保存、器具選購,四語言,各 3 題 FAQ);文章頁新增重點摘要、更新日期、Article JSON-LD(migration 0023)。en / ms-MY / id-ID 由本機模型翻譯,待母語者校對。
+
+- 2026-11-26 Claude:完成 S31(`/faq` 問答中心 5 主題 25 題、FAQPage JSON-LD、四語言)。
 
 - 2026-11-26 Claude:完成 S29(zh-Hant 前台文字全面改為專業、白話、親民的用語;語言檔鍵名 amber / incense / craft / materials 改為 beans / brewing / roasting / origins;修正文章頁 FAQ 標題鍵名錯誤(原本會直接顯示鍵名);新增 `pnpm check:i18n` 檢查語言檔)。en / ms-MY / id-ID 目前仍是舊用詞,待 S30 重新翻譯。測驗的 tea 舊鍵與後台文字未動。
 

@@ -2,6 +2,7 @@
 import Layout from "@layouts/Layout.astro";
 import { env } from "cloudflare:workers";
 import FaqSchema from "@components/FaqSchema.astro";
+import ArticleSchema from "@components/ArticleSchema.astro";
 import { createT } from "../../i18n/t";
 import { defaultLocale, localizedPath, type Locale } from "../../i18n/config";
 
@@ -26,6 +27,7 @@ const post = env?.DB
         cover_image_url: string | null;
         author_email: string | null;
         published_at: number | null;
+        updated_at: number | null;
         title: string | null;
         excerpt: string | null;
         body_markdown: string | null;
@@ -96,18 +98,30 @@ const postFaqs: { q: string; a: string }[] = (() => {
   title={`${title} — ${t("common.site_name")}`}
   description={post.excerpt ?? ""}
 >
-  {
-    postFaqs.length > 0 && (
-      <Fragment slot="head">
-        <FaqSchema items={postFaqs} />
-      </Fragment>
-    )
-  }
+  <Fragment slot="head">
+    <ArticleSchema
+      headline={title}
+      description={post.excerpt ?? undefined}
+      datePublished={post.published_at
+        ? new Date(post.published_at * 1000).toISOString()
+        : undefined}
+      dateModified={(post.updated_at ?? post.published_at)
+        ? new Date(
+            (post.updated_at ?? post.published_at ?? 0) * 1000,
+          ).toISOString()
+        : undefined}
+      path={localizedPath(locale, `/blog/${post.slug}`)}
+      image={post.cover_image_url}
+      locale={locale}
+      siteName={t("common.site_name")}
+    />
+    {postFaqs.length > 0 && <FaqSchema items={postFaqs} />}
+  </Fragment>
   <article class="max-w-3xl mx-auto px-6 py-section">
     <a
       href={localizedPath(locale, "/blog")}
       class="text-sm text-text-secondary hover:text-text-primary inline-block mb-6"
-      >← Blog</a
+      >← {t("blog.title")}</a
     >
 
     {
@@ -123,9 +137,12 @@ const postFaqs: { q: string; a: string }[] = (() => {
       {title}
     </h1>
     {
-      post.published_at && (
+      (post.updated_at ?? post.published_at) && (
         <div class="text-sm text-text-muted mb-6">
-          {new Date(post.published_at * 1000).toISOString().slice(0, 10)}
+          {t("blog.updated")}:{" "}
+          {new Date((post.updated_at ?? post.published_at ?? 0) * 1000)
+            .toISOString()
+            .slice(0, 10)}
         </div>
       )
     }
@@ -146,6 +163,7 @@ const postFaqs: { q: string; a: string }[] = (() => {
     {
       post.excerpt && (
         <p class="text-lg text-text-secondary italic mb-8 leading-relaxed border-l-4 border-accent-300 pl-4">
+          <strong class="not-italic">{t("blog.summary")}: </strong>
           {post.excerpt}
         </p>
       )
@@ -188,7 +206,8 @@ const postFaqs: { q: string; a: string }[] = (() => {
     <div class="mt-12 pt-6 border-t border-text-muted/20 text-sm">
       <a
         href={localizedPath(locale, "/blog")}
-        class="text-text-secondary hover:text-text-primary">← Back to Blog</a
+        class="text-text-secondary hover:text-text-primary"
+        >← {t("blog.back")}</a
       >
     </div>
   </article>

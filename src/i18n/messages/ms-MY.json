@@ -357,11 +357,14 @@
   "blog": {
     "title": "Pengetahuan Kopi",
     "intro": "Artikel praktikal tentang asal usul, proses, sangrai, tumbuk, dan penyeduhan.",
-    "empty": "Artikel sedang dalam persediaan, nantikan.",
-    "read_more": "Baca lanjut",
+    "empty": "Artikel sedang dalam penyediaan, nantikan.",
+    "read_more": "Baca lagi",
     "faq_kicker": "Soalan Lazim",
     "faq_heading": "Soalan yang kerap ditanya",
-    "no_faq_yet": "Belum ada soalan lazim."
+    "no_faq_yet": "Belum ada soalan lazim.",
+    "updated": "Tarikh kemas kini",
+    "summary": "Ringkasan",
+    "back": "Kembali ke Pengetahuan Kopi"
   },
   "admin": {
     "nav": {

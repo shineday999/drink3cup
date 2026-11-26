@@ -33,7 +33,10 @@ const posts = env?.DB
   : { results: [] as BlogPost[] };
 ---
 
-<Layout title={`Blog — ${t("common.site_name")}`} description={t("blog.intro")}>
+<Layout
+  title={`${t("blog.title")} — ${t("common.site_name")}`}
+  description={t("blog.intro")}
+>
   <div class="max-w-4xl mx-auto px-6 py-section">
     <header class="mb-12 text-center">
       <p

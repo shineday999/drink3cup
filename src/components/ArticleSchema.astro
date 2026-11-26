@@ -1,0 +1,38 @@
+---
+// ArticleSchema.astro — JSON-LD Article(SEO / AEO / GEO)
+const SITE = "https://mycafe.de5.net";
+interface Props {
+  headline: string;
+  description?: string | undefined;
+  datePublished?: string | undefined;
+  dateModified?: string | undefined;
+  path: string;
+  image?: string | null | undefined;
+  locale: string;
+  siteName: string;
+}
+const p = Astro.props as Props;
+const org = { "@type": "Organization", name: p.siteName, url: SITE };
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Article",
+  headline: p.headline,
+  description: p.description,
+  inLanguage: p.locale,
+  mainEntityOfPage: SITE + p.path,
+  datePublished: p.datePublished,
+  dateModified: p.dateModified,
+  image: p.image
+    ? p.image.startsWith("/")
+      ? SITE + p.image
+      : p.image
+    : undefined,
+  author: org,
+  publisher: org,
+};
+---
+
+<script
+  type="application/ld+json"
+  set:html={JSON.stringify(jsonLd).replace(/</g, "\\u003c")}
+/>

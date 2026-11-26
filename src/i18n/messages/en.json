@@ -361,7 +361,10 @@
     "read_more": "Read More",
     "faq_kicker": "FAQ",
     "faq_heading": "Frequently Asked Questions",
-    "no_faq_yet": "No FAQs yet."
+    "no_faq_yet": "No questions yet.",
+    "updated": "Updated",
+    "summary": "Key Takeaways",
+    "back": "Back to Coffee Knowledge"
   },
   "admin": {
     "nav": {

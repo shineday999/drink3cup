@@ -361,7 +361,10 @@
     "read_more": "Baca selengkapnya",
     "faq_kicker": "Pertanyaan Umum",
     "faq_heading": "Pertanyaan yang Sering Diajukan",
-    "no_faq_yet": "Belum ada pertanyaan umum."
+    "no_faq_yet": "Belum ada pertanyaan umum.",
+    "updated": "Tanggal diperbarui",
+    "summary": "Ringkasan poin penting",
+    "back": "Kembali ke Pengetahuan Kopi"
   },
   "admin": {
     "nav": {

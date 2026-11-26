@@ -361,7 +361,10 @@
     "read_more": "繼續閱讀",
     "faq_kicker": "常見問題",
     "faq_heading": "讀者常問",
-    "no_faq_yet": "尚無常見問題。"
+    "no_faq_yet": "尚無常見問題。",
+    "updated": "更新日期",
+    "summary": "重點摘要",
+    "back": "返回咖啡知識"
   },
   "admin": {
     "nav": {
