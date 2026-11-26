@@ -76,12 +76,12 @@ const [siteImgRes, siteCatRes, featuredRes, bannerRes] = await Promise.all([
 // 後臺「分類圖片」：沒上傳（或資料表還不存在）時沿用靜態預設圖
 const catImages = {
   beans: {
-    src: "/images/banners/cat-jewelry.jpg",
-    small: "/images/banners/cat-jewelry-480.jpg",
+    src: "/images/banners/cat-beans.jpg",
+    small: "/images/banners/cat-beans-480.jpg",
   },
   brewing: {
-    src: "/images/banners/cat-incense.jpg",
-    small: "/images/banners/cat-incense-480.jpg",
+    src: "/images/banners/cat-brewing.jpg",
+    small: "/images/banners/cat-brewing-480.jpg",
   },
 };
 for (const r of siteImgRes?.results ?? []) {

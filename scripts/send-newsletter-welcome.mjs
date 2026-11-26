@@ -87,47 +87,61 @@ function siteNameFor(locale) {
 }
 
 const subjects = {
-  "zh-Hant": (n) => `歡迎來到 ${n} · 來自森林的慢信`,
-  en: (n) => `Welcome to ${n} · Letters from the forest`,
-  "ms-MY": (n) => `Selamat datang ke ${n} · Surat dari hutan`,
-  "id-ID": (n) => `Selamat datang di ${n} · Surat dari hutan`,
+  "zh-Hant": (n) => `歡迎訂閱 ${n}`,
+  en: (n) => `Welcome to ${n}`,
+  "ms-MY": (n) => `Selamat datang ke ${n}`,
+  "id-ID": (n) => `Selamat datang di ${n}`,
 };
 
 const bodies = {
   "zh-Hant": (e, n) =>
     `${e} 您好,
 
-感謝訂閱 ${n}。我們每季會寄一封慢信,分享新作、調香實驗,以及森林系手作工作室的日常。
+感謝訂閱 ${n}。我們會不定期寄出新豆上架、沖煮小技巧與產地介紹,內容力求實用、好懂。
 
-若您願意,也可以從我們的風格測驗開始,讓我們更了解您喜歡的氣味:
+不確定從哪一包豆子開始?可以先做 1 分鐘的口味測驗,我們會依你的喜好推薦:
 https://mycafe.de5.net/quiz
 
-—— ${n} · 森林系手作
+有任何問題,歡迎直接回信或到聯絡頁留言,我們會在一到兩個工作天內回覆。
+
+${n}
 https://mycafe.de5.net/`,
   en: (e, n) =>
     `Hello ${e},
 
-Thanks for subscribing to ${n}. We send one slow letter each season — new work, scent experiments, and quiet notes from the studio.
+Thanks for subscribing to ${n}. We occasionally send news about new beans, practical brewing tips and coffee origins, always written to be clear and useful.
 
-If you'd like, you can also start with our style quiz so we can learn the scents you love:
-https://mycafe.de5.net/quiz
+Not sure which coffee to try first? Take our one-minute taste quiz and we will suggest a match:
+https://mycafe.de5.net/en/quiz
 
-— ${n} · forest handcraft
-https://mycafe.de5.net/`,
+If you have any questions, just reply to this email or use our contact page. We reply within one to two business days.
+
+${n}
+https://mycafe.de5.net/en`,
   "ms-MY": (e, n) =>
     `Helo ${e},
 
-Terima kasih kerana melanggan ${n}. Kami akan mengirim satu surat perlahan setiap musim — karya baru, eksperimen wangian, dan catatan tenang dari studio.
+Terima kasih kerana melanggan ${n}. Kami akan sesekali menghantar berita biji kopi baharu, petua menyeduh yang praktikal dan maklumat asal kopi, ditulis dengan jelas dan berguna.
 
-— ${n} · kraf hutan
-https://mycafe.de5.net/`,
+Tidak pasti biji kopi mana untuk dicuba dahulu? Cuba kuiz citarasa seminit kami dan kami akan mencadangkan yang sesuai:
+https://mycafe.de5.net/ms-MY/quiz
+
+Jika ada sebarang soalan, balas e-mel ini atau gunakan halaman hubungi kami. Kami membalas dalam masa satu hingga dua hari bekerja.
+
+${n}
+https://mycafe.de5.net/ms-MY`,
   "id-ID": (e, n) =>
     `Halo ${e},
 
-Terima kasih telah berlangganan ${n}. Kami mengirim satu surat perlahan setiap musim — karya baru, eksperimen wewangian, dan catatan tenang dari studio.
+Terima kasih telah berlangganan ${n}. Sesekali kami akan mengirim kabar biji kopi baru, tips menyeduh yang praktis, dan informasi asal kopi, ditulis dengan jelas dan bermanfaat.
 
-— ${n} · kerajinan hutan
-https://mycafe.de5.net/`,
+Belum tahu mau mulai dari biji kopi yang mana? Coba kuis selera satu menit kami dan kami akan merekomendasikan yang cocok:
+https://mycafe.de5.net/id-ID/quiz
+
+Jika ada pertanyaan, balas email ini atau gunakan halaman kontak. Kami membalas dalam satu hingga dua hari kerja.
+
+${n}
+https://mycafe.de5.net/id-ID`,
 };
 
 const subs = d1(

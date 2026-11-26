@@ -5,7 +5,7 @@ describe("createT", () => {
   const messages = {
     common: { site_name: "喝三杯咖啡", loading: "載入中..." },
     home: {
-      hero_title: "把森林穿戴在身上",
+      hero_title: "好咖啡,慢慢喝",
       welcome: "歡迎 {name}",
       count: "有 {count} 件商品",
     },
@@ -18,7 +18,7 @@ describe("createT", () => {
 
   it("returns nested key", () => {
     const t = createT(messages);
-    expect(t("home.hero_title")).toBe("把森林穿戴在身上");
+    expect(t("home.hero_title")).toBe("好咖啡,慢慢喝");
   });
 
   it("substitutes {name} placeholder", () => {
