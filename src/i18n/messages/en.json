@@ -883,5 +883,19 @@
       "q5": "How should I clean my brewing equipment?",
       "a5": "Rinse with clean water after each use. Periodically wash with warm water and a small amount of neutral detergent. Residual coffee oils can develop off-flavors and affect the next brew. Ensure the dripper and kettle are completely dry before storing."
     }
+  },
+  "pfaq": {
+    "b1q": "How do I pre-order this bag of coffee beans?",
+    "b1a": "Add it to your pre-order and submit the form. We will reply with a confirmation within one to two business days.",
+    "b2q": "How should I store these coffee beans?",
+    "b2a": "Keep them in a sealed, light-proof container in a cool, dry place. Once opened, try to finish them within 2 to 4 weeks. Avoid putting them in and out of the fridge daily.",
+    "b3q": "What brewing method is best for these beans?",
+    "b3a": "Lighter roasts are ideal for pour-over and filter brewing; medium to dark roasts also work well for espresso and milk-based drinks. If you're unsure, try the \"Find your pick\" quiz.",
+    "g1q": "How do I pre-order this piece of equipment?",
+    "g1a": "Add it to your pre-order and submit the form. We will reply with a confirmation within one to two business days.",
+    "g2q": "How should I clean my brewing equipment?",
+    "g2a": "Rinse with clean water after each use. Periodically wash with warm water and a small amount of neutral detergent, then let it air dry completely before storing.",
+    "g3q": "What equipment should beginners start with?",
+    "g3a": "Start with a dripper, filters, a gooseneck kettle, and a digital scale. Add a grinder once you're drinking coffee regularly."
   }
 }

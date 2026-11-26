@@ -158,13 +158,16 @@ const productJsonLd = {
       : undefined,
   brand: { "@type": "Brand", name: siteName ?? t("common.site_name") },
   sku: variants.results[0]?.sku ?? product.id,
-  offers: {
-    "@type": "Offer",
-    priceCurrency: "TWD",
-    price: cnyPrice ?? undefined,
-    availability: "https://schema.org/PreOrder",
-    url: `${siteUrl}${Astro.url.pathname}`,
-  },
+  offers:
+    cnyPrice === undefined
+      ? undefined
+      : {
+          "@type": "Offer",
+          priceCurrency: "TWD",
+          price: cnyPrice ?? undefined,
+          availability: "https://schema.org/PreOrder",
+          url: `${siteUrl}${Astro.url.pathname}`,
+        },
 };
 
 // Wave 33 Phase 2.3: BreadcrumbList
@@ -174,6 +177,10 @@ const breadcrumbItems = [
   { name: tr.name, url: Astro.url.pathname },
 ];
 
+const genericFaqs = (
+  product.category === "beans" ? ["b1", "b2", "b3"] : ["g1", "g2", "g3"]
+).map((k) => ({ q: t(`pfaq.${k}q`), a: t(`pfaq.${k}a`) }));
+const allFaqs = productFaqs.length > 0 ? productFaqs : genericFaqs;
 const pageTitle = `${tr.name} — ${t("common.site_name")}`;
 void locale;
 ---

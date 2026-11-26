@@ -12,6 +12,14 @@
 - [烘焙](/roasting): 選豆、火候、等待
 - [產地與材料](/origins): 產地、處理法與器具
 - [日誌](/blog): 咖啡知識與工作室筆記
+- [問答中心](/faq): 選豆、烘焙、研磨、沖煮與保存的常見問題
+- [咖啡產地入門](/blog/coffee-origins-guide): 非洲、中南美洲與亞洲產地的風味差異
+- [水洗 vs 日曬](/blog/washed-vs-natural-process): 處理法如何改變風味
+- [烘焙度怎麼選](/blog/roast-levels-explained): 淺焙、中焙、深焙的差異
+- [研磨粗細指南](/blog/grind-size-guide): 不同沖煮方式的研磨選擇
+- [V60 手沖入門](/blog/pour-over-v60-basics): 粉水比、水溫與注水流程
+- [咖啡豆保存](/blog/storing-coffee-beans): 密封、避光、陰涼乾燥
+- [沖煮器具選購](/blog/choosing-brewing-equipment): 新手器具清單
 - [關於](/about)
 - [聯絡](/contact)
 

@@ -106,11 +106,13 @@
 | S30 | 🤖   | 依新用詞重新翻譯 en / ms-MY / id-ID(母語者校對另記)                                                                                                                                                                                                      | ✅   | Claude |
 | S31 | 🤖   | 新增 `/faq` 問答中心:分主題 20–30 題,答案先給結論再補充,附 FAQPage JSON-LD,各語言                                                                                                                                                                        | ✅   | Claude |
 | S32 | 🤖   | 知識文章擴充(接 S11):每篇有摘要、FAQ、更新日期、Article JSON-LD;主題含產地、處理法、烘焙度、研磨、沖煮、保存、器具選購                                                                                                                                   | ✅   |        |
-| S33 | 🤖   | 商品頁:FAQ、Product / Offer 結構化資料、麵包屑、Organization 資訊(不得捏造評價或評分)                                                                                                                                                                    | ⬜   |        |
-| S34 | 🤖   | GEO / AEO 收尾:llms.txt、答案式標題與摘要段、hreflang 與結構化資料驗證                                                                                                                                                                                   | ⬜   |        |
+| S33 | 🤖   | 商品頁:FAQ、Product / Offer 結構化資料、麵包屑、Organization 資訊(不得捏造評價或評分)                                                                                                                                                                    | ✅   |        |
+| S34 | 🤖   | GEO / AEO 收尾:llms.txt、答案式標題與摘要段、hreflang 與結構化資料驗證                                                                                                                                                                                   | ✅   |        |
 | S35 | 👤   | 擁有者提供:社群帳號網址(Instagram 等)與門市/聯絡資訊,用於頁尾連結與 Organization sameAs(目前頁尾社群連結是通用網址、小紅書連結為空)                                                                                                                      | ⬜   |        |
 
 ## 紀錄
+
+- 2026-11-26 Claude:完成 S33、S34。商品頁新增可見的 FAQ 區塊(資料庫無 FAQ 時用通用問答),FAQPage 無內容時不輸出,Offer 無價格時不輸出;llms.txt / llms-full.txt 加入問答中心與知識文章。**不含評價或評分**。Organization sameAs 待 S35(擁有者提供社群網址)。
 
 - 2026-11-26 Claude:完成 S32(含 S11):新增 7 篇知識文章(產地、處理法、烘焙度、研磨、手沖、保存、器具選購,四語言,各 3 題 FAQ);文章頁新增重點摘要、更新日期、Article JSON-LD(migration 0023)。en / ms-MY / id-ID 由本機模型翻譯,待母語者校對。
 

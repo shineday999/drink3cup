@@ -883,5 +883,19 @@
       "q5": "Bagaimana cara membersihkan alat seduh?",
       "a5": "Bilas dengan air bersih setelah setiap penggunaan, dan bersihkan secara berkala dengan air hangat dan sedikit deterjen netral. Sisa minyak kopi dapat menimbulkan bau asing dan mempengaruhi rasa seduhan berikutnya. Pastikan dripper dan kettle benar-benar kering sebelum disimpan."
     }
+  },
+  "pfaq": {
+    "b1q": "Bagaimana cara memesan paket biji kopi ini?",
+    "b1a": "Setelah menambahkan ke prapesan dan mengirim formulir, kami akan membalas konfirmasi dalam 1-2 hari kerja.",
+    "b2q": "Bagaimana cara menyimpan biji kopi ini?",
+    "b2a": "Simpan di tempat kedap udara, terlindung dari cahaya, sejuk, dan kering. Usahakan untuk menghabiskannya dalam 2 hingga 4 minggu setelah dibuka. Sebaiknya hindari memasukkan dan mengeluarkan dari kulkas setiap hari.",
+    "b3q": "Metode seduh apa yang cocok?",
+    "b3a": "Semakin terang tingkat sangrai, semakin cocok untuk seduh manual (pour-over) dan dripper. Sangrai medium-dark juga cocok untuk espresso dan minuman ber susu. Jika ragu, Anda bisa mencoba kuis \"Find your pick\" terlebih dahulu.",
+    "g1q": "Bagaimana cara memesan alat seduh ini?",
+    "g1a": "Setelah menambahkan ke prapesan dan mengirim formulir, kami akan membalas konfirmasi dalam 1-2 hari kerja.",
+    "g2q": "Bagaimana cara membersihkan alat seduh?",
+    "g2a": "Bilas dengan air bersih setelah setiap penggunaan. Bersihkan secara berkala dengan air hangat dan sedikit deterjen netral, lalu keringkan sepenuhnya sebelum disimpan.",
+    "g3q": "Alat apa yang sebaiknya dimiliki pemula?",
+    "g3a": "Mulailah dengan dripper, kertas filter, kettle seduh manual, dan timbangan digital. Tambahkan grinder jika Anda sering minum kopi."
   }
 }

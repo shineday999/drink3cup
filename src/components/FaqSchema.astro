@@ -26,4 +26,8 @@ const jsonLd = {
 };
 ---
 
-<script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+{
+  items.length > 0 && (
+    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+  )
+}
