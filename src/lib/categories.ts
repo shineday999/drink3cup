@@ -49,10 +49,10 @@ export function cleanTextMap(
 // 咖啡豆 / 沖煮器具卡片的預設說明文字(來自語言檔);後臺簡介還是空的時候,一次性填進去讓後臺可以維護。
 const LEGACY_DESCS: Record<string, Record<string, string>> = {
   beans: {
-    "zh-Hant": zhHant.home.cat_amber_desc,
+    "zh-Hant": zhHant.home.cat_beans_desc,
   },
   brewing: {
-    "zh-Hant": zhHant.home.cat_incense_desc,
+    "zh-Hant": zhHant.home.cat_brewing_desc,
   },
 };
 

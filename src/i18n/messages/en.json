@@ -44,11 +44,11 @@
   },
   "nav": {
     "home": "Home",
-    "amber": "Coffee Beans",
-    "incense": "Brewing Equipment",
+    "beans": "Coffee Beans",
+    "brewing": "Brewing Equipment",
     "story": "Brand Story",
-    "materials": "Material Origins",
-    "craft": "Handcrafted Craft",
+    "origins": "Material Origins",
+    "roasting": "Handcrafted Craft",
     "blog": "Journal",
     "contact": "Contact",
     "cart": "Cart",
@@ -75,12 +75,12 @@
     "hero_cta_quiz": "Let's Ask Slowly",
     "categories_kicker": "Categories",
     "categories_title": "Handcrafted Paths",
-    "cat_amber_title": "Coffee Beans",
-    "cat_amber_desc": "From origin to roast, every bag includes origin details and flavor notes.",
-    "cat_incense_title": "Brewing Equipment",
-    "cat_incense_desc": "Drippers, kettles, grinders—brew your coffee even better.",
-    "cat_amber_alt": "Coffee beans on a wooden background",
-    "cat_incense_alt": "Pour-over coffee equipment with steam gently rising",
+    "cat_beans_title": "Coffee Beans",
+    "cat_beans_desc": "From origin to roast, every bag includes origin details and flavor notes.",
+    "cat_brewing_title": "Brewing Equipment",
+    "cat_brewing_desc": "Drippers, kettles, grinders—brew your coffee even better.",
+    "cat_beans_alt": "Coffee beans on a wooden background",
+    "cat_brewing_alt": "Pour-over coffee equipment with steam gently rising",
     "cat_explore": "Step Inside",
     "featured_kicker": "Featured",
     "featured_title": "These Picks",
@@ -89,12 +89,12 @@
     "cta_kicker": "Let's Ask Slowly",
     "cta_title": "Not sure where to start?",
     "cta_desc": "Answer five quick questions, and we’ll find a pick for you.",
-    "cta_quiz_jewelry": "Find Your Coffee Beans",
-    "cta_quiz_incense": "Find Your Equipment",
-    "cta_jewelry_desc": "Five questions to recommend the coffee beans that best suit your taste and brewing style.",
-    "cta_incense_desc": "Select the right equipment based on your brewing habits and budget.",
-    "cta_jewelry_btn": "Ask Me Five Questions",
-    "cta_incense_btn": "Ask Me Five Questions",
+    "cta_quiz_beans": "Find Your Coffee Beans",
+    "cta_quiz_brewing": "Find Your Equipment",
+    "cta_beans_desc": "Five questions to recommend the coffee beans that best suit your taste and brewing style.",
+    "cta_brewing_desc": "Select the right equipment based on your brewing habits and budget.",
+    "cta_beans_btn": "Ask Me Five Questions",
+    "cta_brewing_btn": "Ask Me Five Questions",
     "cta_meta": "Five Questions · Take Your Time",
     "cta_pick_prefix": "Find your pick"
   },
@@ -112,15 +112,6 @@
       "method": "How do you usually brew?",
       "acidity": "How much acidity do you enjoy?",
       "origin": "Which origin would you like to try?"
-    },
-    "tea": {
-      "title": "Choose a cup of tea",
-      "desc": "Tea type, taste, mood, and time of day—let us find the perfect cup for you.",
-      "tea_type": "Which type of tea do you prefer?",
-      "taste": "What’s your taste preference?",
-      "feeling": "What feeling do you want this cup to bring?",
-      "tea_time": "When do you usually drink tea?",
-      "brew": "How do you usually brew it?"
     },
     "brewing": {
       "title": "Choose a brewing tool",
@@ -141,39 +132,6 @@
       "badge_fallback": "You might like this"
     },
     "option": {
-      "tea_type": {
-        "green": "Green tea",
-        "black": "Black tea",
-        "oolong": "Oolong tea",
-        "white": "White tea",
-        "dark": "Dark tea / Pu-erh",
-        "herbal": "Herbal tea"
-      },
-      "tea_taste": {
-        "fresh": "Fresh and crisp",
-        "mellow": "Smooth and full-bodied",
-        "floral": "Floral and fruity",
-        "roasted": "Roasted and smoky",
-        "sweet": "Sweet and mellow"
-      },
-      "tea_feeling": {
-        "refresh": "Refreshing and alert",
-        "relax": "Relaxing and calming",
-        "digest": "Aids digestion",
-        "warm": "Warming and cozy"
-      },
-      "tea_time": {
-        "morning": "Morning",
-        "afternoon": "Afternoon",
-        "evening": "Evening",
-        "after_meal": "After meals"
-      },
-      "tea_brew": {
-        "gongfu": "Gongfu style, slow brewing",
-        "mug": "Quick mug brew",
-        "cold": "Cold brew",
-        "any": "Any method"
-      },
       "beans_roast": {
         "light_roast": "Light roast (bright, fruity acidity)",
         "medium_roast": "Medium roast (balanced, caramel)",
@@ -328,13 +286,13 @@
     "section_brand": "About",
     "section_follow": "Connect",
     "link_all": "All",
-    "link_amber": "Coffee Beans",
-    "link_incense": "Brewing Equipment",
+    "link_beans": "Coffee Beans",
+    "link_brewing": "Brewing Equipment",
     "link_quiz": "Find your pick",
     "link_story": "Coffee Journal",
     "link_vision": "Brand Vision",
-    "link_craft": "Handcrafted",
-    "link_materials": "Materials",
+    "link_roasting": "Handcrafted",
+    "link_origins": "Materials",
     "link_blog": "Slow Letters",
     "link_contact": "Write to us",
     "link_admin": "Admin Login",
@@ -352,7 +310,7 @@
     "made_with": "Handmade with patience",
     "newsletter_success": "Thanks for subscribing! We’ll write to you at the slowest pace."
   },
-  "amber": {
+  "beans": {
     "kicker": "Coffee Beans",
     "title": "Coffee Beans — From Origin to Cup",
     "subtitle": "Every bag has its own unique flavor profile.",
@@ -361,7 +319,7 @@
     "p3": "We select every bean with the same standard: clean flavor and consistent quality. Each bag includes details on origin, processing method, and roast date.",
     "cta": "View All Coffee Beans"
   },
-  "incense": {
+  "brewing": {
     "kicker": "Brewing Equipment",
     "title": "Brewing Equipment — Brew a Better Cup",
     "subtitle": "Stability is the key to consistent flavor.",
@@ -370,7 +328,7 @@
     "p3": "Drippers, kettles, grinders, scales—different shapes, same goal: to let you consistently recreate every cup.",
     "cta": "View All Equipment"
   },
-  "craft": {
+  "roasting": {
     "kicker": "Roasting",
     "title": "The Patience of Hands",
     "p1": "Our roasting begins with bean selection: we tailor the roasting curve to the characteristics of each lot, ensuring a clean and enjoyable cup.",
@@ -379,34 +337,31 @@
     "p4": "Our blends pair beans from different regions: one provides a rich sweetness, the other a bright aroma. If the ratio is off, the flavor loses its depth.",
     "p5": "We believe: slowness is a respect for nature."
   },
-  "materials": {
+  "origins": {
     "kicker": "Ingredients",
     "title": "Where Our Ingredients Come From",
     "intro": "A few origins and tools, each with its own character.",
-    "amber_baltic_title": "Ethiopia Yirgacheffe",
-    "amber_baltic_desc": "High-altitude washed beans with floral, citrus, and tea-like notes.",
-    "amber_burma_title": "Colombia Villa",
-    "amber_burma_desc": "Sweet notes of caramel and red apple, with a smooth, balanced profile.",
-    "amber_dominican_title": "Taiwan Alishan",
-    "amber_dominican_desc": "Tea-like aromas and honey sweetness, with a gentle acidity.",
-    "amber_fushun_title": "Signature Blend",
-    "amber_fushun_desc": "Notes of nuts, cocoa, and caramel; perfect for lattes and everyday drinking.",
-    "amber_sicily_title": "More Origins",
-    "amber_sicily_desc": "New beans will be added soon. Feel free to email us to inquire.",
-    "agarwood_title": "Pour-Over Equipment",
-    "agarwood_desc": "To get started with pour-over, you only need a dripper, kettle, grinder, and digital scale. We select for stability, ease of cleaning, and user-friendliness."
+    "item_1_title": "Ethiopia Yirgacheffe",
+    "item_1_desc": "High-altitude washed beans with floral, citrus, and tea-like notes.",
+    "item_2_title": "Colombia Villa",
+    "item_2_desc": "Sweet notes of caramel and red apple, with a smooth, balanced profile.",
+    "item_3_title": "Taiwan Alishan",
+    "item_3_desc": "Tea-like aromas and honey sweetness, with a gentle acidity.",
+    "item_4_title": "Signature Blend",
+    "item_4_desc": "Notes of nuts, cocoa, and caramel; perfect for lattes and everyday drinking.",
+    "item_5_title": "More Origins",
+    "item_5_desc": "New beans will be added soon. Feel free to email us to inquire.",
+    "gear_title": "Pour-Over Equipment",
+    "gear_desc": "To get started with pour-over, you only need a dripper, kettle, grinder, and digital scale. We select for stability, ease of cleaning, and user-friendliness."
   },
   "blog": {
     "title": "Journal",
     "intro": "Field notes, material research, and slow letters from the studio.",
     "empty": "No journal entries yet — the first one is brewing.",
     "read_more": "Read more",
-    "blog.faq_kicker": "Slow answers to detailed questions",
-    "blog.faq_heading": "Frequently Asked by Readers",
-    "blog.no_faq_yet": "No FAQs yet.",
-    "blog": {
-      "faq_heading": "Frequently Asked by Readers"
-    }
+    "faq_kicker": "Slow answers to detailed questions",
+    "faq_heading": "Frequently Asked by Readers",
+    "no_faq_yet": "No FAQs yet."
   },
   "admin": {
     "nav": {
@@ -569,8 +524,8 @@
       "label_status": "狀態",
       "label_subcategory": "子分類",
       "label_slug": "標識",
-      "option_jewelry": "咖啡豆",
-      "option_incense": "沖煮器具",
+      "option_beans": "咖啡豆",
+      "option_brewing": "沖煮器具",
       "save": "儲存",
       "toggle_status": "切換狀態",
       "toggle_to_active": "上架",
@@ -752,8 +707,8 @@
     "category_images": {
       "title": "分類圖片",
       "subtitle": "首頁「兩條手作路線」的兩張圖。沒上傳時使用預設圖。",
-      "slot_jewelry": "咖啡豆",
-      "slot_incense": "沖煮器具",
+      "slot_beans": "咖啡豆",
+      "slot_brewing": "沖煮器具",
       "current_custom": "已自定義",
       "current_default": "使用預設圖",
       "pending": "待儲存",
@@ -783,30 +738,30 @@
     "vision_next_2_desc": "Beans and equipment, from origin to your home",
     "vision_next_3_label": "Your Daily Coffee",
     "vision_next_3_desc": "From bean to cup",
-    "craft_next_1_label": "The Origin of Our Materials",
-    "craft_next_1_desc": "Washed, natural, and honey process",
-    "craft_next_2_label": "Roasting a Great Bag",
-    "craft_next_2_desc": "From green beans to roast",
-    "craft_next_3_label": "Brewing a Cup",
-    "craft_next_3_desc": "From grinding to the final cup",
-    "materials_next_1_label": "Roasting a Great Bag",
-    "materials_next_1_desc": "Ethiopia, Colombia, and Alishan",
-    "materials_next_2_label": "Brewing a Cup",
-    "materials_next_2_desc": "Drippers, kettles, grinders…",
-    "materials_next_3_label": "The Origin of Three Cups Coffee",
-    "materials_next_3_desc": "Returning to where the brand began",
-    "amber_next_1_label": "The Origin of Our Materials",
-    "amber_next_1_desc": "Origins and processing methods",
-    "amber_next_2_label": "The Art of Handcraft",
-    "amber_next_2_desc": "From green beans to roast",
-    "amber_next_3_label": "Browse All Coffee Beans",
-    "amber_next_3_desc": "Perhaps this is your pick",
-    "incense_next_1_label": "The Origin of Our Materials",
-    "incense_next_1_desc": "Origins and processing methods",
-    "incense_next_2_label": "The Art of Handcraft",
-    "incense_next_2_desc": "From grinding to the final cup",
-    "incense_next_3_label": "Browse All Brewing Equipment",
-    "incense_next_3_desc": "Perhaps this is your pick"
+    "roasting_next_1_label": "The Origin of Our Materials",
+    "roasting_next_1_desc": "Washed, natural, and honey process",
+    "roasting_next_2_label": "Roasting a Great Bag",
+    "roasting_next_2_desc": "From green beans to roast",
+    "roasting_next_3_label": "Brewing a Cup",
+    "roasting_next_3_desc": "From grinding to the final cup",
+    "origins_next_1_label": "Roasting a Great Bag",
+    "origins_next_1_desc": "Ethiopia, Colombia, and Alishan",
+    "origins_next_2_label": "Brewing a Cup",
+    "origins_next_2_desc": "Drippers, kettles, grinders…",
+    "origins_next_3_label": "The Origin of Three Cups Coffee",
+    "origins_next_3_desc": "Returning to where the brand began",
+    "beans_next_1_label": "The Origin of Our Materials",
+    "beans_next_1_desc": "Origins and processing methods",
+    "beans_next_2_label": "The Art of Handcraft",
+    "beans_next_2_desc": "From green beans to roast",
+    "beans_next_3_label": "Browse All Coffee Beans",
+    "beans_next_3_desc": "Perhaps this is your pick",
+    "brewing_next_1_label": "The Origin of Our Materials",
+    "brewing_next_1_desc": "Origins and processing methods",
+    "brewing_next_2_label": "The Art of Handcraft",
+    "brewing_next_2_desc": "From grinding to the final cup",
+    "brewing_next_3_label": "Browse All Brewing Equipment",
+    "brewing_next_3_desc": "Perhaps this is your pick"
   },
   "about": {
     "kicker": "About",
@@ -846,8 +801,8 @@
   "products": {
     "kicker": "Take your time",
     "filter_all": "All",
-    "filter_jewelry": "Coffee Beans",
-    "filter_incense": "Brewing Equipment",
+    "filter_beans": "Coffee Beans",
+    "filter_brewing": "Brewing Equipment",
     "empty_title": "No pieces yet",
     "empty_desc": "Our first collection is slowly taking shape. Leave us a note to reserve your spot.",
     "sort_label": "Sort by",

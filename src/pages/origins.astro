@@ -12,24 +12,24 @@ const messages = (Astro.locals.messages ?? {}) as Record<string, unknown>;
 const t = createT(messages);
 
 const items = [
-  ["materials.amber_baltic_title", "materials.amber_baltic_desc"],
-  ["materials.amber_burma_title", "materials.amber_burma_desc"],
-  ["materials.amber_dominican_title", "materials.amber_dominican_desc"],
-  ["materials.amber_fushun_title", "materials.amber_fushun_desc"],
-  ["materials.amber_sicily_title", "materials.amber_sicily_desc"],
-  ["materials.agarwood_title", "materials.agarwood_desc"],
+  ["origins.item_1_title", "origins.item_1_desc"],
+  ["origins.item_2_title", "origins.item_2_desc"],
+  ["origins.item_3_title", "origins.item_3_desc"],
+  ["origins.item_4_title", "origins.item_4_desc"],
+  ["origins.item_5_title", "origins.item_5_desc"],
+  ["origins.gear_title", "origins.gear_desc"],
 ] as const;
 
 const breadcrumbItems = [
   { name: t("nav.home"), url: "/" },
   { name: t("nav.story"), url: "/story" },
-  { name: t("nav.materials"), url: "/origins" },
+  { name: t("nav.origins"), url: "/origins" },
 ];
 ---
 
 <Layout
-  title={`${t("materials.title")} — ${t("common.site_name")}`}
-  description={t("materials.intro")}
+  title={`${t("origins.title")} — ${t("common.site_name")}`}
+  description={t("origins.intro")}
 >
   <Fragment slot="head">
     <BreadcrumbSchema items={breadcrumbItems} />
@@ -40,15 +40,15 @@ const breadcrumbItems = [
         <p
           class="text-[10px] uppercase tracking-[0.4em] text-forest-600 font-sans mb-4"
         >
-          {t("materials.kicker")}
+          {t("origins.kicker")}
         </p>
         <h1
           class="text-display-sm md:text-display-md font-serif text-text-primary mb-4 leading-[1.08]"
         >
-          {t("materials.title")}
+          {t("origins.title")}
         </h1>
         <p class="text-text-secondary italic max-w-xl mx-auto">
-          {t("materials.intro")}
+          {t("origins.intro")}
         </p>
       </header>
     </RevealOnScroll>
@@ -83,18 +83,18 @@ const breadcrumbItems = [
       links={[
         {
           href: localizedPath(locale, "/beans"),
-          label: t("continue.materials_next_1_label"),
-          desc: t("continue.materials_next_1_desc"),
+          label: t("continue.origins_next_1_label"),
+          desc: t("continue.origins_next_1_desc"),
         },
         {
           href: localizedPath(locale, "/brewing"),
-          label: t("continue.materials_next_2_label"),
-          desc: t("continue.materials_next_2_desc"),
+          label: t("continue.origins_next_2_label"),
+          desc: t("continue.origins_next_2_desc"),
         },
         {
           href: localizedPath(locale, "/story"),
-          label: t("continue.materials_next_3_label"),
-          desc: t("continue.materials_next_3_desc"),
+          label: t("continue.origins_next_3_label"),
+          desc: t("continue.origins_next_3_desc"),
         },
       ]}
     />

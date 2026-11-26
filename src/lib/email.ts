@@ -131,7 +131,7 @@ export function welcomeNewsletterEmail(
   const safeName = safe(siteName);
   const safeEmail = safe(email);
   const subjects: Record<string, string> = {
-    "zh-Hant": `歡迎來到 ${safeName} · 一杯一杯慢慢喝`,
+    "zh-Hant": `歡迎訂閱 ${safeName}`,
   };
   const bodies: Record<string, { html: string; text: string }> = {
     "zh-Hant": {

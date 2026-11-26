@@ -13,13 +13,13 @@ const t = createT(messages);
 const breadcrumbItems = [
   { name: t("nav.home"), url: "/" },
   { name: t("nav.story"), url: "/story" },
-  { name: t("craft.title"), url: "/roasting" },
+  { name: t("roasting.title"), url: "/roasting" },
 ];
 ---
 
 <Layout
-  title={`${t("craft.title")} — ${t("common.site_name")}`}
-  description={t("craft.p1")}
+  title={`${t("roasting.title")} — ${t("common.site_name")}`}
+  description={t("roasting.p1")}
 >
   <Fragment slot="head">
     <BreadcrumbSchema items={breadcrumbItems} />
@@ -30,12 +30,12 @@ const breadcrumbItems = [
         <p
           class="text-[10px] uppercase tracking-[0.4em] text-forest-600 font-sans mb-4"
         >
-          {t("craft.kicker")}
+          {t("roasting.kicker")}
         </p>
         <h1
           class="text-display-sm md:text-display-md font-serif text-text-primary mb-4 leading-[1.08]"
         >
-          {t("craft.title")}
+          {t("roasting.title")}
         </h1>
       </header>
     </RevealOnScroll>
@@ -44,13 +44,13 @@ const breadcrumbItems = [
       <div
         class="prose prose-lg max-w-none space-y-6 text-text-secondary font-sans leading-relaxed text-base"
       >
-        <p>{t("craft.p1")}</p>
-        <p>{t("craft.p2")}</p>
-        <p>{t("craft.p3")}</p>
-        <p>{t("craft.p4")}</p>
+        <p>{t("roasting.p1")}</p>
+        <p>{t("roasting.p2")}</p>
+        <p>{t("roasting.p3")}</p>
+        <p>{t("roasting.p4")}</p>
         <blockquote class="my-10 py-5 border-y border-forest-100 text-center">
           <p class="text-xl font-serif italic text-forest-700 leading-snug">
-            “{t("craft.p5")}”
+            “{t("roasting.p5")}”
           </p>
         </blockquote>
       </div>
@@ -62,18 +62,18 @@ const breadcrumbItems = [
       links={[
         {
           href: localizedPath(locale, "/origins"),
-          label: t("continue.craft_next_1_label"),
-          desc: t("continue.craft_next_1_desc"),
+          label: t("continue.roasting_next_1_label"),
+          desc: t("continue.roasting_next_1_desc"),
         },
         {
           href: localizedPath(locale, "/beans"),
-          label: t("continue.craft_next_2_label"),
-          desc: t("continue.craft_next_2_desc"),
+          label: t("continue.roasting_next_2_label"),
+          desc: t("continue.roasting_next_2_desc"),
         },
         {
           href: localizedPath(locale, "/brewing"),
-          label: t("continue.craft_next_3_label"),
-          desc: t("continue.craft_next_3_desc"),
+          label: t("continue.roasting_next_3_label"),
+          desc: t("continue.roasting_next_3_desc"),
         },
       ]}
     />

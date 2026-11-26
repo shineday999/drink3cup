@@ -44,11 +44,11 @@
   },
   "nav": {
     "home": "Utama",
-    "amber": "Biji Kopi",
-    "incense": "Peralatan Seduhan",
+    "beans": "Biji Kopi",
+    "brewing": "Peralatan Seduhan",
     "story": "Kisah Jenama",
-    "materials": "Sumber Bahan",
-    "craft": "Kraf Tangan",
+    "origins": "Sumber Bahan",
+    "roasting": "Kraf Tangan",
     "blog": "Blog",
     "contact": "Hubungi Kami",
     "cart": "Troli",
@@ -75,12 +75,12 @@
     "hero_cta_quiz": "Soalan santai untuk anda",
     "categories_kicker": "Categories",
     "categories_title": "Jalan Tangan",
-    "cat_amber_title": "Biji Kopi",
-    "cat_amber_desc": "Dari ladang ke roasting, setiap pek disertakan dengan nota asal dan rasa.",
-    "cat_incense_title": "Peralatan Seduh",
-    "cat_incense_desc": "Dripper, kawah pour-over, pengisar kopi—untuk seduhan yang lebih baik.",
-    "cat_amber_alt": "Biji kopi, latar belakang kayu",
-    "cat_incense_alt": "Peralatan kopi pour-over, uap naik perlahan",
+    "cat_beans_title": "Biji Kopi",
+    "cat_beans_desc": "Dari ladang ke roasting, setiap pek disertakan dengan nota asal dan rasa.",
+    "cat_brewing_title": "Peralatan Seduh",
+    "cat_brewing_desc": "Dripper, kawah pour-over, pengisar kopi—untuk seduhan yang lebih baik.",
+    "cat_beans_alt": "Biji kopi, latar belakang kayu",
+    "cat_brewing_alt": "Peralatan kopi pour-over, uap naik perlahan",
     "cat_explore": "Jelajahi",
     "featured_kicker": "Featured",
     "featured_title": "Pilihan Ini",
@@ -89,12 +89,12 @@
     "cta_kicker": "Soalan Santai",
     "cta_title": "Tidak tahu dari mana untuk bermula?",
     "cta_desc": "Lima soalan kecil, biar kami cari pilihan untuk anda.",
-    "cta_quiz_jewelry": "Cari pilihan biji kopi anda",
-    "cta_quiz_incense": "Cari pilihan peralatan anda",
-    "cta_jewelry_desc": "Lima soalan, berdasarkan rasa dan kaedah seduh, kami cadangkan biji kopi yang paling sesuai untuk anda.",
-    "cta_incense_desc": "Berdasarkan kebiasaan seduh dan bajet, kami pilih peralatan yang sesuai untuk anda.",
-    "cta_jewelry_btn": "Soal saya lima soalan",
-    "cta_incense_btn": "Soal saya lima soalan",
+    "cta_quiz_beans": "Cari pilihan biji kopi anda",
+    "cta_quiz_brewing": "Cari pilihan peralatan anda",
+    "cta_beans_desc": "Lima soalan, berdasarkan rasa dan kaedah seduh, kami cadangkan biji kopi yang paling sesuai untuk anda.",
+    "cta_brewing_desc": "Berdasarkan kebiasaan seduh dan bajet, kami pilih peralatan yang sesuai untuk anda.",
+    "cta_beans_btn": "Soal saya lima soalan",
+    "cta_brewing_btn": "Soal saya lima soalan",
     "cta_meta": "Lima soalan · Santai",
     "cta_pick_prefix": "Cari pilihan anda"
   },
@@ -112,15 +112,6 @@
       "method": "Biasanya anda seduh bagaimana?",
       "acidity": "Tahap keasidan yang boleh diterima?",
       "origin": "Nak minum dari mana?"
-    },
-    "tea": {
-      "title": "Pilih secawan teh",
-      "desc": "Jenis teh, tekstur, suasana hati, waktu—biarkan kami pilihkan teh yang paling sesuai untuk anda.",
-      "tea_type": "Jenis teh apa yang anda sukai?",
-      "taste": "Keutamaan rasa?",
-      "feeling": "Apa perasaan yang anda inginkan dari teh ini?",
-      "tea_time": "Biasanya minum pada waktu apa?",
-      "brew": "Biasanya anda seduh bagaimana?"
     },
     "brewing": {
       "title": "Pilih satu peralatan",
@@ -141,39 +132,6 @@
       "badge_fallback": "Mungkin anda akan suka"
     },
     "option": {
-      "tea_type": {
-        "green": "Teh Hijau",
-        "black": "Teh Hitam",
-        "oolong": "Teh Oolong",
-        "white": "Teh Putih",
-        "dark": "Teh Gelap / Pu-erh",
-        "herbal": "Teh Herba"
-      },
-      "tea_taste": {
-        "fresh": "Segar dan ringan",
-        "mellow": "Kaya dan lembut",
-        "floral": "Aroma bunga dan buah",
-        "roasted": "Aroma sangrai dan asap",
-        "sweet": "Manis dan lembut"
-      },
-      "tea_feeling": {
-        "refresh": "Menyegarkan dan memberi tenaga",
-        "relax": "Rileks dan tenang",
-        "digest": "Menyerap lemak dan membantu penghadaman",
-        "warm": "Menghangatkan badan"
-      },
-      "tea_time": {
-        "morning": "Pagi",
-        "afternoon": "Tengah hari",
-        "evening": "Petang",
-        "after_meal": "Selepas makan"
-      },
-      "tea_brew": {
-        "gongfu": "Seduh perlahan dengan set teh Gongfu",
-        "mug": "Seduh ringkas dalam cawan",
-        "cold": "Seduh sejuk",
-        "any": "Mana-mana boleh"
-      },
       "beans_roast": {
         "light_roast": "Sangrai ringan (cerah, asid buah)",
         "medium_roast": "Sangrai sederhana (seimbang, karamel)",
@@ -328,13 +286,13 @@
     "section_brand": "Kami",
     "section_follow": "Ikuti",
     "link_all": "Semua Karya",
-    "link_amber": "Biji Kopi",
-    "link_incense": "Peralatan Seduh",
+    "link_beans": "Biji Kopi",
+    "link_brewing": "Peralatan Seduh",
     "link_quiz": "Cari Pilihan Anda",
     "link_story": "Jurnal Kopi",
     "link_vision": "Visi Jenama",
-    "link_craft": "Kerja Tangan",
-    "link_materials": "Sumber Bahan",
+    "link_roasting": "Kerja Tangan",
+    "link_origins": "Sumber Bahan",
     "link_blog": "Surat Perlahan",
     "link_contact": "Tulis Surat",
     "link_admin": "Log Masuk Pentadbir",
@@ -352,7 +310,7 @@
     "made_with": "Dibuat dengan sabar",
     "newsletter_success": "Terima kasih telah melanggan! Kami akan menulis surat kepada anda dengan kelajuan paling perlahan."
   },
-  "amber": {
+  "beans": {
     "kicker": "Biji Kopi",
     "title": "Biji Kopi — Dari Tanah Asal ke Cawan Anda",
     "subtitle": "Setiap pek biji kopi mempunyai keunikan rasanya.",
@@ -361,7 +319,7 @@
     "p3": "Kami memilih biji kopi dengan standard yang sama: rasa yang bersih dan kualiti yang konsisten. Setiap pek disertakan dengan maklumat tanah asal, kaedah pemprosesan, dan tarikh pembakaran.",
     "cta": "Lihat Semua Biji Kopi"
   },
-  "incense": {
+  "brewing": {
     "kicker": "Peralatan Penyeduhan",
     "title": "Peralatan Penyeduhan — Seduh secawan kopi yang lebih baik",
     "subtitle": "Kestabilan adalah kunci untuk mengulangi rasa yang enak.",
@@ -370,7 +328,7 @@
     "p3": "Corong, teko seduh tangan, pengisar, dan penimbang digital — bentuknya berbeza, tetapi tujuannya sama: memastikan setiap cawan boleh diulang dengan stabil.",
     "cta": "Lihat Semua Peralatan"
   },
-  "craft": {
+  "roasting": {
     "kicker": "Penghantaran",
     "title": "Kesabaran Tangan",
     "p1": "Penghantaran kami bermula dengan pemilihan biji kopi: mengikut ciri setiap batch, kami menetapkan lengkung penghantaran untuk memastikan rasa yang bersih dan enak.",
@@ -379,34 +337,31 @@
     "p4": "Kopi campuran (blend) menggabungkan biji dari pelbagai kawasan: satu menyediakan rasa manis yang tebal, satu lagi menyediakan aroma yang cerah. Jika nisbah tidak seimbang, rasa akan kehilangan kedalaman.",
     "p5": "Kami percaya: perlahan adalah tanda hormat kepada alam semula jadi."
   },
-  "materials": {
+  "origins": {
     "kicker": "Bahan",
     "title": "Asal Usul Bahan",
     "intro": "Beberapa rintis dan peralatan, masing-masing mempunyai watak tersendiri.",
-    "amber_baltic_title": "Etiopia Yirgacheffe",
-    "amber_baltic_desc": "Biji kopi proses basuh dari ketinggian, dengan aroma bunga, sitrus, dan rasa teh.",
-    "amber_burma_title": "Kolombia Villa",
-    "amber_burma_desc": "Manis karamel dan epal merah, dengan rasa yang lembut dan seimbang.",
-    "amber_dominican_title": "Taiwan Alishan",
-    "amber_dominican_desc": "Aroma teh dan rasa madu, dengan keasaman yang lembut.",
-    "amber_fushun_title": "Resipi Tanda Dagang",
-    "amber_fushun_desc": "Rasa kacang, koko, dan karamel; sesuai untuk latte dan penggunaan harian.",
-    "amber_sicily_title": "Rintis Lain",
-    "amber_sicily_desc": "Biji kopi baharu akan terus ditambah. Sila hubungi kami untuk pertanyaan.",
-    "agarwood_title": "Peralatan Seduh Tangan",
-    "agarwood_desc": "Untuk bermula dengan seduh tangan, anda hanya memerlukan corong, teko seduh tangan, pengisar kopi, dan penimbang digital. Kami memilih berdasarkan kestabilan, kemudahan pembersihan, dan kebolehan penggunaan."
+    "item_1_title": "Etiopia Yirgacheffe",
+    "item_1_desc": "Biji kopi proses basuh dari ketinggian, dengan aroma bunga, sitrus, dan rasa teh.",
+    "item_2_title": "Kolombia Villa",
+    "item_2_desc": "Manis karamel dan epal merah, dengan rasa yang lembut dan seimbang.",
+    "item_3_title": "Taiwan Alishan",
+    "item_3_desc": "Aroma teh dan rasa madu, dengan keasaman yang lembut.",
+    "item_4_title": "Resipi Tanda Dagang",
+    "item_4_desc": "Rasa kacang, koko, dan karamel; sesuai untuk latte dan penggunaan harian.",
+    "item_5_title": "Rintis Lain",
+    "item_5_desc": "Biji kopi baharu akan terus ditambah. Sila hubungi kami untuk pertanyaan.",
+    "gear_title": "Peralatan Seduh Tangan",
+    "gear_desc": "Untuk bermula dengan seduh tangan, anda hanya memerlukan corong, teko seduh tangan, pengisar kopi, dan penimbang digital. Kami memilih berdasarkan kestabilan, kemudahan pembersihan, dan kebolehan penggunaan."
   },
   "blog": {
     "title": "Jurnal",
     "intro": "Nota lapangan, kajian bahan, dan surat perlahan dari studio kami.",
     "empty": "Belum ada jurnal — entri pertama sedang dalam proses.",
     "read_more": "Baca lagi",
-    "blog.faq_kicker": "Soalan & Jawapan",
-    "blog.faq_heading": "Soalan Lazim Pembaca",
-    "blog.no_faq_yet": "Belum ada soalan lazim.",
-    "blog": {
-      "faq_heading": "Soalan Lazim Pembaca"
-    }
+    "faq_kicker": "Soalan & Jawapan",
+    "faq_heading": "Soalan Lazim Pembaca",
+    "no_faq_yet": "Belum ada soalan lazim."
   },
   "admin": {
     "nav": {
@@ -569,8 +524,8 @@
       "label_status": "狀態",
       "label_subcategory": "子分類",
       "label_slug": "標識",
-      "option_jewelry": "咖啡豆",
-      "option_incense": "沖煮器具",
+      "option_beans": "咖啡豆",
+      "option_brewing": "沖煮器具",
       "save": "儲存",
       "toggle_status": "切換狀態",
       "toggle_to_active": "上架",
@@ -752,8 +707,8 @@
     "category_images": {
       "title": "分類圖片",
       "subtitle": "首頁「兩條手作路線」的兩張圖。沒上傳時使用預設圖。",
-      "slot_jewelry": "咖啡豆",
-      "slot_incense": "沖煮器具",
+      "slot_beans": "咖啡豆",
+      "slot_brewing": "沖煮器具",
       "current_custom": "已自定義",
       "current_default": "使用預設圖",
       "pending": "待儲存",
@@ -783,30 +738,30 @@
     "vision_next_2_desc": "Biji kopi dan peralatan, dari tempat asal ke rumah anda",
     "vision_next_3_label": "Kopi Harian Anda",
     "vision_next_3_desc": "Dari biji ke cawan",
-    "craft_next_1_label": "Asal Usul Bahan",
-    "craft_next_1_desc": "Proses dicuci, kering, dan madu",
-    "craft_next_2_label": "Dibakar Menjadi Biji Berkualiti",
-    "craft_next_2_desc": "Dari biji mentah ke proses pembakaran",
-    "craft_next_3_label": "Diseduh Menjadi Secawan Kopi",
-    "craft_next_3_desc": "Dari penggilingan ke secawan kopi",
-    "materials_next_1_label": "Dibakar Menjadi Biji Berkualiti",
-    "materials_next_1_desc": "Ethiopia, Colombia, dan juga Alishan",
-    "materials_next_2_label": "Diseduh Menjadi Secawan Kopi",
-    "materials_next_2_desc": "Penapis, teko seduh tangan, penggiling kopi...",
-    "materials_next_3_label": "Asal Usul Three Cups Coffee",
-    "materials_next_3_desc": "Kembali ke permulaan jenama",
-    "amber_next_1_label": "Asal Usul Bahan",
-    "amber_next_1_desc": "Tempat asal dan kaedah pemprosesan",
-    "amber_next_2_label": "Proses Tangan",
-    "amber_next_2_desc": "Dari biji mentah ke proses pembakaran",
-    "amber_next_3_label": "Lihat Semua Biji Kopi",
-    "amber_next_3_desc": "Mungkin inilah pilihan anda",
-    "incense_next_1_label": "Asal Usul Bahan",
-    "incense_next_1_desc": "Tempat asal dan kaedah pemprosesan",
-    "incense_next_2_label": "Proses Tangan",
-    "incense_next_2_desc": "Dari penggilingan ke secawan kopi",
-    "incense_next_3_label": "Lihat Semua Peralatan",
-    "incense_next_3_desc": "Mungkin inilah pilihan anda"
+    "roasting_next_1_label": "Asal Usul Bahan",
+    "roasting_next_1_desc": "Proses dicuci, kering, dan madu",
+    "roasting_next_2_label": "Dibakar Menjadi Biji Berkualiti",
+    "roasting_next_2_desc": "Dari biji mentah ke proses pembakaran",
+    "roasting_next_3_label": "Diseduh Menjadi Secawan Kopi",
+    "roasting_next_3_desc": "Dari penggilingan ke secawan kopi",
+    "origins_next_1_label": "Dibakar Menjadi Biji Berkualiti",
+    "origins_next_1_desc": "Ethiopia, Colombia, dan juga Alishan",
+    "origins_next_2_label": "Diseduh Menjadi Secawan Kopi",
+    "origins_next_2_desc": "Penapis, teko seduh tangan, penggiling kopi...",
+    "origins_next_3_label": "Asal Usul Three Cups Coffee",
+    "origins_next_3_desc": "Kembali ke permulaan jenama",
+    "beans_next_1_label": "Asal Usul Bahan",
+    "beans_next_1_desc": "Tempat asal dan kaedah pemprosesan",
+    "beans_next_2_label": "Proses Tangan",
+    "beans_next_2_desc": "Dari biji mentah ke proses pembakaran",
+    "beans_next_3_label": "Lihat Semua Biji Kopi",
+    "beans_next_3_desc": "Mungkin inilah pilihan anda",
+    "brewing_next_1_label": "Asal Usul Bahan",
+    "brewing_next_1_desc": "Tempat asal dan kaedah pemprosesan",
+    "brewing_next_2_label": "Proses Tangan",
+    "brewing_next_2_desc": "Dari penggilingan ke secawan kopi",
+    "brewing_next_3_label": "Lihat Semua Peralatan",
+    "brewing_next_3_desc": "Mungkin inilah pilihan anda"
   },
   "about": {
     "kicker": "Tentang Kami",
@@ -846,8 +801,8 @@
   "products": {
     "kicker": "Ambillah masa",
     "filter_all": "Semua",
-    "filter_jewelry": "Biji kopi",
-    "filter_incense": "Peralatan penyeduhan",
+    "filter_beans": "Biji kopi",
+    "filter_brewing": "Peralatan penyeduhan",
     "empty_title": "Belum ada karya",
     "empty_desc": "Karya pertama sedang terbentuk perlahan-lahan. Sila tinggalkan e-mel untuk tempahan awal.",
     "sort_label": "Susunan",

@@ -112,16 +112,16 @@ const LEGACY_CAT_KEYS: Record<
   { kicker: string; title: string; desc: string; alt: string }
 > = {
   beans: {
-    kicker: "nav.amber",
-    title: "home.cat_amber_title",
-    desc: "home.cat_amber_desc",
-    alt: "home.cat_amber_alt",
+    kicker: "nav.beans",
+    title: "home.cat_beans_title",
+    desc: "home.cat_beans_desc",
+    alt: "home.cat_beans_alt",
   },
   brewing: {
-    kicker: "nav.incense",
-    title: "home.cat_incense_title",
-    desc: "home.cat_incense_desc",
-    alt: "home.cat_incense_alt",
+    kicker: "nav.brewing",
+    title: "home.cat_brewing_title",
+    desc: "home.cat_brewing_desc",
+    alt: "home.cat_brewing_alt",
   },
 };
 const legacyT = (key: string | undefined): string => {
@@ -195,10 +195,10 @@ const quizCards: QuizCard[] = homeCategories.map((c) => {
       href: localizedPath(locale, "/quiz/beans"),
       icon: "beans",
       kicker: c.title,
-      heading: String(t("home.cta_quiz_jewelry")),
-      desc: String(t("home.cta_jewelry_desc")),
+      heading: String(t("home.cta_quiz_beans")),
+      desc: String(t("home.cta_beans_desc")),
       meta: String(t("home.cta_meta")),
-      btn: String(t("home.cta_jewelry_btn")),
+      btn: String(t("home.cta_beans_btn")),
     };
   }
   if (c.code === "brewing") {
@@ -206,10 +206,10 @@ const quizCards: QuizCard[] = homeCategories.map((c) => {
       href: localizedPath(locale, "/quiz/brewing"),
       icon: "brewing",
       kicker: c.title,
-      heading: String(t("home.cta_quiz_incense")),
-      desc: String(t("home.cta_incense_desc")),
+      heading: String(t("home.cta_quiz_brewing")),
+      desc: String(t("home.cta_brewing_desc")),
       meta: String(t("home.cta_meta")),
-      btn: String(t("home.cta_incense_btn")),
+      btn: String(t("home.cta_brewing_btn")),
     };
   }
   return {

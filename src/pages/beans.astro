@@ -12,13 +12,13 @@ const t = createT(messages);
 
 const breadcrumbItems = [
   { name: t("nav.home"), url: "/" },
-  { name: t("nav.amber"), url: "/beans" },
+  { name: t("nav.beans"), url: "/beans" },
 ];
 ---
 
 <Layout
-  title={`${t("amber.title")} — ${t("common.site_name")}`}
-  description={t("amber.p1")}
+  title={`${t("beans.title")} — ${t("common.site_name")}`}
+  description={t("beans.p1")}
 >
   <Fragment slot="head">
     <BreadcrumbSchema items={breadcrumbItems} />
@@ -29,15 +29,15 @@ const breadcrumbItems = [
         <p
           class="text-[10px] uppercase tracking-[0.4em] text-forest-600 font-sans mb-4"
         >
-          {t("amber.kicker")}
+          {t("beans.kicker")}
         </p>
         <h1
           class="text-display-sm md:text-display-md font-serif text-text-primary mb-4 leading-[1.08]"
         >
-          {t("amber.title")}
+          {t("beans.title")}
         </h1>
         <p class="text-lg text-text-secondary italic max-w-xl mx-auto">
-          {t("amber.subtitle")}
+          {t("beans.subtitle")}
         </p>
       </header>
     </RevealOnScroll>
@@ -46,9 +46,9 @@ const breadcrumbItems = [
       <div
         class="space-y-6 text-text-secondary font-sans leading-relaxed text-base max-w-3xl mx-auto"
       >
-        <p>{t("amber.p1")}</p>
-        <p>{t("amber.p2")}</p>
-        <p>{t("amber.p3")}</p>
+        <p>{t("beans.p1")}</p>
+        <p>{t("beans.p2")}</p>
+        <p>{t("beans.p3")}</p>
       </div>
     </RevealOnScroll>
   </article>
@@ -58,18 +58,18 @@ const breadcrumbItems = [
       links={[
         {
           href: localizedPath(locale, "/origins"),
-          label: t("continue.amber_next_1_label"),
-          desc: t("continue.amber_next_1_desc"),
+          label: t("continue.beans_next_1_label"),
+          desc: t("continue.beans_next_1_desc"),
         },
         {
           href: localizedPath(locale, "/roasting"),
-          label: t("continue.amber_next_2_label"),
-          desc: t("continue.amber_next_2_desc"),
+          label: t("continue.beans_next_2_label"),
+          desc: t("continue.beans_next_2_desc"),
         },
         {
           href: localizedPath(locale, "/products?cat=beans"),
-          label: t("continue.amber_next_3_label"),
-          desc: t("continue.amber_next_3_desc"),
+          label: t("continue.beans_next_3_label"),
+          desc: t("continue.beans_next_3_desc"),
         },
       ]}
     />
