@@ -110,3 +110,11 @@ Cloudflare 後台操作(D1、R2、Pages、網域、secrets)、Resend 金鑰、�
 - **`pnpm install` 失敗:** 不要用 npm;確認 `pnpm-lock.yaml` 已更新並一起提交。
 - **lint 失敗:** 執行 `pnpm exec prettier --write .` 後再提交。
 - **新增頁面或網址:** 同步更新 `src/pages/sitemap.xml.ts`。
+
+## 2026-11-26 進度更新(S13b)
+
+- 首頁封面:照片保留原色,標題與文字改為白色並加強陰影
+- 首頁封面遮罩加深(左側 black/80、底部 black/60),解決文字與背景混在一起
+- `kindOf` 移除未使用的 `_zhTitle` 參數與 tea 測驗種類,同步修改 admin/products/new.astro、quiz/index.astro 呼叫端
+- 已 build 並 deploy 到 Cloudflare Pages(mycafe)
+- 待辦:到 mycafe.de5.net 確認封面可讀性,必要時再調整遮罩
