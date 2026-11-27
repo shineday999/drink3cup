@@ -53,7 +53,7 @@ pnpm exec wrangler d1 migrations apply mycafe --remote
 
 - 新增 migration:在 `migrations/` 建立下一個編號的 `.sql`,**不要修改已套用過的檔案**。
 - `scripts/seed-coffee.sql` 會**清空**商品、文章、評論再匯入示範資料,**不要在正式環境重跑**。
-- 分類代碼目前沿用舊名:`jewelry` = 咖啡豆、`incense` = 沖煮器具(對應顯示名稱在 `src/lib/sheet-sync-api.ts` 的 `CATEGORY_LABELS`)。S06 完成改名時,要同步調整這裡。
+- 分類代碼:`beans` = 咖啡豆、`brewing` = 沖煮器具(顯示名稱在 `src/lib/sheet-sync-api.ts` 的 `CATEGORY_LABELS`)。程式內保留舊代碼 `jewelry` / `incense` 的相容對應,不需清除。
 
 ## 6. 後台與金鑰(擁有者管理)
 
@@ -88,17 +88,16 @@ Google 試算表 `mycafe` 分頁與網站商品雙向同步,約每分鐘一次�
 
 **待辦(可認領)**
 
-| 項目                                                        | 步驟          | 備註                                                             |
-| ----------------------------------------------------------- | ------------- | ---------------------------------------------------------------- |
-| 資料庫分類代碼改名(`jewelry`/`incense` → `beans`/`brewing`) | S06           | 需 migration + 更新 `CATEGORY_LABELS` 與 `category-kind.ts`      |
-| 重建 `en`、`ms-MY`、`id-ID` 語言檔                          | —             | 目前 `src/i18n/messages` 只有 `zh-Hant.json`;商品資料已有 4 語言 |
-| 品牌頁文案:story、vision、about、more 等                    | S10           | 文案在 `zh-Hant.json`                                            |
-| 商品與頁面圖片、首頁插圖(目前仍是舊的森林插圖)              | S13           | 只能用自有或有授權的照片,需擁有者提供                            |
-| SEO:sitemap、`llms.txt`、`llms-full.txt`、結構化資料        | S14           |                                                                  |
-| 驗收:殘留字樣為 0、手機與桌面 QA、表單與 Email              | S15、S16、S24 |                                                                  |
-| 寄信(Resend)金鑰與寄件人設定                                | S23           | 擁有者                                                           |
-| 確認 R2 bucket `mycafe-images` 已建立並可上傳               | S19           | 擁有者                                                           |
-| 資料庫內文字(後台設定、橫幅)是否仍有簡體                    | S05d          | 擁有者在後台檢查,或請協作者寫轉換 migration                      |
+| 項目                                                 | 步驟          | 備註                                                             |
+| ---------------------------------------------------- | ------------- | ---------------------------------------------------------------- |
+| 重建 `en`、`ms-MY`、`id-ID` 語言檔                   | —             | 目前 `src/i18n/messages` 只有 `zh-Hant.json`;商品資料已有 4 語言 |
+| 品牌頁文案:story、vision、about、more 等             | S10           | 文案在 `zh-Hant.json`                                            |
+| 商品與頁面圖片、首頁插圖(目前仍是舊的森林插圖)       | S13           | 只能用自有或有授權的照片,需擁有者提供                            |
+| SEO:sitemap、`llms.txt`、`llms-full.txt`、結構化資料 | S14           |                                                                  |
+| 驗收:殘留字樣為 0、手機與桌面 QA、表單與 Email       | S15、S16、S24 |                                                                  |
+| 寄信(Resend)金鑰與寄件人設定                         | S23           | 擁有者                                                           |
+| 確認 R2 bucket `mycafe-images` 已建立並可上傳        | S19           | 擁有者                                                           |
+| 資料庫內文字(後台設定、橫幅)是否仍有簡體             | S05d          | 擁有者在後台檢查,或請協作者寫轉換 migration                      |
 
 ## 9. 只有擁有者能做的事
 
