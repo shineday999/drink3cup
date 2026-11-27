@@ -29,10 +29,11 @@
     "SITE_URL": "https://mycafe.de5.net",
     "EMAIL_FROM": "喝三杯咖啡 <weider@0061qwen.cc.cd>",
     // 網站分析(皆不是機密)。必須是「本站自己的」帳戶,不可使用其他網站的 ID。
-    // GTM 容器 ID(GTM-XXXXXXX):有設定就用 GTM(優先);GA4 在 GTM 後台設定。
-    "GTM_CONTAINER_ID": "GTM-WMBGGQ8J",
-    // 直接使用 GA4 的衡量 ID(G-XXXXXXXXXX):只有沒設 GTM 時才會使用。留空 = 不用。
-    "GA_MEASUREMENT_ID": "",
+    // 目前:直接使用 GA4,不經過 GTM,立即開始收資料。
+    // 若要改走 GTM:把下面 GTM_CONTAINER_ID 填成 "GTM-WMBGGQ8J"(GTM 優先),並在 GTM 後台設定標記,
+    // 見 docs/PLAN.md「S36 擁有者設定」。兩者同時設定時只會載入 GTM,不會重複計算。
+    "GTM_CONTAINER_ID": "",
+    "GA_MEASUREMENT_ID": "G-6CFV7K8C9W",
     "EMAIL_REPLY_TO": "weider@0061qwen.cc.cd",
   },
 }
