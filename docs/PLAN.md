@@ -99,20 +99,22 @@
 
 目標:形象專業但親民,一般大眾容易接受;用詞白話、具體、可被搜尋引擎與 AI 引用。**每完成一步,務必更新本表與「紀錄」。**
 
-| ID   | 標籤  | 步驟                                                                                                                                                                                                                                                                                                                                                                                              | 狀態 | 負責人 |
-| ---- | ----- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---- | ------ |
-| S28  | 🤖    | 舊資料盤點與清理:程式碼、種子檔、資料庫(商品 FAQ、文章 FAQ、橫幅、設定)、公開檔案中的琥珀/香品/森林/OxHorse 等字樣;新增 migration。進度 2026-11-26:已刪除舊種子檔、清除 DB quiz_rules、程式內舊分類改名碼與 SVG 舊名;待辦:歡迎信腳本、舊圖片檔名(見 S13)                                                                                                                                          | ✅   | Claude |
-| S29  | 🤖    | 品牌定位與用詞重寫:重寫 `zh-Hant.json` 全部前台文字(導覽、首頁、品牌頁、聯絡、結帳、錯誤頁、頁尾),專業、白話、少文青腔;並把語言檔鍵名 amber / incense / materials / craft 改為 beans / brewing / origins / roasting                                                                                                                                                                               | ✅   | Claude |
-| S30  | 🤖    | 依新用詞重新翻譯 en / ms-MY / id-ID(母語者校對另記)                                                                                                                                                                                                                                                                                                                                               | ✅   | Claude |
-| S31  | 🤖    | 新增 `/faq` 問答中心:分主題 20–30 題,答案先給結論再補充,附 FAQPage JSON-LD,各語言                                                                                                                                                                                                                                                                                                                 | ✅   | Claude |
-| S32  | 🤖    | 知識文章擴充(接 S11):每篇有摘要、FAQ、更新日期、Article JSON-LD;主題含產地、處理法、烘焙度、研磨、沖煮、保存、器具選購                                                                                                                                                                                                                                                                            | ✅   | Claude |
-| S33  | 🤖    | 商品頁:FAQ、Product / Offer 結構化資料、麵包屑、Organization 資訊(不得捏造評價或評分)                                                                                                                                                                                                                                                                                                             | ✅   | Claude |
-| S34  | 🤖    | GEO / AEO 收尾:llms.txt、答案式標題與摘要段、hreflang 與結構化資料驗證                                                                                                                                                                                                                                                                                                                            | ✅   | Claude |
-| S35  | 👤    | 擁有者提供:社群帳號網址(Instagram 等)與門市/聯絡資訊,用於頁尾連結與 Organization sameAs(目前頁尾社群連結是通用網址、小紅書連結為空)                                                                                                                                                                                                                                                               | ⬜   |        |
-| S36  | 🤖/👤 | **Google Analytics 4**:程式已完成(`src/lib/analytics.ts`、`components/Analytics.astro`;設定 `wrangler.jsonc` 的 `GA_MEASUREMENT_ID`,留空 = 關閉)。事件:`view_item`、`add_to_cart`、`begin_checkout`、`generate_lead`(預訂送出 / 聯絡表單)、`newsletter_subscribe`、`quiz_complete`;後台與 API 不追蹤;尊重 DNT / GPC。**待擁有者(見下方「S36 擁有者設定」)提供本站專屬的衡量 ID 後才會開始收資料** | 🟨   | Claude |
-| S36b | 🤖    | 隱私權政策頁(說明 GA 與 Cookie、DNT/GPC、聯絡方式)+ 頁尾連結 + 四語言;評估是否需要同意橫幅(台灣個資法、馬來西亞 PDPA、印尼 PDP 法)                                                                                                                                                                                                                                                                | ⬜   |        |
+| ID   | 標籤  | 步驟                                                                                                                                                                                                                                                                                                                                                                                                        | 狀態 | 負責人 |
+| ---- | ----- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---- | ------ |
+| S28  | 🤖    | 舊資料盤點與清理:程式碼、種子檔、資料庫(商品 FAQ、文章 FAQ、橫幅、設定)、公開檔案中的琥珀/香品/森林/OxHorse 等字樣;新增 migration。進度 2026-11-26:已刪除舊種子檔、清除 DB quiz_rules、程式內舊分類改名碼與 SVG 舊名;待辦:歡迎信腳本、舊圖片檔名(見 S13)                                                                                                                                                    | ✅   | Claude |
+| S29  | 🤖    | 品牌定位與用詞重寫:重寫 `zh-Hant.json` 全部前台文字(導覽、首頁、品牌頁、聯絡、結帳、錯誤頁、頁尾),專業、白話、少文青腔;並把語言檔鍵名 amber / incense / materials / craft 改為 beans / brewing / origins / roasting                                                                                                                                                                                         | ✅   | Claude |
+| S30  | 🤖    | 依新用詞重新翻譯 en / ms-MY / id-ID(母語者校對另記)                                                                                                                                                                                                                                                                                                                                                         | ✅   | Claude |
+| S31  | 🤖    | 新增 `/faq` 問答中心:分主題 20–30 題,答案先給結論再補充,附 FAQPage JSON-LD,各語言                                                                                                                                                                                                                                                                                                                           | ✅   | Claude |
+| S32  | 🤖    | 知識文章擴充(接 S11):每篇有摘要、FAQ、更新日期、Article JSON-LD;主題含產地、處理法、烘焙度、研磨、沖煮、保存、器具選購                                                                                                                                                                                                                                                                                      | ✅   | Claude |
+| S33  | 🤖    | 商品頁:FAQ、Product / Offer 結構化資料、麵包屑、Organization 資訊(不得捏造評價或評分)                                                                                                                                                                                                                                                                                                                       | ✅   | Claude |
+| S34  | 🤖    | GEO / AEO 收尾:llms.txt、答案式標題與摘要段、hreflang 與結構化資料驗證                                                                                                                                                                                                                                                                                                                                      | ✅   | Claude |
+| S35  | 👤    | 擁有者提供:社群帳號網址(Instagram 等)與門市/聯絡資訊,用於頁尾連結與 Organization sameAs(目前頁尾社群連結是通用網址、小紅書連結為空)                                                                                                                                                                                                                                                                         | ⬜   |        |
+| S36  | 🤖/👤 | **網站分析(GTM + GA4)**:程式已完成(`src/lib/analytics.ts`、`components/Analytics.astro`)。`wrangler.jsonc` 已設 `GTM_CONTAINER_ID`;GA4 衡量 ID 與標記設定在 GTM 後台完成(見「S36 擁有者設定」)。事件:`view_item`、`add_to_cart`、`begin_checkout`、`generate_lead`(預訂送出 / 聯絡表單)、`newsletter_subscribe`、`quiz_complete`;後台與 API 不追蹤;尊重 DNT / GPC。**GTM 容器內的標記尚未設定前不會有資料** | 🟨   | Claude |
+| S36b | 🤖    | 隱私權政策頁(說明 GA 與 Cookie、DNT/GPC、聯絡方式)+ 頁尾連結 + 四語言;評估是否需要同意橫幅(台灣個資法、馬來西亞 PDPA、印尼 PDP 法)                                                                                                                                                                                                                                                                          | ⬜   |        |
 
 ## 紀錄
+
+- 2026-11-27 Claude:擁有者提供 GTM 容器 `GTM-WMBGGQ8J`(已確認非原站所有)。S36 擴充為支援 GTM(優先)與直接 GA4,二選一不重複;事件改以 `dataLayer.push` 送出。驗證:`pnpm check` 0 錯誤、`pnpm test` 53/53(含以假瀏覽器實際執行指令碼)、lint、`prettier --check .`、build 通過;本機實測四種設定組合,後台頁面不載入。
 
 - 2026-11-27 Claude:**事故**:S00 複製時,舊版 `Layout.astro` 內寫死的 **原站 GA 衡量 ID** 被一併帶進新站(守衛腳本當時沒有檢查 GA ID),新站上線後的瀏覽資料一直送進**原站的 GA 資源**。已移除(`fix(S36)`),並把該 ID 加進 `scripts/check-no-original-refs.sh`。原站網站本身沒有被修改,但原站 GA 資料裡混入了新站的流量,**擁有者可在原站 GA 以日期或主機名稱篩選排除**(主機名稱 `mycafe.de5.net`)。新站 GA 在擁有者提供新 ID 前保持關閉。
 
@@ -140,16 +142,35 @@
 - 2026-11-21 Claude:完成 S00–S02。移除指向原專案 D1/KV/R2 的 ID、deploy.yml 中的原 Pages 專案名稱、lighthouserc 的原網域,並刪除舊文件。
 - 2026-11-21 Claude:改為繁體中文文件,新增語言規則。
 
-## S36 擁有者設定(Google Analytics)
+## S36 擁有者設定(GTM + GA4)
 
-1. 到 https://analytics.google.com 建立**新的**資源(名稱:喝三杯咖啡;時區:台北;幣別:新台幣 TWD)。**不要使用原站的 GA 資源。**
-2. 資源下新增「網站」資料串流,網址填 `https://mycafe.de5.net`,複製「衡量 ID」(格式 `G-XXXXXXXXXX`)。
-3. 把 ID 填進 `wrangler.jsonc` 的 `GA_MEASUREMENT_ID` 後 commit + push(衡量 ID 不是機密,可以公開)。
-4. 到 GA「管理 > 事件」,把 `generate_lead` 標記為**關鍵事件**(預訂與聯絡的轉換)。
-5. 「管理 > 資料收集與修改 > 資料保留」設為 14 個月;確認「加強型評估」(捲動、外連、站內搜尋)為開啟。
-6. (建議)「資料串流 > 設定標記 > 定義內部流量」排除自己與同事的 IP,並建立過濾器。
-7. (建議)連結 Search Console,方便看自然搜尋成效。
-8. 驗證:開啟網站後到 GA「報表 > 即時」應看到自己的造訪;用手機各點一次「加入購物車」「送出聯絡表單」確認事件出現。
+網站只負責把事件推進 `dataLayer`,**標記要在 GTM 後台設定**(網站已載入容器 `GTM-WMBGGQ8J`)。請依序做:
+
+**A. 取得 GA4 衡量 ID**
+
+1. https://analytics.google.com 建立**新的**資源(名稱:喝三杯咖啡;時區:台北;幣別:新台幣 TWD)。**不要使用原站的 GA 資源。**
+2. 新增「網站」資料串流,網址 `https://mycafe.de5.net`,複製「衡量 ID」(`G-XXXXXXXXXX`)。
+
+**B. 在 GTM(https://tagmanager.google.com,容器 GTM-WMBGGQ8J)建立**
+
+1. 變數 > 內建變數:勾選 **Event**。新增 3 個「資料層變數」:`lead_source`、`quiz_type`、`site_language`(名稱同資料層鍵)。
+2. 標記 1:類型「Google 代碼」,代碼 ID 填 A 的 `G-…`,觸發條件 **Initialization - All Pages**。在「要設定的設定」加入使用者屬性 `site_language` = `{{site_language}}`。
+3. 觸發條件:類型「自訂事件」,事件名稱勾「使用規則運算式比對」,填 `^(view_item|add_to_cart|begin_checkout|generate_lead|newsletter_subscribe|quiz_complete)$`。
+4. 標記 2:類型「Google Analytics:GA4 事件」,衡量 ID 填 `G-…`,事件名稱 `{{Event}}`;事件參數 `lead_source` = `{{lead_source}}`、`quiz_type` = `{{quiz_type}}`;展開「更多設定」勾選「傳送電子商務資料」來源選「資料層」;觸發條件用上一步的自訂事件。
+5. 按「預覽」,輸入 `https://mycafe.de5.net`,實際操作:看商品、加入購物車、進結帳、送出聯絡表單,確認事件都有觸發。
+6. 確認無誤後「提交」並發布。
+
+**C. 在 GA4 後台**
+
+1. 管理 > 事件:把 `generate_lead` 標記為**關鍵事件**。
+2. 資料保留設為 14 個月;確認「加強型評估」為開啟。
+3. 設定自訂維度 `site_language`(範圍:使用者)、`lead_source`、`quiz_type`(範圍:事件),報表才看得到。
+4. (建議)定義內部流量並排除自己與同事的 IP;連結 Search Console。
+
+**注意**
+
+- 使用 GTM 時,**不要**再把 `G-…` 填進 `wrangler.jsonc` 的 `GA_MEASUREMENT_ID`,否則程式雖然只會載入 GTM,但 GTM 內若又手動貼了 gtag 會重複計算。兩者只能選一種。
+- 網站有內容安全政策(`src/middleware.ts`),只允許 Google 分析相關網域。若要在 GTM 加入其他廠商標記(廣告、熱度圖等),會被擋下,需先請工程協作者調整。
 
 ## 程式碼背景(給新同事)
 

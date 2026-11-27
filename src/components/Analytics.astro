@@ -1,12 +1,12 @@
 ---
-// Google Analytics 4(S36)。只在公開前台載入;後台使用 AdminLayout,不會經過這裡。
-// 設定:wrangler.jsonc vars 的 GA_MEASUREMENT_ID(留空 = 完全關閉)。
+// 網站分析(S36)。只在公開前台載入;後台使用 AdminLayout,不會經過這裡。
+// 設定:wrangler.jsonc vars 的 GTM_CONTAINER_ID(優先)或 GA_MEASUREMENT_ID;都留空 = 完全關閉。
 // 指令碼內容與事件定義在 src/lib/analytics.ts(有單元測試)。
 import { env } from "cloudflare:workers";
 import { defaultLocale, locales, type Locale } from "../i18n/config";
 import {
-  buildGaSnippet,
-  normalizeGaId,
+  buildTrackingSnippet,
+  pickTracking,
   shouldTrackPath,
 } from "../lib/analytics";
 
@@ -15,12 +15,15 @@ interface Props {
 }
 const { locale } = Astro.props;
 
-const gaId = normalizeGaId(env?.GA_MEASUREMENT_ID);
+const tracking = pickTracking({
+  GTM_CONTAINER_ID: env?.GTM_CONTAINER_ID,
+  GA_MEASUREMENT_ID: env?.GA_MEASUREMENT_ID,
+});
 // 非預設語言的網址前綴(例如 en、ms-MY),事件判斷時要先去掉
 const prefixes = locales.filter((l: Locale) => l !== defaultLocale);
 const snippet =
-  gaId && import.meta.env.PROD && shouldTrackPath(Astro.url.pathname)
-    ? buildGaSnippet(gaId, locale, prefixes)
+  tracking && import.meta.env.PROD && shouldTrackPath(Astro.url.pathname)
+    ? buildTrackingSnippet(tracking, locale, prefixes)
     : "";
 ---
 

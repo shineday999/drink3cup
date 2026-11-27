@@ -28,8 +28,10 @@
   "vars": {
     "SITE_URL": "https://mycafe.de5.net",
     "EMAIL_FROM": "喝三杯咖啡 <weider@0061qwen.cc.cd>",
-    // Google Analytics 4 衡量 ID(格式 G-XXXXXXXXXX,不是機密)。留空 = 不載入 GA。
-    // 必須是「本站自己的」GA 資源,不可使用其他網站的 ID。
+    // 網站分析(皆不是機密)。必須是「本站自己的」帳戶,不可使用其他網站的 ID。
+    // GTM 容器 ID(GTM-XXXXXXX):有設定就用 GTM(優先);GA4 在 GTM 後台設定。
+    "GTM_CONTAINER_ID": "GTM-WMBGGQ8J",
+    // 直接使用 GA4 的衡量 ID(G-XXXXXXXXXX):只有沒設 GTM 時才會使用。留空 = 不用。
     "GA_MEASUREMENT_ID": "",
     "EMAIL_REPLY_TO": "weider@0061qwen.cc.cd",
   },

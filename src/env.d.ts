@@ -40,7 +40,9 @@ declare namespace Cloudflare {
     EMAIL_FROM: string;
     EMAIL_REPLY_TO: string;
     SESSION_SECRET?: string;
-    /** Google Analytics 4 衡量 ID(G-XXXXXXXXXX);空字串 = 關閉 */
+    /** Google Tag Manager 容器 ID(GTM-XXXXXXX),優先;空字串 = 不用 GTM */
+    GTM_CONTAINER_ID?: string;
+    /** Google Analytics 4 衡量 ID(G-XXXXXXXXXX),沒設 GTM 時才使用;空字串 = 關閉 */
     GA_MEASUREMENT_ID?: string;
   }
 }
