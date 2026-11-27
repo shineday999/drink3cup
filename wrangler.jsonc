@@ -28,6 +28,9 @@
   "vars": {
     "SITE_URL": "https://mycafe.de5.net",
     "EMAIL_FROM": "喝三杯咖啡 <weider@0061qwen.cc.cd>",
+    // Google Analytics 4 衡量 ID(格式 G-XXXXXXXXXX,不是機密)。留空 = 不載入 GA。
+    // 必須是「本站自己的」GA 資源,不可使用其他網站的 ID。
+    "GA_MEASUREMENT_ID": "",
     "EMAIL_REPLY_TO": "weider@0061qwen.cc.cd",
   },
 }

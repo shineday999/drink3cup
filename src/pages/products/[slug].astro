@@ -357,6 +357,14 @@ void locale;
 
           <form
             data-pd-form
+            data-ga-item={JSON.stringify({
+              item_id: product.slug,
+              item_name: tr.name,
+              item_category: product.category,
+              price: cnyPrice ?? 0,
+              currency: "TWD",
+              quantity: 1,
+            })}
             method="POST"
             action="/api/cart/add"
             class="space-y-4"

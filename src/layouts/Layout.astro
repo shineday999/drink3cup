@@ -5,6 +5,7 @@ import "../styles/mobile.css";
 import "../styles/global.css";
 import LocaleSwitcher from "@components/LocaleSwitcher.astro";
 import Footer from "@components/Footer.astro";
+import Analytics from "@components/Analytics.astro";
 import { createT } from "../i18n/t";
 import {
   defaultLocale,
@@ -220,6 +221,7 @@ const nav = [
         }
       }
     </style>
+    <Analytics locale={currentLocale} />
   </head>
   <body class="bg-white text-text-primary">
     <MobileNav title={title} />

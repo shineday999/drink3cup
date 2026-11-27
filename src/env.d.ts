@@ -40,5 +40,7 @@ declare namespace Cloudflare {
     EMAIL_FROM: string;
     EMAIL_REPLY_TO: string;
     SESSION_SECRET?: string;
+    /** Google Analytics 4 衡量 ID(G-XXXXXXXXXX);空字串 = 關閉 */
+    GA_MEASUREMENT_ID?: string;
   }
 }
