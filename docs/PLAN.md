@@ -65,12 +65,12 @@
 
 | ID   | 標籤 | 步驟                                                                                                                                   | 狀態 | 負責人 |
 | ---- | ---- | -------------------------------------------------------------------------------------------------------------------------------------- | ---- | ------ |
-| S07  | 🤖   | 重寫 `zh-Hant.json`(咖啡內容;需先完成 S05b,並處理 `site_name`、`hero_title`、`faq_a2_a`、後台 `brand` 等舊品牌鍵)                      | ⬜   |        |
+| S07  | 🤖   | 重寫 `zh-Hant.json`(咖啡內容;需先完成 S05b,並處理 `site_name`、`hero_title`、`faq_a2_a`、後台 `brand` 等舊品牌鍵)                      | ✅   |        |
 | S10  | 🤖   | 品牌頁:story、beans、brewing、origins、roasting、vision、more、about                                                                   | ✅   | Claude |
 | S11  | 🤖   | 知識文章種子(產地、水洗 vs 日曬、研磨度、V60、義式、保存)                                                                              | ✅   |        |
 | S12  | 🤖   | 資料庫種子:新 `scripts/seed*.sql`、商品 FAQ、migrations 0007/0009/0011/0014 的站名與分類                                               | ✅   |        |
 | S13  | 🤖   | 更換 `public/images/**`(舊圖屬舊品牌),僅用自有或有授權的照片                                                                           | ⬜   |        |
-| S13b | 🤖   | 配色/設計 token 由「森林綠」改為咖啡色系(`tailwind.config.cjs`、`global.css`,class 名稱 `forest-*` 可保留或改名);重新製作 favicon/圖示 | ⬜   |        |
+| S13b | 🤖   | 配色/設計 token 由「森林綠」改為咖啡色系(`tailwind.config.cjs`、`global.css`,class 名稱 `forest-*` 可保留或改名);重新製作 favicon/圖示 | ✅   |        |
 | S14  | 🤖   | SEO:sitemap、`llms.txt`、`llms-full.txt`、結構化資料                                                                                   | ✅   | Claude |
 | S26  | 🤖   | 重新啟用 en / ms-MY / id-ID:語言檔(本機模型翻譯,**待母語者校對**)、語言切換器、`/<lang>/...` 路由、幣別對應                            | ✅   | Claude |
 
@@ -78,15 +78,15 @@
 
 | ID  | 標籤 | 步驟                                                             | 狀態 | 負責人 |
 | --- | ---- | ---------------------------------------------------------------- | ---- | ------ |
-| S15 | 🤖   | `pnpm install && pnpm check && pnpm test && pnpm build` 全部通過 | ⬜   |        |
+| S15 | 🤖   | `pnpm install && pnpm check && pnpm test && pnpm build` 全部通過 | ✅   |        |
 | S16 | 🤖   | 檢查腳本顯示 `CLEAN`;搜尋「琥珀/香品/牛马」殘留 = 0              | ⬜   |        |
 
 ### E 階段 — 上線(需擁有者)
 
 | ID  | 標籤  | 步驟                                                                                                                                                                                                                                                         | 狀態 | 負責人 |
 | --- | ----- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---- | ------ |
-| S17 | 👤    | 建立**全新空白 Public** GitHub repo `mycafe`(不要勾 README/.gitignore/授權檔)。若要讓 Claude 代為推送:建立 **Fine-grained token,Repository access 只選 mycafe**,權限 Contents: Read and write,效期 7 天,用完撤銷。**不要用能存取原專案的 token**(違反鐵則 2) | ⬜   |        |
-| S18 | 👤/🤖 | 推送:`git remote add origin https://github.com/shineday999/mycafe.git` → `git push -u origin main`(Claude 沙盒無 GitHub 憑證,擁有者在本機執行即可)                                                                                                           | ⬜   |        |
+| S17 | 👤    | 建立**全新空白 Public** GitHub repo `mycafe`(不要勾 README/.gitignore/授權檔)。若要讓 Claude 代為推送:建立 **Fine-grained token,Repository access 只選 mycafe**,權限 Contents: Read and write,效期 7 天,用完撤銷。**不要用能存取原專案的 token**(違反鐵則 2) | ✅   |        |
+| S18 | 👤/🤖 | 推送:`git remote add origin https://github.com/shineday999/mycafe.git` → `git push -u origin main`(Claude 沙盒無 GitHub 憑證,擁有者在本機執行即可)                                                                                                           | ✅   |        |
 | S19 | 👤    | Cloudflare 建立新 D1 `mycafe`、R2 `mycafe-images`、2 個 KV;ID 填入 `wrangler.jsonc`                                                                                                                                                                          | ✅   |        |
 | S20 | 👤    | 套用 migrations:`npx wrangler d1 migrations apply mycafe --remote`,再匯入種子                                                                                                                                                                                | ✅   |        |
 | S21 | 👤    | Cloudflare Pages 建立新專案 `mycafe` 連接新 repo;GitHub secrets 設定**新的**受限權限 API Token                                                                                                                                                               | ✅   |        |
@@ -146,3 +146,4 @@
 - 2026-11-21 Claude:新增商品試算表雙向同步(網站端 /api/sync/products + Apps Script),說明見 docs/PRODUCT-SHEET-SYNC.md。
 - 2026-11-21 Claude:新增商品試算表雙向同步(網站端 /api/sync/products + Apps Script),說明見 docs/PRODUCT-SHEET-SYNC.md。
 - 2026-11-22 Claude:S06 測驗改咖啡口味題、移除選茶測驗(/quiz/tea 轉到 /quiz)、結果依分數排序。
+- 2026-11-22 Claude:校正看板,標記完成:S07 S13b S17 S18 S15。
