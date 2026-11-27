@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800" role="img" aria-label="咖啡杯">
+  <rect width="800" height="800" fill="#f4ebe0"/>
+  <path d="M230 340h300v110a120 120 0 0 1-120 120h-60a120 120 0 0 1-120-120V340z" fill="#3b261a"/>
+  <path d="M530 372h30a50 50 0 0 1 0 100h-30" fill="none" stroke="#3b261a" stroke-width="34" stroke-linecap="round"/>
+  <path d="M290 290c-20 30 20 50 0 90M380 270c-20 30 20 50 0 90M470 290c-20 30 20 50 0 90" fill="none" stroke="#c98a5e" stroke-width="22" stroke-linecap="round"/>
+  <ellipse cx="380" cy="630" rx="230" ry="22" fill="#e2d3c2"/>
+</svg>
