@@ -1,0 +1,169 @@
+---
+// 後台「留言」:聯絡表單送出的訊息。留言一律先存進資料庫,再寄通知信;
+// 即使寄信失敗(例如寄信金鑰尚未設定),也可以在這裡看到並回覆。
+import AdminLayout from "../../../layouts/AdminLayout.astro";
+import { env } from "cloudflare:workers";
+
+interface InquiryRow {
+  id: string;
+  name: string;
+  email: string;
+  phone: string | null;
+  subject: string | null;
+  message: string;
+  locale: string | null;
+  status: string;
+  created_at: number;
+}
+
+const STATUSES = [
+  { value: "new", label: "未處理" },
+  { value: "done", label: "已處理" },
+];
+const requested = Astro.url.searchParams.get("status") ?? "";
+const filter = STATUSES.some((s) => s.value === requested) ? requested : "";
+
+let rows: InquiryRow[] = [];
+const counts: Record<string, number> = {};
+let total = 0;
+
+if (env?.DB) {
+  const sql = `SELECT id, name, email, phone, subject, message, locale, status, created_at FROM inquiries ${
+    filter ? "WHERE status = ?" : ""
+  } ORDER BY created_at DESC LIMIT 100`;
+  const stmt = env.DB.prepare(sql);
+  rows = (await (filter ? stmt.bind(filter) : stmt).all<InquiryRow>()).results;
+  const c = await env.DB.prepare(
+    "SELECT status, COUNT(*) AS c FROM inquiries GROUP BY status",
+  ).all<{ status: string; c: number }>();
+  for (const r of c.results ?? []) {
+    counts[r.status] = r.c;
+    total += r.c;
+  }
+}
+
+const chips = [
+  { value: "", label: "全部", n: total },
+  ...STATUSES.map((s) => ({ ...s, n: counts[s.value] ?? 0 })),
+];
+const th =
+  "px-3 py-2 text-left text-xs font-medium tracking-wide text-text-secondary";
+const fmt = (ts: number) =>
+  new Date(ts * 1000 + 8 * 3600 * 1000)
+    .toISOString()
+    .replace("T", " ")
+    .slice(0, 16);
+---
+
+<AdminLayout title="留言" active="inquiries">
+  <nav class="mb-3 flex gap-2 overflow-x-auto pb-1" aria-label="留言狀態篩選">
+    {
+      chips.map((c) => (
+        <a
+          href={
+            c.value ? `/admin/inquiries?status=${c.value}` : "/admin/inquiries"
+          }
+          aria-current={filter === c.value ? "page" : undefined}
+          class={`shrink-0 rounded-full border px-3 py-1 text-sm transition-colors ${
+            filter === c.value
+              ? "border-forest-700 bg-forest-700 text-bg-base"
+              : "border-text-muted/30 text-text-secondary hover:border-forest-700"
+          }`}
+        >
+          {c.label}
+          <span class="ml-1 tabular-nums opacity-70">{c.n}</span>
+        </a>
+      ))
+    }
+  </nav>
+
+  <div
+    class="overflow-x-auto rounded-card border border-text-muted/20 bg-bg-card"
+  >
+    <table class="w-full text-sm leading-normal">
+      <thead class="bg-forest-100">
+        <tr>
+          <th class={th}>時間(台北)</th>
+          <th class={th}>姓名 / 聯絡方式</th>
+          <th class={th}>主旨與內容</th>
+          <th class={th}>狀態</th>
+          <th class={th}>操作</th>
+        </tr>
+      </thead>
+      <tbody>
+        {
+          rows.length === 0 && (
+            <tr>
+              <td colspan="5" class="px-3 py-8 text-center text-text-muted">
+                目前沒有留言
+              </td>
+            </tr>
+          )
+        }
+        {
+          rows.map((r) => (
+            <tr
+              class="border-t border-text-muted/10 align-top transition-colors hover:bg-forest-50"
+              title={r.id}
+            >
+              <td class="whitespace-nowrap px-3 py-2 font-mono text-xs text-text-muted">
+                {fmt(r.created_at)}
+              </td>
+              <td class="px-3 py-2">
+                <div class="font-medium">{r.name}</div>
+                <div class="text-xs text-text-secondary">{r.email}</div>
+                {r.phone && (
+                  <div class="text-xs text-text-secondary">{r.phone}</div>
+                )}
+                {r.locale && (
+                  <div class="font-mono text-xs text-text-muted">
+                    {r.locale}
+                  </div>
+                )}
+              </td>
+              <td class="max-w-md px-3 py-2 leading-relaxed">
+                {r.subject && <div class="font-medium">{r.subject}</div>}
+                <div class="whitespace-pre-wrap text-text-secondary">
+                  {r.message}
+                </div>
+              </td>
+              <td class="px-3 py-2">
+                <span
+                  class={`rounded px-2 py-0.5 text-xs ${
+                    r.status === "done"
+                      ? "bg-success/20 text-success"
+                      : "bg-warning/20 text-warning"
+                  }`}
+                >
+                  {r.status === "done" ? "已處理" : "未處理"}
+                </span>
+              </td>
+              <td class="whitespace-nowrap px-3 py-2">
+                <a
+                  class="mr-3 text-forest-700 underline"
+                  href={`mailto:${r.email}?subject=${encodeURIComponent("Re: " + (r.subject ?? ""))}`}
+                >
+                  回信
+                </a>
+                <form
+                  method="POST"
+                  action={`/api/admin/inquiries/${r.id}`}
+                  class="inline"
+                >
+                  <input
+                    type="hidden"
+                    name="status"
+                    value={r.status === "done" ? "new" : "done"}
+                  />
+                  <button type="submit" class="text-text-secondary underline">
+                    {r.status === "done" ? "改回未處理" : "標記已處理"}
+                  </button>
+                </form>
+              </td>
+            </tr>
+          ))
+        }
+      </tbody>
+    </table>
+  </div>
+</AdminLayout>

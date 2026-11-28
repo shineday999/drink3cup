@@ -1,7 +1,7 @@
 import type { APIRoute } from "astro";
 import { getDB, genId } from "../../lib/db";
 import {
-  sendEmail,
+  sendEmailSafely,
   emailEnvFromContext,
   contactNotificationEmail,
 } from "../../lib/email";
@@ -43,15 +43,19 @@ export const POST: APIRoute = async (ctx) => {
     )
     .run();
 
-  // 寄通知給管理員(若有 RESEND_API_KEY)
+  // 寄通知給管理員。留言已先存進資料庫,所以寄信失敗也不會遺失(後台「留言」頁可看到)
   const template = contactNotificationEmail(name, email, message);
-  void sendEmail(emailEnvFromContext(), {
-    to: "weider@0061qwen.cc.cd",
-    subject: template.subject,
-    html: template.html,
-    text: template.text,
-    replyTo: email,
-  }).catch((e) => console.error("[contact] admin notification failed", e));
+  await sendEmailSafely(
+    emailEnvFromContext(),
+    {
+      to: "weider@0061qwen.cc.cd",
+      subject: template.subject,
+      html: template.html,
+      text: template.text,
+      replyTo: email,
+    },
+    "contact notification",
+  );
 
   return ctx.redirect("/contact?ok=1", 303);
 };

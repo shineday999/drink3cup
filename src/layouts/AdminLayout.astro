@@ -70,10 +70,15 @@ const NAV: NavGroup[] = [
     label: "內容",
     href: "/admin/posts",
     icon: "doc",
-    match: ["/admin/posts", "/admin/reviews"],
+    match: ["/admin/posts", "/admin/reviews", "/admin/inquiries"],
     children: [
       { label: "文章", href: "/admin/posts", match: ["/admin/posts"] },
       { label: "評論", href: "/admin/reviews", match: ["/admin/reviews"] },
+      {
+        label: "留言",
+        href: "/admin/inquiries",
+        match: ["/admin/inquiries"],
+      },
     ],
   },
   {

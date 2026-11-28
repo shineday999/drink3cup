@@ -36,10 +36,12 @@ export function safe(value: unknown): string {
   return String(value).replace(/[&<>"']/g, (ch) => HTML_ESCAPE_MAP[ch] ?? ch);
 }
 
+export type EmailResult = { ok: boolean; id?: string; error?: string };
+
 export async function sendEmail(
   env: EmailEnv,
   params: EmailParams,
-): Promise<{ ok: boolean; id?: string; error?: string }> {
+): Promise<EmailResult> {
   if (!env.CF_API_TOKEN || !env.CF_ACCOUNT_ID) {
     console.warn("[email] CF_API_TOKEN / CF_ACCOUNT_ID not set, skipping send");
     console.log(`[email] To: ${params.to}`);
@@ -71,6 +73,40 @@ export async function sendEmail(
   }
   const data = (await res.json()) as { result?: { id?: string } };
   return data.result?.id ? { ok: true, id: data.result.id } : { ok: true };
+}
+
+/**
+ * 寄信並「等到結果」(最多 timeoutMs 毫秒),任何錯誤都只記錄、絕不拋出:
+ * 寄信失敗不能讓表單或訂單失敗。
+ *
+ * 為什麼不用 `void sendEmail(...)` 背景送出:Cloudflare 在回應送出後,
+ * 沒有被等待的工作可能被中斷,信就寄不出去,而且完全沒有錯誤訊息。
+ */
+export async function sendEmailSafely(
+  env: EmailEnv,
+  params: EmailParams,
+  label: string,
+  timeoutMs = 8000,
+): Promise<EmailResult> {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  try {
+    const timeout = new Promise<EmailResult>((resolve) => {
+      timer = setTimeout(
+        () => resolve({ ok: false, error: "timeout" }),
+        timeoutMs,
+      );
+    });
+    const result = await Promise.race([sendEmail(env, params), timeout]);
+    if (!result.ok) {
+      console.error(`[email] ${label} 寄送失敗: ${result.error}`);
+    }
+    return result;
+  } catch (e) {
+    console.error(`[email] ${label} 發生例外`, e);
+    return { ok: false, error: "exception" };
+  } finally {
+    if (timer) clearTimeout(timer);
+  }
 }
 
 export function emailEnvFromContext(): EmailEnv {

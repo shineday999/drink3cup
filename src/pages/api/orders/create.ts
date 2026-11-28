@@ -2,7 +2,8 @@ import type { APIRoute } from "astro";
 import { getDB, genId } from "../../../lib/db";
 import { readCart } from "../../../lib/cart";
 import {
-  sendEmail,
+  safe,
+  sendEmailSafely,
   emailEnvFromContext,
   orderConfirmationEmail,
 } from "../../../lib/email";
@@ -95,23 +96,33 @@ export const POST: APIRoute = async (ctx) => {
   // 清空 cart cookie
   ctx.cookies.set("mycafe_cart", "", { path: "/", maxAge: 0 });
 
-  // 寄確認信(非阻塞失敗)
+  // 寄確認信給顧客、通知管理員。兩封一起等,寄信失敗不會讓訂單失敗(訂單已寫入資料庫)
   const itemsSummary = items.map((i) => `${i.slug} × ${i.qty}`).join(", ");
   const template = orderConfirmationEmail(orderId, name, itemsSummary);
-  void sendEmail(emailEnvFromContext(), {
-    to: email,
-    subject: template.subject,
-    html: template.html,
-    text: template.text,
-    replyTo: "weider@0061qwen.cc.cd",
-  }).catch((e) => console.error("[orders/create] email failed", e));
-
-  // 同時寄通知給管理員(若有 email setting)
-  void sendEmail(emailEnvFromContext(), {
-    to: "weider@0061qwen.cc.cd",
-    subject: `[New Order] ${orderId} from ${name}`,
-    html: `<p>${name} (${email}) placed a new order.</p><pre>${JSON.stringify(items, null, 2)}</pre><p>Notes: ${notes ?? "(none)"}</p>`,
-  }).catch(() => {});
+  await Promise.all([
+    sendEmailSafely(
+      emailEnvFromContext(),
+      {
+        to: email,
+        subject: template.subject,
+        html: template.html,
+        text: template.text,
+        replyTo: "weider@0061qwen.cc.cd",
+      },
+      "order confirmation",
+    ),
+    sendEmailSafely(
+      emailEnvFromContext(),
+      {
+        to: "weider@0061qwen.cc.cd",
+        subject: `[New Order] ${orderId} from ${name}`,
+        // 顧客輸入的內容一律先跳脫,避免 HTML 注入到管理員的信件
+        html: `<p>${safe(name)} (${safe(email)}) placed a new order.</p><pre>${safe(JSON.stringify(items, null, 2))}</pre><p>Notes: ${safe(notes ?? "(none)")}</p>`,
+        replyTo: email,
+      },
+      "order admin notification",
+    ),
+  ]);
 
   return ctx.redirect(`/checkout/success?id=${orderId}`, 303);
 };

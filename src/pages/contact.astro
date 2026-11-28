@@ -13,6 +13,9 @@ const messages = (Astro.locals.messages ?? {}) as Record<string, unknown>;
 const t = createT(messages);
 void locale;
 
+// 表單送出成功後會轉址到 /contact?ok=1,在這裡顯示確認訊息
+const sent = Astro.url.searchParams.get("ok") === "1";
+
 const breadcrumbItems = [
   { name: t("nav.home"), url: "/" },
   { name: t("nav.contact"), url: "/contact" },
@@ -52,6 +55,20 @@ const faqs = [
         </p>
       </header>
     </RevealOnScroll>
+
+    {
+      sent && (
+        <div
+          role="status"
+          class="mx-auto mb-8 max-w-2xl rounded-card border border-forest-700/30 bg-forest-100 p-6 text-center"
+        >
+          <p class="font-serif text-xl text-forest-700">
+            {t("contact.success_title")}
+          </p>
+          <p class="mt-2 text-text-secondary">{t("contact.success_intro")}</p>
+        </div>
+      )
+    }
 
     <RevealOnScroll>
       <form
